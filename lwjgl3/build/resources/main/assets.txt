@@ -1,1 +1,12 @@
 libgdx.png
+map/Layer_0000_9.png
+map/Layer_0000_9.tsx
+map/Layer_0001_8.png
+map/Layer_0002_7.png
+map/Layer_0002_7.tsx
+map/Layer_0003_6.png
+map/Layer_0003_6.tsx
+map/Layer_0005_5.png
+map/Layer_0005_5.tsx
+map/New4.tmx
+map/Test.tsx

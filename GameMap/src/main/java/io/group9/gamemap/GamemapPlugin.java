@@ -1,31 +1,27 @@
 package io.group9.gamemap;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import io.group9.plugins.RenderablePlugin;
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
+import io.group9.CoreResources;
+import io.group9.gamemap.system.GameMapSystem;
+import io.group9.plugins.ECSPlugin;
+import com.badlogic.ashley.core.Entity;
 
-public class GamemapPlugin implements RenderablePlugin {
+public class GamemapPlugin implements ECSPlugin {
 
-    private BitmapFont font;
+    private GameMapSystem gameMapSystem;
+
 
     @Override
-    public void onLoad() {
-        System.out.println("Gamemap plugin loaded!");
-        // Initialize resources for rendering
-        font = new BitmapFont(); // Using the default font
+    public void registerSystems(Engine engine) {
+        System.out.println("Registering GameMap systems...");
+
     }
 
     @Override
-    public void render(SpriteBatch batch) {
-        // Draw a simple message on screen
-        font.draw(batch, "Gamemap Plugin Active!", 10, 400);
+    public void createEntities(Engine engine) {
+        System.out.println("Creating GameMap entity...");
+
     }
 
-    @Override
-    public void onUnload() {
-        System.out.println("Gamemap plugin unloaded!");
-        if (font != null) {
-            font.dispose();
-        }
-    }
 }
