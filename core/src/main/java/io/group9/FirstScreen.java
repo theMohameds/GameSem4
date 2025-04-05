@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import io.group9.plugins.ECSPlugin;
+import plugins.ECSPlugin;
+
 
 import java.io.File;
 import java.net.URL;

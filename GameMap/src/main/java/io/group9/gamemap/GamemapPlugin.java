@@ -1,11 +1,8 @@
 package io.group9.gamemap;
 
-import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
-import io.group9.CoreResources;
 import io.group9.gamemap.system.GameMapSystem;
-import io.group9.plugins.ECSPlugin;
-import com.badlogic.ashley.core.Entity;
+import plugins.ECSPlugin;
 
 public class GamemapPlugin implements ECSPlugin {
 

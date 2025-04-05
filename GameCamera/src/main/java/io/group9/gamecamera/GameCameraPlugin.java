@@ -1,7 +1,8 @@
 package io.group9.gamecamera;
 
 import com.badlogic.ashley.core.Engine;
-import io.group9.plugins.ECSPlugin;
+import plugins.ECSPlugin;
+
 
 public class GameCameraPlugin implements ECSPlugin {
 
