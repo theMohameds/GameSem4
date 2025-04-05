@@ -14,25 +14,34 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
 
 public class FirstScreen implements Screen {
-    private Box2DDebugRenderer debugRenderer;
     private World world;
     private Engine engine;
+    private Box2DDebugRenderer debugRenderer;
     private final File pluginsDir = new File(System.getProperty("user.dir"), "mods");
 
 
     @Override
     public void show() {
         world = new World(new Vector2(0, -10), true);
+        CoreResources.setWorld(world);
         engine = new Engine();
         loadPluginsFromMods(); // Load all JARs into a single class loader
+        debugRenderer = new Box2DDebugRenderer();
 
         ServiceLoader<ECSPlugin> serviceLoader = loadPluginsFromClasspath();
-
+        List<ECSPlugin> plugins = new ArrayList<>();
         for (ECSPlugin plugin : serviceLoader) {
+            plugins.add(plugin);
+        }
+
+        plugins.sort(Comparator.comparingInt(ECSPlugin::getPriority));
+
+        for (ECSPlugin plugin : plugins) {
             plugin.registerSystems(engine);
             plugin.createEntities(engine);
             System.out.println("Loaded plugin: " + plugin.getClass().getName() + "\n");
@@ -44,6 +53,7 @@ public class FirstScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         world.step(1/60f * delta, 6, 2);
         engine.update(delta);
+        debugRenderer.render(world, CoreResources.getCamera().combined);
     }
 
     @Override

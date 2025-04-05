@@ -1,6 +1,7 @@
 package io.group9;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class CoreResources {
@@ -23,4 +24,14 @@ public class CoreResources {
     }
 
     public static Engine engine;
+
+    public static OrthographicCamera getCamera() {
+        return camera;
+    }
+
+    public static void setCamera(OrthographicCamera camera) {
+        CoreResources.camera = camera;
+    }
+
+    public static OrthographicCamera camera = new OrthographicCamera();
 }

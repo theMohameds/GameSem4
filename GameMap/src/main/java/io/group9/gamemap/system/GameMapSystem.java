@@ -37,32 +37,22 @@ public class GameMapSystem extends EntitySystem {
     private final List<Body> collisionBodies = new ArrayList<>();
 
 
-    public GameMapSystem(World world, String mapPath, int collisionLayerIndex) {
+    public GameMapSystem(World world, String mapPath, int collisionLayerIndex, OrthographicCamera camera) {
         this.world = world;
         this.camera = camera;
 
-        // Load the TiledMap
         tiledMap = new TmxMapLoader().load(mapPath);
-
-        // Create a renderer for drawing the map
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-
-        // Grab the collision layer (be sure the index is correct for your map)
         collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get(collisionLayerIndex);
-
-        // 1) Collect tile rectangles from the collision layer
         gatherCollisionTiles();
-
-        // 2) Merge those rectangles horizontally then vertically
         mergeRectangles();
-
-        // 3) Create Box2D bodies for each merged rectangle
         createCollisionBodies();
     }
-
-    /**
-     * Collects individual tile rectangles into rawRectangles.
-     */
+    @Override
+    public void update(float deltaTime) {
+        camera.update();
+        render();
+    }
     private void gatherCollisionTiles() {
         int width = collisionLayer.getWidth();
         int height = collisionLayer.getHeight();
@@ -85,8 +75,6 @@ public class GameMapSystem extends EntitySystem {
             }
         }
     }
-
-
     private void mergeRectangles() {
         // Step 1: Group by row and merge horizontally
         Map<Float, List<Rectangle>> rows = new HashMap<>();
@@ -150,8 +138,6 @@ public class GameMapSystem extends EntitySystem {
         // Not strictly necessary, but let's clear rawRectangles to avoid confusion
         rawRectangles.clear();
     }
-
-
     private void createCollisionBodies() {
         for (Rectangle rect : mergedRectangles) {
             // Box2D Body definition
@@ -182,15 +168,10 @@ public class GameMapSystem extends EntitySystem {
             collisionBodies.add(body);
         }
     }
-
     public void render() {
-        // Make sure your camera is updated externally
-        // (e.g., camera.update() before calling this)
-
         mapRenderer.setView(camera);
         mapRenderer.render();
     }
-
     public void dispose() {
         if (tiledMap != null) {
             tiledMap.dispose();
@@ -202,11 +183,4 @@ public class GameMapSystem extends EntitySystem {
         // Also be cautious about destroying bodies if you might need them later.
     }
 
-    public List<Body> getCollisionBodies() {
-        return collisionBodies;
-    }
-
-    public TiledMap getTiledMap() {
-        return tiledMap;
-    }
 }
