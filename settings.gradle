@@ -9,4 +9,5 @@ include 'lwjgl3', 'core'
 include 'GameMap'
 include 'GameCamera'
 include 'GameCamera'
+include 'Common'
 
