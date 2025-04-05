@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import io.group9.gamemap.system.GameMapSystem;
 import plugins.ECSPlugin;
 
-public class GamemapPlugin implements ECSPlugin {
+public class GameMapPlugin implements ECSPlugin {
 
     private GameMapSystem gameMapSystem;
 
