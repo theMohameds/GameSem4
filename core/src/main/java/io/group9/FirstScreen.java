@@ -11,6 +11,7 @@ import plugins.ECSPlugin;
 
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ public class FirstScreen implements Screen {
     private World world;
     private Engine engine;
     private Box2DDebugRenderer debugRenderer;
-    private final File pluginsDir = new File(System.getProperty("user.dir"), "mods");
-
+    File jarLocation = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+    File pluginsDir = jarLocation.getParentFile();
 
     @Override
     public void show() {
@@ -81,6 +82,7 @@ public class FirstScreen implements Screen {
         }
     }
 
+    public FirstScreen() throws URISyntaxException {}
     private void loadPluginsFromMods() {
         addJarsToClasspath(pluginsDir);
     }

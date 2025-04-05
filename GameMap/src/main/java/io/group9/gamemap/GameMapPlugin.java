@@ -15,7 +15,8 @@ public class GameMapPlugin implements ECSPlugin {
         System.out.println("Registering GameMap systems...");
 
 
-        gameMapSystem = new GameMapSystem(CoreResources.getWorld(), "map/New4.tmx", 2, CoreResources.getCamera());
+        gameMapSystem = new GameMapSystem(CoreResources.getWorld(), "map/New4.tmx",
+            2, CoreResources.getCamera());
         engine.addSystem(gameMapSystem);
     }
 
