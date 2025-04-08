@@ -1,56 +1,79 @@
 package io.group9.player.system;
 
-import com.badlogic.ashley.core.*;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
-import io.group9.player.component.PlayerComponent;
-import com.badlogic.gdx.physics.box2d.Body;
+import io.group9.player.components.PlayerComponent;
 
 public class PlayerSystem extends EntitySystem {
-    private static final float MAX_SPEED = 300.0f;
-    private static final float ACCELERATION = 900.0f;
-    private static final float JUMP_IMPULSE = 500.0f;
-
     private ImmutableArray<Entity> entities;
-    private ComponentMapper<PlayerComponent> pm = ComponentMapper.getFor(PlayerComponent.class);
+
+    .
+    private static final float FIRST_JUMP_VELOCITY = 15f;
+    private static final float DOUBLE_JUMP_VELOCITY = 15f;
+
+
+    private static final float UPWARD_GRAVITY_SCALE = 2.5f;
+    private static final float FALL_MULTIPLIER = 3f;
 
     @Override
-    public void addedToEngine(Engine engine) {
+    public void addedToEngine(com.badlogic.ashley.core.Engine engine) {
+        // Get all entities having PlayerComponent.
         entities = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
     }
 
     @Override
     public void update(float deltaTime) {
-        for (Entity entity : entities) {
-            PlayerComponent player = pm.get(entity);
-            Body body = player.body;
+        for (Entity e : entities) {
+            PlayerComponent pc = e.getComponent(PlayerComponent.class);
+            if (pc.body == null) continue;
 
-            if (body == null) continue;
-
-            Vector2 velocity = body.getLinearVelocity();
-            int horizontalInput = 0;
-            System.out.println(velocity);
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) horizontalInput -= 1;
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) horizontalInput += 1;
-
-            if (horizontalInput != 0) {
-                float mass = body.getMass();
-                body.applyForceToCenter(new Vector2(horizontalInput * mass * ACCELERATION, 0), true);
-            } else if (player.onGround) {
-                body.setLinearVelocity(0, velocity.y); // Stop horizontal movement
+            // Process horizontal movement.
+            float horizontal = 0f;
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                horizontal = -pc.speed;
+                pc.facingLeft = true;
+            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                horizontal = pc.speed;
+                pc.facingLeft = false;
             }
 
-            if (Math.abs(velocity.x) > MAX_SPEED) {
-                body.setLinearVelocity(Math.signum(velocity.x) * MAX_SPEED, velocity.y);
+            Vector2 vel = pc.body.getLinearVelocity();
+            pc.body.setLinearVelocity(horizontal, vel.y);
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.W) && pc.jumpsLeft > 0) {
+                if (pc.jumpsLeft == pc.maxJumps) {  // First jump.
+                    pc.body.setLinearVelocity(vel.x, FIRST_JUMP_VELOCITY);
+                    pc.state = PlayerComponent.State.JUMP;
+                } else {  // Double jump.
+                    pc.body.setLinearVelocity(vel.x, DOUBLE_JUMP_VELOCITY);
+                    pc.state = PlayerComponent.State.AIRSPIN;
+                }
+                pc.jumpsLeft--;
             }
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && player.jumpCount < 2) {
-                body.setLinearVelocity(velocity.x, 0);
-                body.applyLinearImpulse(new Vector2(0, JUMP_IMPULSE), body.getWorldCenter(), true);
-                player.jumpCount++;
-                player.onGround = false;
+            .
+            if (pc.jumpsLeft == pc.maxJumps) {
+                if (Math.abs(horizontal) > 0.1f)
+                    pc.state = PlayerComponent.State.RUN;
+                else
+                    pc.state = PlayerComponent.State.IDLE;
+            } else {  // In air.
+                if (pc.body.getLinearVelocity().y > 0.1f)
+                    pc.state = PlayerComponent.State.JUMP;
+                else
+                    pc.state = PlayerComponent.State.AIRSPIN;
+            }
+
+            if (pc.body.getLinearVelocity().y > 0) {
+                pc.body.setGravityScale(UPWARD_GRAVITY_SCALE);
+            } else {
+                pc.body.setGravityScale(FALL_MULTIPLIER);
             }
         }
     }

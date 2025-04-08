@@ -1,44 +1,32 @@
 package io.group9;
 
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 
-import java.util.List;
-
 public class CoreResources {
-    public static World getWorld() {
-        return world;
-    }
+    private static World world;
+    private static OrthographicCamera camera;
+    private static Body playerBody;
+    private static Entity playerEntity;
+    private static CoreContactDispatcher contactDispatcher;
 
-    public static void setWorld(World world) {
-        CoreResources.world = world;
-    }
+    // Pixels per meter conversion.
+    public static final float PPM = 16f;
 
-    public static World world;
+    public static void setWorld(World w) { world = w; }
+    public static World getWorld() { return world; }
 
-    public static Engine getEngine() {
-        return engine;
-    }
+    public static void setCamera(OrthographicCamera cam) { camera = cam; }
+    public static OrthographicCamera getCamera() { return camera; }
 
-    public static void setEngine(Engine engine) {
-        CoreResources.engine = engine;
-    }
+    public static void setPlayerBody(Body body) { playerBody = body; }
+    public static Body getPlayerBody() { return playerBody; }
 
-    public static Engine engine;
+    public static void setPlayerEntity(Entity entity) { playerEntity = entity; }
+    public static Entity getPlayerEntity() { return playerEntity; }
 
-    public static OrthographicCamera getCamera() {
-        return camera;
-    }
-
-    public static void setCamera(OrthographicCamera camera) {
-        CoreResources.camera = camera;
-    }
-
-    public static OrthographicCamera camera = new OrthographicCamera();
-
+    public static void setContactDispatcher(CoreContactDispatcher dispatcher) { contactDispatcher = dispatcher; }
+    public static CoreContactDispatcher getContactDispatcher() { return contactDispatcher; }
 }
-

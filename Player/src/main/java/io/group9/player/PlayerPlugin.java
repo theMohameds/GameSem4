@@ -1,23 +1,57 @@
 package io.group9.player;
 
 import com.badlogic.ashley.core.Engine;
-import io.group9.player.system.PlayerInputSystem;
-import io.group9.player.system.PlayerMovementSystem;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.physics.box2d.*;
+import io.group9.CoreResources;
+import io.group9.player.components.PlayerComponent;
+import io.group9.player.system.PlayerAnimationRenderer;
+import io.group9.player.system.PlayerSystem;
 import plugins.ECSPlugin;
 
 public class PlayerPlugin implements ECSPlugin {
-
     @Override
     public void registerSystems(Engine engine) {
-        System.out.println("Registering Player systems...");
-        engine.addSystem(new PlayerInputSystem());
-        engine.addSystem(new PlayerMovementSystem());
+        engine.addSystem(new PlayerSystem());
+        engine.addSystem(new PlayerAnimationRenderer());
+        CoreResources.getContactDispatcher().addReceiver(new PlayerContactReceiver());
     }
 
     @Override
     public void createEntities(Engine engine) {
-        System.out.println("Creating Player entity...");
-        // Optionally, create the player entity here if needed
+        Gdx.app.log("PlayerPlugin", "Creating Player Entity");
+        World world = CoreResources.getWorld();
+        BodyDef bd = new BodyDef();
+        bd.type = BodyDef.BodyType.DynamicBody;
+
+        bd.position.set(100 / CoreResources.PPM, 150 / CoreResources.PPM);
+        bd.fixedRotation = true;
+        Body body = world.createBody(bd);
+
+        body.setLinearDamping(0f);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(10 / CoreResources.PPM, 16 / CoreResources.PPM);
+        FixtureDef fd = new FixtureDef();
+        fd.shape = shape;
+        fd.density = 0.5f;
+        fd.friction = 0f;
+        fd.restitution = 0f;
+        body.createFixture(fd);
+        shape.dispose();
+
+        body.setUserData("player");
+
+        Entity playerEntity = new Entity();
+        PlayerComponent pc = new PlayerComponent();
+        pc.body = body;
+        pc.jumpsLeft = pc.maxJumps;
+        playerEntity.add(pc);
+        engine.addEntity(playerEntity);
+
+        CoreResources.setPlayerEntity(playerEntity);
+        CoreResources.setPlayerBody(body);
     }
 
     @Override
@@ -25,4 +59,5 @@ public class PlayerPlugin implements ECSPlugin {
         return 2;
     }
 }
+
 
