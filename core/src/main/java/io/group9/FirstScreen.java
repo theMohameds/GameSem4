@@ -28,7 +28,9 @@ public class FirstScreen implements Screen {
 
     @Override
     public void show() {
-        world = new World(new Vector2(0, -10), true);
+
+
+        world = new World(new Vector2(0, -50f), true); // Realistic gravity
         CoreResources.setWorld(world);
         engine = new Engine();
         loadPluginsFromMods(); // Load all JARs into a single class loader
@@ -49,10 +51,20 @@ public class FirstScreen implements Screen {
         }
     }
 
+    float accumulator = 0;
+    float fixedTimeStep = 1/60f; // 60 FPS physics
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        world.step(1/60f * delta, 6, 2);
+
+        // Accumulate elapsed time and step physics
+        accumulator += delta;
+        while (accumulator >= fixedTimeStep) {
+            world.step(fixedTimeStep, 6, 2); // Update Box2D with fixed step
+            accumulator -= fixedTimeStep;
+        }
+
         engine.update(delta);
         debugRenderer.render(world, CoreResources.getCamera().combined);
     }

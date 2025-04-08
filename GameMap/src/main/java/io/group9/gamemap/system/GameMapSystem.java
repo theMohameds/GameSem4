@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
+import io.group9.CoreResources;
 
 
 import java.util.*;
@@ -159,7 +160,7 @@ public class GameMapSystem extends EntitySystem {
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.shape = shape;
             fixtureDef.density = 0f;    // Static bodies do not need density
-            fixtureDef.friction = 0.8f; // Example friction
+            fixtureDef.friction = 0.2f; // Example friction
             fixtureDef.restitution = 0f; // Example restitution (bounciness)
 
             body.createFixture(fixtureDef);
