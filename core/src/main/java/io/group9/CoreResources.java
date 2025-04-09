@@ -1,16 +1,30 @@
 package io.group9;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class CoreResources {
+
+
+   ;
+    private static float elapsedTime = 0f;
+
+
+    public static void updateTime(float delta) {
+        elapsedTime += delta;
+    }
     private static World world;
     private static OrthographicCamera camera;
     private static Body playerBody;
     private static Entity playerEntity;
     private static CoreContactDispatcher contactDispatcher;
+
+    public static float getCurrentTime() {
+        return Gdx.graphics.getFrameId(); // Or use a custom timer
+    }
 
     // Pixels per meter conversion.
     public static final float PPM = 16f;
