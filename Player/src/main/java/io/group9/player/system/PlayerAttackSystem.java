@@ -61,11 +61,13 @@ public class PlayerAttackSystem extends EntitySystem {
     // Create an attack sensor fixture on the player's body.
     private void createAttackSensor(PlayerComponent pc) {
         // Define sensor dimensions (world units).
-        float sensorWidth = 8f / CoreResources.PPM;  // Example: 8 pixels.
-        float sensorHeight = 15f / CoreResources.PPM;  // Example: 15 pixels.
+        float sensorWidth = 16f / CoreResources.PPM;  // Example: 8 pixels.
+        float sensorHeight = 30f / CoreResources.PPM;  // Example: 15 pixels.
         // Calculate offset from player's center.
-        float offsetX = pc.facingLeft ? -((20f / CoreResources.PPM) / 2 + sensorWidth / 2)
+        float offsetX = pc.facingLeft
+            ? -((20f / CoreResources.PPM) / 2 + sensorWidth / 2)
             : ((20f / CoreResources.PPM) / 2 + sensorWidth / 2);
+
         float offsetY = 0f;
         PolygonShape sensorShape = new PolygonShape();
         sensorShape.setAsBox(sensorWidth / 2, sensorHeight / 2, new com.badlogic.gdx.math.Vector2(offsetX, offsetY), 0);
@@ -75,7 +77,7 @@ public class PlayerAttackSystem extends EntitySystem {
         sensorFD.isSensor = true;
         // Set collision filtering: category = ATTACK, mask = ENEMY.
         sensorFD.filter.categoryBits = CollisionCategories.ATTACK;
-        sensorFD.filter.maskBits = CollisionCategories.ENEMY;
+        sensorFD.filter.maskBits = CollisionCategories.ENEMY_HURTBOX;
 
         Fixture sensorFixture = pc.body.createFixture(sensorFD);
         // Tag this sensor fixture for contact processing.

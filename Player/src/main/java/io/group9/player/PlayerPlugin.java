@@ -32,6 +32,7 @@ public class PlayerPlugin implements ECSPlugin {
         bd.position.set(100 / CoreResources.PPM, 150 / CoreResources.PPM);
         bd.fixedRotation = true;
         Body body = world.createBody(bd);
+        body.setSleepingAllowed(false);
 
         body.setLinearDamping(0f);
 
