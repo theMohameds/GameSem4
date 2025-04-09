@@ -27,11 +27,16 @@ public class PlayerAnimationRenderer extends EntitySystem {
 
         // Load animations from assets.
 
-        animations.put(PlayerComponent.State.IDLE, loadAnimation("player/Player_idle.png", 0.1f, 10));
-        animations.put(PlayerComponent.State.RUN, loadAnimation("player/Player_run.png", 0.092f, 8));
-        animations.put(PlayerComponent.State.JUMP, loadAnimation("player/Player_jump.png", 0.088f, 6));
-        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("player/Player_airspin.png", 0.099f, 6));
+        animations.put(PlayerComponent.State.IDLE, loadAnimation("player/Player_idle.png", 0.066f, 10));
+        animations.put(PlayerComponent.State.RUN, loadAnimation("player/Player_run.png", 0.066f, 8));
+        animations.put(PlayerComponent.State.JUMP, loadAnimation("player/Player_jump.png", 0.066f, 6));
+        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("player/Player_airspin.png", 0.066f, 6));
+        animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("player/Punch_cross.png", 0.066f, 7));
+        animations.put(PlayerComponent.State.WALL_LAND, loadAnimation("player/Player_landWall.png", 0.066f, 6));
+        animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("player/Punch_jab.png", 0.066f, 10));
+
     }
+
 
     private Animation<TextureRegion> loadAnimation(String filePath, float frameDuration, int numFrames) {
         Texture texture = new Texture(Gdx.files.internal(filePath));
@@ -77,8 +82,8 @@ public class PlayerAnimationRenderer extends EntitySystem {
             }
             TextureRegion frame = currentAnim.getKeyFrame(stateTime);
 
-             float targetWidth = 32f / CoreResources.PPM;
-             float targetHeight = 40f / CoreResources.PPM;
+             float targetWidth = 48f / CoreResources.PPM;
+             float targetHeight = 48f / CoreResources.PPM;
 
             if (pc.facingLeft) {
                 batch.draw(frame, pos.x + targetWidth / 2, pos.y - targetHeight / 2, -targetWidth, targetHeight);
@@ -88,6 +93,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
         }
         batch.end();
     }
+    
 
     @Override
     public void removedFromEngine(com.badlogic.ashley.core.Engine engine) {

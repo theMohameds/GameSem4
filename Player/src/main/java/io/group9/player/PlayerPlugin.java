@@ -6,16 +6,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
-import io.group9.player.system.PlayerAnimationRenderer;
-import io.group9.player.system.PlayerSystem;
+import io.group9.player.system.*;
 import plugins.ECSPlugin;
 
 public class PlayerPlugin implements ECSPlugin {
     @Override
     public void registerSystems(Engine engine) {
-        engine.addSystem(new PlayerSystem());
         engine.addSystem(new PlayerAnimationRenderer());
+        engine.addSystem(new PlayerAttackSystem());
+        engine.addSystem(new PlayerInputSystem());
+        engine.addSystem(new PlayerStateSystem());
+
         CoreResources.getContactDispatcher().addReceiver(new PlayerContactReceiver());
+        CoreResources.getContactDispatcher().addReceiver(new AttackContactReceiver());
+
     }
 
     @Override
