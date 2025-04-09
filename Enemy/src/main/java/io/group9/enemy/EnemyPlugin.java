@@ -58,7 +58,7 @@ public class EnemyPlugin implements ECSPlugin {
         Entity enemy = new Entity();
         EnemyComponent enemyComponent = new EnemyComponent();
         enemyComponent.body = body;
-        body.setUserData(enemyComponent); // Enable Damageable interface use
+        body.setUserData(enemyComponent);
 
         enemy.add(enemyComponent);
         engine.addEntity(enemy);

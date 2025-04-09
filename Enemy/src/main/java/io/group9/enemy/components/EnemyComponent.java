@@ -7,7 +7,7 @@ public class EnemyComponent implements Component {
     public Body body;
     public boolean facingLeft = true;
 
-    public float hurtDuration = 0.264f; // 4 * 0.066f
+    public float hurtDuration = 0.264f;
     public float hurtTimer = 0f;
     public boolean isHurt = false;
 
