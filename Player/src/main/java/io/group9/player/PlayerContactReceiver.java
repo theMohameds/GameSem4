@@ -14,8 +14,32 @@ public class PlayerContactReceiver implements ContactReceiver {
             ("ground".equals(dataA) && "player".equals(dataB))) {
             if (CoreResources.getPlayerEntity() != null) {
                 PlayerComponent pc = CoreResources.getPlayerEntity().getComponent(PlayerComponent.class);
-                pc.jumpsLeft = pc.maxJumps;
-                pc.state = PlayerComponent.State.IDLE;
+                if(!pc.isWallBound) {
+                    pc.jumpsLeft = pc.maxJumps;
+                    pc.state = PlayerComponent.State.IDLE;
+                }
+            }
+        }
+
+        // Check for wall contact
+        if(("player".equals(dataA) && "wall".equals(dataB)) || ("wall".equals(dataA) && "player".equals(dataB))) {
+
+            if (CoreResources.getPlayerEntity() != null) {
+                PlayerComponent pc = CoreResources.getPlayerEntity().getComponent(PlayerComponent.class);
+
+                if(pc.jumpsLeft < pc.maxJumps && !pc.isWallBound) {
+                    pc.state = PlayerComponent.State.WALL_LAND;
+                    pc.isWallBound = true;
+                    pc.wallBoundTimer = pc.wallBoundDuration;
+
+                    pc.jumpsLeft = pc.maxJumps; // Reset jumps on wall contact
+
+                    //Stop vertical movement
+                    if(pc.body != null){
+                        pc.body.setLinearVelocity(pc.body.getLinearVelocity().x, 0);
+                        pc.body.setGravityScale(0);
+                    }
+                }
             }
         }
     }

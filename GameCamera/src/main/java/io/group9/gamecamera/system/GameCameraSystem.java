@@ -17,7 +17,7 @@ public class GameCameraSystem extends EntitySystem {
     }
 
     public OrthographicCamera getCamera() { return camera; }
-    public void setCameraPos(float x, float y) { camera.position.set(x, y, 0); camera.update(); }
+    public void setCameraPos(float x, float y) { camera.position.set(x, y+ 6.25f, 0); camera.update(); }
 
     @Override
     public void update(float deltaTime) {

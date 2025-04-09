@@ -12,7 +12,24 @@ public class PlayerComponent implements Component {
 
     public Body body;
 
-    public enum State { IDLE, RUN, JUMP, AIRSPIN }
+    // Walls
+    public boolean isWallBound = false;
+    public float wallBoundDuration = 3.0f; // Duration in seconds
+    public float wallBoundTimer = 0f;
+
+    public enum State {
+        IDLE,
+        RUN,
+        JUMP,
+        AIRSPIN,
+        LIGHT_ATTACK,
+        HEAVY_ATTACK,
+        DEAD,
+        DASH,
+        BLOCK,
+        WALL_LAND
+    }
+
     public State state = State.IDLE;
 }
 

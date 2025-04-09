@@ -32,7 +32,7 @@ public class PlayerPlugin implements ECSPlugin {
         body.setLinearDamping(0f);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(10 / CoreResources.PPM, 16 / CoreResources.PPM);
+        shape.setAsBox(8 / CoreResources.PPM, 15 / CoreResources.PPM);
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
         fd.density = 0.5f;
