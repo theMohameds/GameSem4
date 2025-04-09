@@ -30,24 +30,22 @@ public class FirstScreen implements Screen {
 
     @Override
     public void show() {
-        engine = new PooledEngine();
-        Gdx.app.log("FirstScreen", "Initializing world, engine, and plugins...");
-        // Create Box2D world (gravity in world units)
-
+        engine = new PooledEngine(); // Use this everywhere
         world = new World(new Vector2(0, -10f), true);
         CoreResources.setWorld(world);
 
+        // Initialize camera here (as previously suggested)
         OrthographicCamera camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth() / CoreResources.PPM, Gdx.graphics.getHeight() / CoreResources.PPM);
+        camera.setToOrtho(false, Gdx.graphics.getWidth() / CoreResources.PPM,
+            Gdx.graphics.getHeight() / CoreResources.PPM);
         CoreResources.setCamera(camera);
-
 
         // Create and set contact dispatcher.
         CoreContactDispatcher dispatcher = new CoreContactDispatcher();
         world.setContactListener(dispatcher);
         CoreResources.setContactDispatcher(dispatcher);
 
-        engine = new Engine();
+        //engine = new Engine();
         loadPluginsFromMods();
         debugRenderer = new Box2DDebugRenderer();
 
