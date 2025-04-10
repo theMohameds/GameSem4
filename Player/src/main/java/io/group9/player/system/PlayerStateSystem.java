@@ -27,7 +27,10 @@ public class PlayerStateSystem extends EntitySystem {
 
             // Update state if not attacking.
             if (!pc.attacking) {
-                if (pc.jumpsLeft == pc.maxJumps) {
+                if(pc.wallHanging){
+                    pc.state = PlayerComponent.State.LAND_WALL;
+                }
+                else if (pc.jumpsLeft == pc.maxJumps) {
                     // On the ground.
                     if (Math.abs(pc.body.getLinearVelocity().x) > 0.1f)
                         pc.state = PlayerComponent.State.RUN;
