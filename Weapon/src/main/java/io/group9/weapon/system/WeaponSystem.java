@@ -18,7 +18,18 @@ public class WeaponSystem extends EntitySystem {
     private float spawnTimer = 0f;
     private float spawnInterval = 8f;
 
+
     @Override
+    public void update(float deltaTime) {
+        // Keep only the despawning logic
+        for (Entity entity : getEngine().getEntitiesFor(Family.all(WeaponComponent.class).get())) {
+            WeaponComponent wc = entity.getComponent(WeaponComponent.class);
+            if (wc.isActive && (CoreResources.getCurrentTime() - wc.spawnTime) >= wc.lifeTime) {
+                despawnWeapon(entity);
+            }
+        }
+    }
+   /* @Override
     public void update(float deltaTime) {
         spawnTimer += deltaTime;
         if (spawnTimer >= spawnInterval) {
@@ -78,10 +89,11 @@ public class WeaponSystem extends EntitySystem {
             camera.position.x - camera.viewportWidth/2 + padding,
             camera.position.x + camera.viewportWidth/2 - padding
         );
-        float y = camera.viewportHeight/2 - padding;
+        // Spawn 150 units above the player's current position (camera's y-coordinate)
+        float y = camera.position.y + 250;
         return new Vector2(x, y);
     }
-
+*/
     private void despawnWeapon(Entity weapon) {
         WeaponComponent wc = weapon.getComponent(WeaponComponent.class);
         if (wc != null && wc.body != null) {
