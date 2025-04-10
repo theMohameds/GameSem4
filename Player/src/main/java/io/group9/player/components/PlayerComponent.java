@@ -15,6 +15,14 @@ public class PlayerComponent implements Component {
     public float attackTimer = 0f;
     public boolean attackRequested = false;
 
+
+    public boolean isBlocking=false;
+    public float blockDuration = 1.5f;
+    public float blockTimer = 0f;
+
+
+
+
     public boolean facingLeft = false;
 
     public Body body;

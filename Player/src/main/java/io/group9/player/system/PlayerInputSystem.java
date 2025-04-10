@@ -53,6 +53,17 @@ public class PlayerInputSystem extends EntitySystem {
             // If attack key is pressed and not already attacking, set attackRequested flag.
             if (Gdx.input.isKeyJustPressed(Input.Keys.J) && !pc.attacking) {
                 pc.attackRequested = true;
+
+                pc.isBlocking = Gdx.input.isKeyPressed(Input.Keys.L); // Hold L nede for at blokere
+
+                if (pc.isBlocking) {
+                    pc.body.setLinearVelocity(0, pc.body.getLinearVelocity().y);
+                }
+            }
+            if(Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+                pc.attacking = true;
+                pc.state = PlayerComponent.State.BLOCK;
+
             }
         }
     }

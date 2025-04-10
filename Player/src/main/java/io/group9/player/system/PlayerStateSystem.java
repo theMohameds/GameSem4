@@ -25,6 +25,14 @@ public class PlayerStateSystem extends EntitySystem {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
 
+
+            // === KORRIGERET: Blokeringslogik placeret INDE i løkken === //
+            if (pc.isBlocking && pc.jumpsLeft == pc.maxJumps) {
+                pc.state = PlayerComponent.State.BLOCK;
+                pc.blockTimer = pc.blockDuration;
+                continue; // Spring over andre tilstandsændringer
+            }
+
             // Update state if not attacking.
             if (!pc.attacking) {
                 if (pc.jumpsLeft == pc.maxJumps) {
@@ -48,5 +56,6 @@ public class PlayerStateSystem extends EntitySystem {
             else
                 pc.body.setGravityScale(FALL_MULTIPLIER);
         }
+
     }
 }

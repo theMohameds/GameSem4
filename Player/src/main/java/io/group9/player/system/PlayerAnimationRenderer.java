@@ -34,6 +34,8 @@ public class PlayerAnimationRenderer extends EntitySystem {
         animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("player/Punch_cross.png", 0.066f, 7));
         animations.put(PlayerComponent.State.WALL_LAND, loadAnimation("player/Player_landWall.png", 0.066f, 6));
         animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("player/Punch_jab.png", 0.066f, 10));
+        animations.put(PlayerComponent.State.BLOCK,loadAnimation("player/push_pull.png", 0.066f, 8)
+        );
 
     }
 
@@ -93,7 +95,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
         }
         batch.end();
     }
-    
+
 
     @Override
     public void removedFromEngine(com.badlogic.ashley.core.Engine engine) {

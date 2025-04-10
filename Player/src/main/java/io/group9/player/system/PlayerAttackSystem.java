@@ -52,7 +52,14 @@ public class PlayerAttackSystem extends EntitySystem {
                             pc.state = PlayerComponent.State.JUMP;
                         else
                             pc.state = PlayerComponent.State.AIRSPIN;
+
+
                     }
+                    if (pc.isBlocking) {
+                        pc.attackRequested = false;
+                        return;
+                    }
+
                 }
             }
         }
