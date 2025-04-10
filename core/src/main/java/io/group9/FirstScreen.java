@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import plugins.ECSPlugin;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -20,9 +21,10 @@ public class FirstScreen implements Screen {
     private World world;
     private Engine engine;
     private Box2DDebugRenderer debugRenderer;
-    private File pluginsDir = new File("mods");
+    private File jarLocation = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+    private File pluginsDir = jarLocation.getParentFile();
 
-    public FirstScreen() {
+    public FirstScreen() throws URISyntaxException {
         // Initialization in show().
     }
 
