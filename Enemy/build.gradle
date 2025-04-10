@@ -1,25 +1,25 @@
 apply plugin: 'java-library'
 
 dependencies {
-    implementation project(":Common")
-    implementation project(":core")
+  implementation project(":Common")
+  implementation project(":core")
 
-    api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-    api "com.badlogicgames.box2dlights:box2dlights:$box2dlightsVersion"
-    api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
-    api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-    api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.badlogicgames.ashley:ashley:$ashleyVersion"
+  api "com.badlogicgames.box2dlights:box2dlights:$box2dlightsVersion"
+  api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
+  api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+  api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
 
-    if(enableGraalNative == 'true') {
-        implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
-    }
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
 }
 
 // Ensure JARs are built into mods/ directory
 jar {
-    archiveFileName.set("${project.name}.jar")  // Ensures correct naming
-    destinationDirectory.set(file("$rootDir/mods"))
+  archiveFileName.set("${project.name}.jar")  // Ensures correct naming
+  destinationDirectory.set(file("$rootDir/mods"))
 }

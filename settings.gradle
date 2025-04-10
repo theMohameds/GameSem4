@@ -12,4 +12,5 @@ include 'GameCamera'
 include 'Common'
 include 'Player'
 include 'CollisionHandling'
+include 'Enemy'
 
