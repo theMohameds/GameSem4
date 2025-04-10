@@ -33,6 +33,7 @@ public class WeaponPlugin implements ECSPlugin {
 
     @Override
     public void createEntities(Engine engine) {
+
         Gdx.app.log("WeaponPlugin", "createEntities() called (no initial weapons)");
     }
 

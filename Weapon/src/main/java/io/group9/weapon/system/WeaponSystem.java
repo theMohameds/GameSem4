@@ -10,13 +10,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.group9.CoreResources;
 import io.group9.common.WeaponType;
-import io.group9.weapon.components.WeaponComponent;
 import components.CollisionCategories;
 import com.badlogic.ashley.core.Family;
+import io.group9.weapon.components.WeaponComponent;
 
 public class WeaponSystem extends EntitySystem {
     private float spawnTimer = 0f;
-    private float spawnInterval = 5f;
+    private float spawnInterval = 8f;
 
     @Override
     public void update(float deltaTime) {
@@ -43,19 +43,23 @@ public class WeaponSystem extends EntitySystem {
         wc.spawnTime = CoreResources.getCurrentTime();
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody; // Consider DynamicBody if needed
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.linearDamping = 5f;
         Vector2 position = getRandomSpawnPosition();
         bodyDef.position.set(position);
 
         Body body = CoreResources.getWorld().createBody(bodyDef);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(4f / CoreResources.PPM, 4f / CoreResources.PPM);
+
+        CircleShape shape = new CircleShape();
+        shape.setRadius(4f / CoreResources.PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
+        fixtureDef.density = 0.001f;
+        fixtureDef.restitution = 0.1f;
         fixtureDef.isSensor = true;
         fixtureDef.filter.categoryBits = CollisionCategories.WEAPON;
-        fixtureDef.filter.maskBits = CollisionCategories.PLAYER;
+        fixtureDef.filter.maskBits = (short) (CollisionCategories.PLAYER | CollisionCategories.GROUND);
 
         body.createFixture(fixtureDef);
         shape.dispose();
@@ -69,16 +73,20 @@ public class WeaponSystem extends EntitySystem {
 
     private Vector2 getRandomSpawnPosition() {
         OrthographicCamera camera = CoreResources.getCamera();
-        float viewportWidth = camera.viewportWidth;
-        float viewportHeight = camera.viewportHeight;
-        float x = MathUtils.random(camera.position.x - viewportWidth / 2 + 1, camera.position.x + viewportWidth / 2 - 1);
-        float y = 1f; // Adjust based on your ground level
+        float padding = 2f;
+        float x = MathUtils.random(
+            camera.position.x - camera.viewportWidth/2 + padding,
+            camera.position.x + camera.viewportWidth/2 - padding
+        );
+        float y = camera.viewportHeight/2 - padding;
         return new Vector2(x, y);
     }
 
     private void despawnWeapon(Entity weapon) {
         WeaponComponent wc = weapon.getComponent(WeaponComponent.class);
-        CoreResources.getWorld().destroyBody(wc.body);
+        if (wc != null && wc.body != null) {
+            CoreResources.getWorld().destroyBody(wc.body);
+        }
         getEngine().removeEntity(weapon);
     }
 }

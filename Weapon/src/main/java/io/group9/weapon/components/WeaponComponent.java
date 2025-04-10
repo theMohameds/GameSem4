@@ -9,6 +9,7 @@ public class WeaponComponent implements Component {
     public WeaponType type;
     public boolean isActive = true;
     public float spawnTime;
-    public float lifeTime = 10f;
+    public float lifeTime = 30f;
     public Body body;
+
 }

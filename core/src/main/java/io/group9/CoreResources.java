@@ -23,7 +23,7 @@ public class CoreResources {
     private static CoreContactDispatcher contactDispatcher;
 
     public static float getCurrentTime() {
-        return Gdx.graphics.getFrameId(); // Or use a custom timer
+        return elapsedTime; // Or use a custom timer
     }
 
     // Pixels per meter conversion.
