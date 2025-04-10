@@ -37,8 +37,12 @@ public class PlayerContactReceiver implements ContactReceiver {
                 }
                 else if (Math.abs(normal.x) > Math.abs(normal.y)) {
                     if (normal.x > 0) {
-                        pc.facingLeft = true;
-                    } else if (normal.x < 0) {
+                        // Wall on left side of player
+                        pc.wallOnLeft = true;
+                        pc.facingLeft = true; // So character faces left (assuming you want them to face outward)
+                    } else {
+                        // Wall on right side of player
+                        pc.wallOnLeft = false;
                         pc.facingLeft = false;
                     }
 
