@@ -2,109 +2,64 @@ package io.group9.weapon.system;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.World;
 import io.group9.CoreResources;
-import io.group9.common.WeaponType;
-import components.CollisionCategories;
 import io.group9.weapon.components.WeaponComponent;
+import components.CollisionCategories;
 
 public class WeaponSystem extends EntitySystem {
-    private float spawnTimer = 0f;
-    private float spawnInterval = 8f;  // Spawn a new weapon every 8 seconds
+    // Minimum time (in seconds) for a weapon to be allowed to fall.
+    private static final float MIN_FALL_TIME = 7f;
+    // Raycast distance in world units (adjust if needed)
+    private static final float RAYCAST_DISTANCE = 10f / CoreResources.PPM;
+    // Threshold for vertical velocity to consider the weapon has landed.
+    private static final float LANDING_VELOCITY_THRESHOLD = 0.1f;
 
     @Override
     public void update(float deltaTime) {
-        spawnTimer += deltaTime;
-        if (spawnTimer >= spawnInterval) {
-            spawnTimer -= spawnInterval;
-            spawnWeapon();
-        }
-
-        // Loop through all weapon entities and check if they should be despawned
+        // Loop through all weapon entities.
         for (Entity entity : getEngine().getEntitiesFor(Family.all(WeaponComponent.class).get())) {
             WeaponComponent wc = entity.getComponent(WeaponComponent.class);
-            if (wc.isActive && (CoreResources.getCurrentTime() - wc.spawnTime) >= wc.lifeTime) {
+            float age = CoreResources.getCurrentTime() - wc.spawnTime;
+
+            // Only check for ground after the weapon has fallen for at least MIN_FALL_TIME seconds.
+            if (age < MIN_FALL_TIME) {
+                continue;
+            }
+
+            // If the weapon's vertical speed is low, assume it's landed.
+            float vy = wc.body.getLinearVelocity().y;
+            if (Math.abs(vy) < LANDING_VELOCITY_THRESHOLD) {
+                // Weapon is at rest (landed); do not remove it.
+                continue;
+            }
+
+            // Otherwise, perform a raycast from just below the weapon downwards to detect ground.
+            final boolean[] groundFound = { false };
+            Vector2 weaponPos = wc.body.getPosition();
+            // Start a little below the center (assuming the weapon's radius is 4/PPM)
+            Vector2 rayStart = new Vector2(weaponPos.x, weaponPos.y - (4f / CoreResources.PPM));
+            Vector2 rayEnd = new Vector2(weaponPos.x, weaponPos.y - RAYCAST_DISTANCE);
+
+            World world = CoreResources.getWorld();
+            world.rayCast((fixture, point, normal, fraction) -> {
+                if ((fixture.getFilterData().categoryBits & CollisionCategories.GROUND) != 0) {
+                    groundFound[0] = true;
+                    // Terminate the raycast as soon as ground is detected.
+                    return 0f;
+                }
+                return 1f;
+            }, rayStart, rayEnd);
+
+            // If no ground is detected below a falling weapon, despawn it.
+            if (!groundFound[0]) {
+                Gdx.app.log("WeaponSystem", "No ground found for weapon at x: " + weaponPos.x);
                 despawnWeapon(entity);
             }
         }
-    }
-
-    private void spawnWeapon() {
-        PooledEngine engine = (PooledEngine) getEngine();
-        Entity weapon = engine.createEntity();
-
-        WeaponComponent wc = engine.createComponent(WeaponComponent.class);
-        // Randomly choose a weapon type: SWORD or KNIFE
-        wc.type = MathUtils.randomBoolean() ? WeaponType.SWORD : WeaponType.KNIFE;
-        wc.spawnTime = CoreResources.getCurrentTime();
-        wc.isActive = true;
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.linearDamping = 5f;
-        Vector2 position = getRandomSpawnPosition();
-        bodyDef.position.set(position);
-        bodyDef.fixedRotation = true;
-
-        Body body = CoreResources.getWorld().createBody(bodyDef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(4f / CoreResources.PPM);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 0.001f;
-        fixtureDef.restitution = 0.1f;
-        fixtureDef.isSensor = true;
-        fixtureDef.filter.categoryBits = CollisionCategories.WEAPON;
-        fixtureDef.filter.maskBits = (short) (CollisionCategories.PLAYER | CollisionCategories.GROUND);
-
-        body.createFixture(fixtureDef);
-        shape.dispose();
-
-        body.setUserData(weapon);
-        wc.body = body;
-
-        weapon.add(wc);
-        engine.addEntity(weapon);
-    }
-
-    private Vector2 getRandomSpawnPosition() {
-        OrthographicCamera camera = CoreResources.getCamera();
-        float padding = 2f;
-        float x = MathUtils.random(
-            camera.position.x - camera.viewportWidth / 2 + padding,
-            camera.position.x + camera.viewportWidth / 2 - padding
-        );
-
-        // Use a ray cast to determine the ground’s highest Y value at x
-        World world = CoreResources.getWorld();
-        float radius = 4f / CoreResources.PPM;
-        float cameraTop = camera.position.y + camera.viewportHeight / 2;
-
-        final float[] highestY = { -Float.MAX_VALUE };
-        Vector2 rayStart = new Vector2(x, cameraTop + 500f);  // Start well above the camera view
-        Vector2 rayEnd = new Vector2(x, cameraTop - camera.viewportHeight - 500f);  // Extend well below
-
-        world.rayCast((fixture, point, normal, fraction) -> {
-            if ((fixture.getFilterData().categoryBits & CollisionCategories.GROUND) != 0) {
-                highestY[0] = Math.max(highestY[0], point.y);
-            }
-            return 1; // Continue the ray cast
-        }, rayStart, rayEnd);
-
-        if (highestY[0] == -Float.MAX_VALUE) {
-            Gdx.app.error("WeaponSystem", "No ground found at x: " + x + " with camera y: " + camera.position.y);
-            return new Vector2(x, cameraTop + 50f);  // Fall back to a position near the top
-        }
-
-        return new Vector2(x, highestY[0] + radius);
     }
 
     private void despawnWeapon(Entity weapon) {
@@ -115,4 +70,5 @@ public class WeaponSystem extends EntitySystem {
         getEngine().removeEntity(weapon);
     }
 }
+
 

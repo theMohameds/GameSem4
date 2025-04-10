@@ -52,8 +52,8 @@ public class WeaponPlugin implements ECSPlugin {
     }
 
     // Spawns a weapon with two fixtures:
-    // 1. A sensor fixture for player pickup (only collides with the player).
-    // 2. A physical fixture for ground collision (uses default filtering so it collides like the player).
+    // 1. A sensor fixture for player pickup (colliding only with the player).
+    // 2. A physical fixture for ground collision (so it will land).
     private void spawnWeapon(PooledEngine engine, World world) {
         Entity weapon = engine.createEntity();
 
@@ -65,6 +65,7 @@ public class WeaponPlugin implements ECSPlugin {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.linearDamping = 5f;
+        // Use a fixed high Y so the weapon gets time to fall.
         Vector2 position = getRandomSpawnPosition();
         bodyDef.position.set(position);
         bodyDef.fixedRotation = true;
@@ -72,40 +73,39 @@ public class WeaponPlugin implements ECSPlugin {
         Body body = world.createBody(bodyDef);
 
         // --- Sensor Fixture for Pickup ---
-        // This fixture is used to detect when the player picks up the weapon.
+        // Detects collision with the player.
         CircleShape sensorShape = new CircleShape();
         sensorShape.setRadius(4f / CoreResources.PPM);
         FixtureDef sensorFixtureDef = new FixtureDef();
         sensorFixtureDef.shape = sensorShape;
         sensorFixtureDef.isSensor = true;
         sensorFixtureDef.filter.categoryBits = CollisionCategories.WEAPON;
-        // Only register collisions with the player.
         sensorFixtureDef.filter.maskBits = CollisionCategories.PLAYER;
         body.createFixture(sensorFixtureDef);
         sensorShape.dispose();
 
         // --- Physical Fixture for Ground Collision ---
-        // This fixture is used so that the weapon collides physically with the map.
-        // We do not set filter bits here so it uses the default filtering (like the player).
+        // This fixture allows the weapon to interact with the ground.
         CircleShape physicalShape = new CircleShape();
         physicalShape.setRadius(4f / CoreResources.PPM);
         FixtureDef physicalFixtureDef = new FixtureDef();
         physicalFixtureDef.shape = physicalShape;
         physicalFixtureDef.density = 0.001f;
-        physicalFixtureDef.restitution = 0.1f;  // Adjust bounce as needed.
+        physicalFixtureDef.restitution = 0.1f; // Adjust bounce as needed.
         physicalFixtureDef.isSensor = false;
+        // Using default collision filtering so it collides with the ground as expected.
         body.createFixture(physicalFixtureDef);
         physicalShape.dispose();
 
-        // Finish setting up the entity.
+        // Finalize the weapon entity.
         body.setUserData(weapon);
         wc.body = body;
         weapon.add(wc);
         engine.addEntity(weapon);
     }
 
-    // Spawns the weapon at a random X position within the camera view and
-    // at a high Y position (e.g., 250f/PPM) so that it falls onto the map.
+    // Returns a random X (within the camera view) and a fixed high Y.
+    // This function does not raycast for ground so that weapons have time to fall.
     private Vector2 getRandomSpawnPosition() {
         OrthographicCamera camera = CoreResources.getCamera();
         float padding = 2f;
@@ -113,7 +113,7 @@ public class WeaponPlugin implements ECSPlugin {
             camera.position.x - camera.viewportWidth / 2 + padding,
             camera.position.x + camera.viewportWidth / 2 - padding
         );
-        // Spawn high at y = 250f/PPM.
+        // Spawn high. Adjust 250f/PPM as needed to ensure weapons have room to fall.
         float y = 250f / CoreResources.PPM;
         return new Vector2(x, y);
     }
