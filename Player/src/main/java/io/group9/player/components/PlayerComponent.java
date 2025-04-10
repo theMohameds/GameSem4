@@ -23,9 +23,9 @@ public class PlayerComponent implements Component {
     public static final float DOUBLE_JUMP_VELOCITY = 23f;
 
     // Walls
-    public boolean isWallBound = false;
-    public float wallBoundDuration = 3.0f; // Duration in seconds
-    public float wallBoundTimer = 0f;
+   public boolean wallHanging = false;
+   public float wallHangingDuration = 3.0f; // Duration in seconds
+   public float wallHangingTimer = 0f;
 
     public enum State {
         IDLE,
@@ -37,7 +37,7 @@ public class PlayerComponent implements Component {
         DEAD,
         DASH,
         BLOCK,
-        WALL_LAND
+        LAND_WALL
     }
 
     public State state = State.IDLE;

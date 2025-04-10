@@ -32,11 +32,10 @@ public class PlayerAnimationRenderer extends EntitySystem {
         animations.put(PlayerComponent.State.JUMP, loadAnimation("player/Player_jump.png", 0.066f, 6));
         animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("player/Player_airSpin.png", 0.066f, 6));
         animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("player/Punch_cross.png", 0.066f, 7));
-        animations.put(PlayerComponent.State.WALL_LAND, loadAnimation("player/Player_landWall.png", 0.066f, 6));
+        animations.put(PlayerComponent.State.LAND_WALL, loadAnimation("player/Player_landWall.png", 0.066f, 6));
         animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("player/Punch_jab.png", 0.066f, 10));
 
     }
-
 
     private Animation<TextureRegion> loadAnimation(String filePath, float frameDuration, int numFrames) {
         Texture texture = new Texture(Gdx.files.internal(filePath));
