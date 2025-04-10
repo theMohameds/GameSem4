@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
+import io.group9.common.WeaponType;
 import io.group9.weapon.components.WeaponComponent;
 
 public class WeaponRendererSystem extends IteratingSystem {
@@ -18,6 +19,7 @@ public class WeaponRendererSystem extends IteratingSystem {
     public WeaponRendererSystem() {
         super(Family.all(WeaponComponent.class).get());
         batch = new SpriteBatch();
+        // Load the textures for each weapon type
         swordTexture = new Texture(Gdx.files.internal("weapons/sword.png"));
         knifeTexture = new Texture(Gdx.files.internal("weapons/knife.png"));
     }
@@ -35,13 +37,13 @@ public class WeaponRendererSystem extends IteratingSystem {
         WeaponComponent wc = entity.getComponent(WeaponComponent.class);
         if (wc == null || !wc.isActive) return;
 
-        Texture texture = wc.type == WeaponComponent.WeaponType.SWORD ? swordTexture : knifeTexture;
+        // Compare the weapon's type using the enum from io.group9.common.WeaponType
+        Texture texture = (wc.type == WeaponType.SWORD) ? swordTexture : knifeTexture;
         Vector2 pos = wc.body.getPosition();
         float width = 8f / CoreResources.PPM;
         float height = 8f / CoreResources.PPM;
-        batch.draw(texture, pos.x - width/2, pos.y - height/2, width, height);
+        batch.draw(texture, pos.x - width / 2, pos.y - height / 2, width, height);
     }
-
 
     public void dispose() {
         batch.dispose();
@@ -49,3 +51,4 @@ public class WeaponRendererSystem extends IteratingSystem {
         knifeTexture.dispose();
     }
 }
+

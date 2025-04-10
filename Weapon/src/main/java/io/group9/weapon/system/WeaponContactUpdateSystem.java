@@ -15,3 +15,4 @@ public class WeaponContactUpdateSystem extends EntitySystem {
         contactReceiver.update();
     }
 }
+

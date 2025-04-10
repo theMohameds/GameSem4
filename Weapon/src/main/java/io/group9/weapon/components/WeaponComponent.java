@@ -5,11 +5,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import io.group9.common.WeaponType;
 
 public class WeaponComponent implements Component {
-    public static WeaponType WeaponType;
-    public WeaponType type;
+    public WeaponType type;        // e.g., WeaponType.SWORD or WeaponType.KNIFE
     public boolean isActive = true;
-    public float spawnTime;
-    public float lifeTime = 30f;
-    public Body body;
-
+    public float spawnTime;          // Time when the weapon was spawned
+    public float lifeTime = 30f;     // How long the weapon remains active before despawning
+    public Body body;                // The Box2D body for physics
 }
+

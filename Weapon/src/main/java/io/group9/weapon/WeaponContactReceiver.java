@@ -1,7 +1,5 @@
 package io.group9.weapon;
 
-
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -10,10 +8,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import components.CollisionCategories;
 import io.group9.ContactReceiver;
 import io.group9.CoreResources;
-
-
 import io.group9.weapon.components.WeaponComponent;
-
 
 public class WeaponContactReceiver implements ContactReceiver {
     private Engine engine;
@@ -33,19 +28,31 @@ public class WeaponContactReceiver implements ContactReceiver {
         Entity playerEntity = null;
         Entity weaponEntity = null;
 
-        // Check if one is PLAYER and the other is WEAPON
-        if ((categoryA == CollisionCategories.PLAYER && categoryB == CollisionCategories.WEAPON)) {
-            playerEntity = (Entity) fixtureA.getBody().getUserData();
-            weaponEntity = (Entity) fixtureB.getBody().getUserData();
-        } else if ((categoryB == CollisionCategories.PLAYER && categoryA == CollisionCategories.WEAPON)) {
-            playerEntity = (Entity) fixtureB.getBody().getUserData();
-            weaponEntity = (Entity) fixtureA.getBody().getUserData();
+        // Check if one fixture belongs to the player and the other to the weapon.
+        if (categoryA == CollisionCategories.PLAYER && categoryB == CollisionCategories.WEAPON) {
+            Object playerData = fixtureA.getBody().getUserData();
+            Object weaponData = fixtureB.getBody().getUserData();
+            if (playerData instanceof Entity) {
+                playerEntity = (Entity) playerData;
+            }
+            if (weaponData instanceof Entity) {
+                weaponEntity = (Entity) weaponData;
+            }
+        } else if (categoryB == CollisionCategories.PLAYER && categoryA == CollisionCategories.WEAPON) {
+            Object playerData = fixtureB.getBody().getUserData();
+            Object weaponData = fixtureA.getBody().getUserData();
+            if (playerData instanceof Entity) {
+                playerEntity = (Entity) playerData;
+            }
+            if (weaponData instanceof Entity) {
+                weaponEntity = (Entity) weaponData;
+            }
         }
 
         if (playerEntity != null && weaponEntity != null) {
             WeaponComponent wc = weaponEntity.getComponent(WeaponComponent.class);
             if (wc != null && wc.isActive) {
-                // Handle weapon pickup here (e.g., trigger an event or modify another component)
+                // Handle the weapon pickup.
                 engine.removeEntity(weaponEntity);
                 CoreResources.getWorld().destroyBody(wc.body);
             }
@@ -53,8 +60,11 @@ public class WeaponContactReceiver implements ContactReceiver {
     }
 
     @Override
-    public void endContact(Contact contact) {}
+    public void endContact(Contact contact) { }
 
     public void update() {
+        // Additional per-frame logic for weapon collisions if needed.
     }
 }
+
+

@@ -8,14 +8,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import components.CollisionCategories;
 import io.group9.CoreResources;
 import io.group9.common.WeaponType;
 import io.group9.weapon.components.WeaponComponent;
 import io.group9.weapon.system.WeaponContactUpdateSystem;
-import plugins.ECSPlugin;
 import io.group9.weapon.system.WeaponRendererSystem;
 import io.group9.weapon.system.WeaponSystem;
+import plugins.ECSPlugin;
+import components.CollisionCategories;
 
 public class WeaponPlugin implements ECSPlugin {
     private WeaponContactReceiver contactReceiver;
@@ -46,11 +46,14 @@ public class WeaponPlugin implements ECSPlugin {
         World world = CoreResources.getWorld();
         PooledEngine pooledEngine = (PooledEngine) engine;
 
-        for(int i = 0; i < INITIAL_WEAPONS; i++) {
+        for (int i = 0; i < INITIAL_WEAPONS; i++) {
             spawnWeapon(pooledEngine, world);
         }
     }
 
+    // Spawns a weapon with two fixtures:
+    // 1. A sensor fixture for player pickup (only collides with the player).
+    // 2. A physical fixture for ground collision (uses default filtering so it collides like the player).
     private void spawnWeapon(PooledEngine engine, World world) {
         Entity weapon = engine.createEntity();
 
@@ -68,61 +71,58 @@ public class WeaponPlugin implements ECSPlugin {
 
         Body body = world.createBody(bodyDef);
 
-        CircleShape shape = new CircleShape();
-        shape.setRadius(4f / CoreResources.PPM);
+        // --- Sensor Fixture for Pickup ---
+        // This fixture is used to detect when the player picks up the weapon.
+        CircleShape sensorShape = new CircleShape();
+        sensorShape.setRadius(4f / CoreResources.PPM);
+        FixtureDef sensorFixtureDef = new FixtureDef();
+        sensorFixtureDef.shape = sensorShape;
+        sensorFixtureDef.isSensor = true;
+        sensorFixtureDef.filter.categoryBits = CollisionCategories.WEAPON;
+        // Only register collisions with the player.
+        sensorFixtureDef.filter.maskBits = CollisionCategories.PLAYER;
+        body.createFixture(sensorFixtureDef);
+        sensorShape.dispose();
 
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 0.001f;
-        fixtureDef.restitution = 0.1f;
-        fixtureDef.isSensor = true;
-        fixtureDef.filter.categoryBits = CollisionCategories.WEAPON;
-        fixtureDef.filter.maskBits = (short) (CollisionCategories.PLAYER | CollisionCategories.GROUND);
+        // --- Physical Fixture for Ground Collision ---
+        // This fixture is used so that the weapon collides physically with the map.
+        // We do not set filter bits here so it uses the default filtering (like the player).
+        CircleShape physicalShape = new CircleShape();
+        physicalShape.setRadius(4f / CoreResources.PPM);
+        FixtureDef physicalFixtureDef = new FixtureDef();
+        physicalFixtureDef.shape = physicalShape;
+        physicalFixtureDef.density = 0.001f;
+        physicalFixtureDef.restitution = 0.1f;  // Adjust bounce as needed.
+        physicalFixtureDef.isSensor = false;
+        body.createFixture(physicalFixtureDef);
+        physicalShape.dispose();
 
-        body.createFixture(fixtureDef);
-        shape.dispose();
-
+        // Finish setting up the entity.
         body.setUserData(weapon);
         wc.body = body;
-
         weapon.add(wc);
         engine.addEntity(weapon);
     }
 
+    // Spawns the weapon at a random X position within the camera view and
+    // at a high Y position (e.g., 250f/PPM) so that it falls onto the map.
     private Vector2 getRandomSpawnPosition() {
         OrthographicCamera camera = CoreResources.getCamera();
         float padding = 2f;
         float x = MathUtils.random(
-            camera.position.x - camera.viewportWidth/2 + padding,
-            camera.position.x + camera.viewportWidth/2 - padding
+            camera.position.x - camera.viewportWidth / 2 + padding,
+            camera.position.x + camera.viewportWidth / 2 - padding
         );
-
-        World world = CoreResources.getWorld();
-        float radius = 4f / CoreResources.PPM;
-        float cameraTop = camera.position.y + camera.viewportHeight/2;
-
-        final float[] highestY = {-Float.MAX_VALUE};
-        Vector2 rayStart = new Vector2(x, cameraTop + 500f);  // Start 500 units above camera view
-        Vector2 rayEnd = new Vector2(x, cameraTop - camera.viewportHeight - 500f);  // Extend below view
-
-        world.rayCast((fixture, point, normal, fraction) -> {
-            if ((fixture.getFilterData().categoryBits & CollisionCategories.GROUND) != 0) {
-                highestY[0] = Math.max(highestY[0], point.y);
-            }
-            return 1; // Continue searching
-        }, rayStart, rayEnd);
-
-        if (highestY[0] == -Float.MAX_VALUE) {
-            Gdx.app.error("WeaponPlugin", "No ground found at X: " + x + " Camera Y: " + camera.position.y);
-            return new Vector2(x, cameraTop + 50f);  // Fallback to camera top
-        }
-
-        return new Vector2(x, highestY[0] + radius);
+        // Spawn high at y = 250f/PPM.
+        float y = 250f / CoreResources.PPM;
+        return new Vector2(x, y);
     }
-
 
     @Override
     public int getPriority() {
-        return 3;
+        return 4;
     }
 }
+
+
+
