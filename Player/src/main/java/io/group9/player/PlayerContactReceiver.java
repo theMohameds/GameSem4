@@ -36,12 +36,16 @@ public class PlayerContactReceiver implements ContactReceiver {
                     Gdx.app.log("PlayerContactReceiver", "Ground contact detected.");
                 }
                 else if (Math.abs(normal.x) > Math.abs(normal.y)) {
-                    if ((pc.state == PlayerComponent.State.JUMP || pc.state == PlayerComponent.State.AIRSPIN) && playerIsPressingTowardsWall()) {
-                        pc.state = PlayerComponent.State.LAND_WALL;
-                        pc.wallHanging = true;
-                        pc.wallHangingTimer = 0;
-                        Gdx.app.log("PlayerContactReceiver", "Wall contact detected.");
+                    if (normal.x > 0) {
+                        pc.facingLeft = true;
+                    } else if (normal.x < 0) {
+                        pc.facingLeft = false;
                     }
+
+                    // 2) Trigger wall-hang logic
+                    pc.wallHanging = true;
+                    pc.wallHangingTimer = 0f; // reset the timer if you use one
+                    pc.state = PlayerComponent.State.LAND_WALL;
                 }
             }
         }

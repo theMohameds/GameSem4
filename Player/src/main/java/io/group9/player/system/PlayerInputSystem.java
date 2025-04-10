@@ -24,8 +24,10 @@ public class PlayerInputSystem extends EntitySystem {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
 
+
             // --- Horizontal Movement ---
             float horizontal = 0f;
+        if (!pc.wallHanging) {
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
                 horizontal = -pc.speed;
                 pc.facingLeft = true;
@@ -33,6 +35,7 @@ public class PlayerInputSystem extends EntitySystem {
                 horizontal = pc.speed;
                 pc.facingLeft = false;
             }
+        }
             // Preserve current vertical velocity.
             Vector2 vel = pc.body.getLinearVelocity();
             pc.body.setLinearVelocity(horizontal, vel.y);
