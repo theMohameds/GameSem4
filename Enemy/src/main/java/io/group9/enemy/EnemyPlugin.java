@@ -16,6 +16,8 @@ public class EnemyPlugin implements ECSPlugin {
     public void registerSystems(Engine engine) {
         engine.addSystem(new EnemySystem());
         engine.addSystem(new EnemyAnimationRenderer());
+        CoreResources.getContactDispatcher().addReceiver(new EnemyContactReceiver());
+
     }
 
     @Override
