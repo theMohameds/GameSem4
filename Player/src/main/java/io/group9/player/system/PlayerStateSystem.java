@@ -40,7 +40,6 @@ public class PlayerStateSystem extends EntitySystem {
 
             // ---------------- wall logic ----------------
             if (pc.wallHanging) {
-               // pc.jumpsLeft = pc.maxJumps;
 
                 if (pc.wallHangCooldownTimer > 0f) {
                     pc.wallHanging = false;
@@ -86,6 +85,7 @@ public class PlayerStateSystem extends EntitySystem {
                         pc.state = PlayerComponent.State.LAND_WALL;
                         continue;
                     }
+                    pc.jumpsLeft = pc.maxJumps; // Reset jumps
                 }
             }
 

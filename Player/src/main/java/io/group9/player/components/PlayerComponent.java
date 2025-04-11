@@ -25,8 +25,8 @@ public class PlayerComponent implements Component {
     // Walls
    public boolean wallHanging = false;
    public float wallHangCooldownTimer = 0f;
-   public float wallHangCooldownDuration = 0.5f; // Duration in seconds
-   public float wallHangingDuration = 3.0f; // Duration in seconds
+   public float wallHangCooldownDuration = 1f; // Duration in seconds
+   public float wallHangingDuration = 0.3f; // Duration in seconds
    public float wallHangingTimer = 0f;
    public boolean wallOnLeft = false; //
 
