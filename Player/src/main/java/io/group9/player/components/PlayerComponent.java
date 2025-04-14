@@ -46,7 +46,10 @@ public class PlayerComponent implements Component {
         DASH,
         BLOCK,
         WALL_LAND
-    }
+    }public enum AttackType { LIGHT, HEAVY }
+
+    public AttackType attackType = AttackType.LIGHT; // standard
+
 
     public State state = State.IDLE;
 }

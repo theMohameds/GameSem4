@@ -33,37 +33,42 @@ public class PlayerInputSystem extends EntitySystem {
                 horizontal = pc.speed;
                 pc.facingLeft = false;
             }
+
             // Preserve current vertical velocity.
             Vector2 vel = pc.body.getLinearVelocity();
             pc.body.setLinearVelocity(horizontal, vel.y);
 
             // --- Jump Input ---
             if (Gdx.input.isKeyJustPressed(Input.Keys.W) && pc.jumpsLeft > 0) {
-                if (pc.jumpsLeft == pc.maxJumps) { // First jump.
+                if (pc.jumpsLeft == pc.maxJumps) {
                     pc.body.setLinearVelocity(vel.x, PlayerComponent.FIRST_JUMP_VELOCITY);
                     pc.state = PlayerComponent.State.JUMP;
-                } else { // Double jump.
+                } else {
                     pc.body.setLinearVelocity(vel.x, PlayerComponent.DOUBLE_JUMP_VELOCITY);
                     pc.state = PlayerComponent.State.AIRSPIN;
                 }
                 pc.jumpsLeft--;
             }
 
-            // --- Attack Input ---
-            // If attack key is pressed and not already attacking, set attackRequested flag.
+            // --- Light Attack (J) ---
             if (Gdx.input.isKeyJustPressed(Input.Keys.J) && !pc.attacking) {
                 pc.attackRequested = true;
-
-                pc.isBlocking = Gdx.input.isKeyPressed(Input.Keys.L); // Hold L nede for at blokere
-
-                if (pc.isBlocking) {
-                    pc.body.setLinearVelocity(0, pc.body.getLinearVelocity().y);
-                }
+                pc.attackType = PlayerComponent.AttackType.LIGHT;  // Set to Light attack
             }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.L)) {
-                pc.attacking = true;
-                pc.state = PlayerComponent.State.BLOCK;
 
+            // --- Heavy Attack (K) ---
+            if (Gdx.input.isKeyJustPressed(Input.Keys.K) && !pc.attacking) {
+                pc.attackRequested = true;
+                pc.attackType = PlayerComponent.AttackType.HEAVY;  // Set to Heavy attack
+            }
+
+            // --- Block (L) ---
+            if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+                pc.isBlocking = true;
+                pc.body.setLinearVelocity(0, pc.body.getLinearVelocity().y);  // Stop horizontal movement while blocking
+                pc.state = PlayerComponent.State.BLOCK;
+            } else {
+                pc.isBlocking = false;
             }
         }
     }
