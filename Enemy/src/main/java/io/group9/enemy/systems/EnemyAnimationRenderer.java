@@ -2,83 +2,74 @@ package io.group9.enemy.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
+import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.components.EnemyComponent;
 
 import java.util.EnumMap;
 
 public class EnemyAnimationRenderer extends EntitySystem {
+    private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
-    private EnumMap<EnemyComponent.State, Animation<TextureRegion>> animations;
-    private ImmutableArray<Entity> enemies;
-    private float stateTime = 0f;
+    private EnumMap<EnemyState, Animation<TextureRegion>> anims;
 
     @Override
     public void addedToEngine(Engine engine) {
-        enemies = engine.getEntitiesFor(Family.all(EnemyComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(EnemyComponent.class).get());
         batch = new SpriteBatch();
-        animations = new EnumMap<>(EnemyComponent.State.class);
+        anims = new EnumMap<>(EnemyState.class);
 
-        animations.put(EnemyComponent.State.IDLE, loadAnimation("enemy/Enemy_idle.png", 0.066f, 10));
-        animations.put(EnemyComponent.State.HURT, loadAnimation("enemy/Enemy_hurt.png", 0.066f, 4));
-        animations.put(EnemyComponent.State.DEAD, loadAnimation("enemy/Enemy_dead.png", 0.1f, 10));
+        anims.put(EnemyState.IDLE,        load("enemy/Enemy_idle.png",     0.066f, 10, true));
+        anims.put(EnemyState.CHASE,       load("enemy/Enemy_run.png",      0.066f,  8, true));
+        anims.put(EnemyState.JUMP,        load("enemy/Enemy_jump.png",     0.066f,  6, true));
+        anims.put(EnemyState.AIRSPIN,     load("enemy/Enemy_AirSpin.png",  0.066f,  6, true));
+        anims.put(EnemyState.ATTACK,      load("enemy/Enemy_punchJab.png", 0.066f, 10, true));
+        anims.put(EnemyState.HURT,        load("enemy/Enemy_hurt.png",     0.066f,  4, true));
+        anims.put(EnemyState.DEAD,        load("enemy/Enemy_dead.png",     0.100f, 10, false));
     }
 
-    private Animation<TextureRegion> loadAnimation(String path, float frameDuration, int cols) {
-        Texture texture = new Texture(Gdx.files.internal(path));
-        int frameWidth = texture.getWidth() / cols;
-        int frameHeight = texture.getHeight();
-        TextureRegion[][] tmp = TextureRegion.split(texture, frameWidth, frameHeight);
-        TextureRegion[] frames = new TextureRegion[cols];
-        for (int i = 0; i < cols; i++) {
-            frames[i] = tmp[0][i];
-        }
-        return new Animation<>(frameDuration, frames);
+    private Animation<TextureRegion> load(String path, float dur, int frames, boolean loop) {
+        Texture tex = new Texture(Gdx.files.internal(path));
+        int fw = tex.getWidth() / frames, fh = tex.getHeight();
+        TextureRegion[][] split = TextureRegion.split(tex, fw, fh);
+        TextureRegion[] arr = new TextureRegion[frames];
+        for (int i = 0; i < frames; i++) arr[i] = split[0][i];
+        Animation<TextureRegion> anim = new Animation<>(dur, arr);
+        anim.setPlayMode(loop ? Animation.PlayMode.LOOP : Animation.PlayMode.NORMAL);
+        return anim;
     }
 
     @Override
-    public void update(float deltaTime) {
-        stateTime += deltaTime;
+    public void update(float dt) {
         OrthographicCamera cam = CoreResources.getCamera();
         cam.update();
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
 
-        for (Entity e : enemies) {
+        for (Entity e : entities) {
             EnemyComponent ec = e.getComponent(EnemyComponent.class);
-            Vector2 pos = ec.body.getPosition();
+            ec.animTime += dt;
 
-            Animation<TextureRegion> anim;
-            // Use non-looping dead animation if the enemy is dead.
-            if (ec.state == EnemyComponent.State.DEAD) {
-                anim = animations.get(EnemyComponent.State.DEAD);
-                // Using false for the looping flag ensures the animation stops on the final frame.
-                // Note: If you wish to have each dead enemy animate independently,
-                // you might want to store an individual stateTime (or deathTime) in the EnemyComponent.
-                TextureRegion frame = anim.getKeyFrame(stateTime, false);
-                drawFrame(frame, pos, ec);
-            } else {
-                anim = animations.getOrDefault(ec.state, animations.get(EnemyComponent.State.IDLE));
-                TextureRegion frame = anim.getKeyFrame(stateTime, true);
-                drawFrame(frame, pos, ec);
-            }
+            Animation<TextureRegion> anim = anims.getOrDefault(
+                ec.state, anims.get(EnemyState.IDLE));
+
+            TextureRegion frame = anim.getKeyFrame(
+                ec.animTime, ec.state != EnemyState.DEAD);
+
+            Vector2 p = ec.body.getPosition();
+            float w = 48f / CoreResources.PPM, h = 48f / CoreResources.PPM;
+            if (ec.facingLeft)
+                batch.draw(frame, p.x + w / 2, p.y - h / 2, -w, h);
+            else
+                batch.draw(frame, p.x - w / 2, p.y - h / 2,  w, h);
         }
         batch.end();
     }
 
-    private void drawFrame(TextureRegion frame, Vector2 pos, EnemyComponent ec) {
-        float width = 48f / CoreResources.PPM;
-        float height = 48f / CoreResources.PPM;
-        if (ec.facingLeft) {
-            batch.draw(frame, pos.x + width / 2, pos.y - height / 2, -width, height);
-        } else {
-            batch.draw(frame, pos.x - width / 2, pos.y - height / 2, width, height);
-        }
-    }
+    @Override public void removedFromEngine(Engine e) { batch.dispose(); }
 }
-

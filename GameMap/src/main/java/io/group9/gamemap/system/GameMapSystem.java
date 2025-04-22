@@ -1,39 +1,57 @@
+
 package io.group9.gamemap.system;
 
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import io.group9.CoreResources;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import io.group9.CoreResources;
 
 public class GameMapSystem extends EntitySystem {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer mapRenderer;
     private TiledMapTileLayer collisionLayer;
-    private final List<Rectangle> rawRectangles = new ArrayList<>();
+    private final List<Rectangle> rawRectangles    = new ArrayList<>();
     private final List<Rectangle> mergedRectangles = new ArrayList<>();
     private World world;
     private OrthographicCamera camera;
-    private final List<Body> collisionBodies = new ArrayList<>();
+    private final List<Body> collisionBodies       = new ArrayList<>();
 
-    // Conversion factor.
+    // Conversion factor from pixels to meters.
     private static final float UNIT_SCALE = 1 / CoreResources.PPM;
 
-    public GameMapSystem(World world, String mapPath, int collisionLayerIndex, OrthographicCamera camera) {
-        this.world = world;
-        this.camera = camera;
-        tiledMap = new TmxMapLoader().load(mapPath);
-        mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, UNIT_SCALE);
+    // Grid info for A* nav‑graph
+    private final int   layerWidth;
+    private final int   layerHeight;
+    private final float cellSizeMeters;
+
+    public GameMapSystem(World world,
+                         String mapPath,
+                         int collisionLayerIndex,
+                         OrthographicCamera camera) {
+        this.world    = world;
+        this.camera   = camera;
+        // Load the TiledMap and renderer
+        tiledMap      = new TmxMapLoader().load(mapPath);
+        mapRenderer   = new OrthogonalTiledMapRenderer(tiledMap, UNIT_SCALE);
         collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get(collisionLayerIndex);
+
+        // Capture layer dimensions and tile size in meters
+        this.layerWidth     = collisionLayer.getWidth();
+        this.layerHeight    = collisionLayer.getHeight();
+        this.cellSizeMeters = collisionLayer.getTileWidth() * UNIT_SCALE;
+
+        // Build collision rectangles and Box2D bodies
         gatherCollisionTiles();
         mergeRectangles();
         createCollisionBodies();
@@ -47,59 +65,62 @@ public class GameMapSystem extends EntitySystem {
     }
 
     private void gatherCollisionTiles() {
-        int layerWidth = collisionLayer.getWidth();
-        int layerHeight = collisionLayer.getHeight();
-        int tileWidth = (int) collisionLayer.getTileWidth();
-        int tileHeight = (int) collisionLayer.getTileHeight();
+        int layerW = collisionLayer.getWidth();
+        int layerH = collisionLayer.getHeight();
+        int tileW  = (int) collisionLayer.getTileWidth();
+        int tileH  = (int) collisionLayer.getTileHeight();
 
-        for (int y = 0; y < layerHeight; y++) {
-            for (int x = 0; x < layerWidth; x++) {
+        for (int y = 0; y < layerH; y++) {
+            for (int x = 0; x < layerW; x++) {
                 TiledMapTileLayer.Cell cell = collisionLayer.getCell(x, y);
                 if (cell != null && cell.getTile() != null) {
-                    Rectangle rect = new Rectangle(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
-                    rawRectangles.add(rect);
+                    rawRectangles.add(new Rectangle(
+                        x * tileW, y * tileH, tileW, tileH
+                    ));
                 }
             }
         }
     }
 
     private void mergeRectangles() {
-        // Merge horizontally.
+        // Horizontal merge
         Map<Float, List<Rectangle>> rows = new HashMap<>();
-        for (Rectangle rect : rawRectangles) {
-            rows.computeIfAbsent(rect.y, k -> new ArrayList<>()).add(rect);
+        for (Rectangle r : rawRectangles) {
+            rows.computeIfAbsent(r.y, k -> new ArrayList<>()).add(r);
         }
-        List<Rectangle> horizMerged = new ArrayList<>();
+        List<Rectangle> horiz = new ArrayList<>();
         for (List<Rectangle> row : rows.values()) {
             row.sort(Comparator.comparingDouble(r -> r.x));
-            Rectangle current = new Rectangle(row.get(0));
+            Rectangle cur = new Rectangle(row.get(0));
             for (int i = 1; i < row.size(); i++) {
                 Rectangle next = row.get(i);
-                if (Math.abs(current.x + current.width - next.x) < 0.1f
-                    && current.y == next.y && current.height == next.height) {
-                    current.width += next.width;
+                if (Math.abs(cur.x + cur.width - next.x) < 0.1f
+                    && cur.y == next.y
+                    && cur.height == next.height) {
+                    cur.width += next.width;
                 } else {
-                    horizMerged.add(new Rectangle(current));
-                    current.set(next);
+                    horiz.add(new Rectangle(cur));
+                    cur.set(next);
                 }
             }
-            horizMerged.add(new Rectangle(current));
+            horiz.add(new Rectangle(cur));
         }
-        // Merge vertically.
-        horizMerged.sort((a, b) -> {
+        // Vertical merge
+        horiz.sort((a, b) -> {
             int cmp = Float.compare(a.y, b.y);
             return cmp != 0 ? cmp : Float.compare(a.x, b.x);
         });
-        boolean[] used = new boolean[horizMerged.size()];
-        for (int i = 0; i < horizMerged.size(); i++) {
+        boolean[] used = new boolean[horiz.size()];
+        for (int i = 0; i < horiz.size(); i++) {
             if (used[i]) continue;
-            Rectangle base = new Rectangle(horizMerged.get(i));
-            for (int j = i + 1; j < horizMerged.size(); j++) {
+            Rectangle base = new Rectangle(horiz.get(i));
+            for (int j = i + 1; j < horiz.size(); j++) {
                 if (used[j]) continue;
-                Rectangle check = horizMerged.get(j);
-                if (Math.abs(check.x - base.x) < 0.1f && Math.abs(check.width - base.width) < 0.1f
-                    && Math.abs(check.y - (base.y + base.height)) < 0.1f) {
-                    base.height += check.height;
+                Rectangle chk = horiz.get(j);
+                if (Math.abs(chk.x - base.x) < 0.1f
+                    && Math.abs(chk.width - base.width) < 0.1f
+                    && Math.abs(chk.y - (base.y + base.height)) < 0.1f) {
+                    base.height += chk.height;
                     used[j] = true;
                 }
             }
@@ -109,33 +130,60 @@ public class GameMapSystem extends EntitySystem {
     }
 
     private void createCollisionBodies() {
-        for (Rectangle rect : mergedRectangles) {
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            float worldX = (rect.x + rect.width / 2f) * UNIT_SCALE;
-            float worldY = (rect.y + rect.height / 2f) * UNIT_SCALE;
-            bodyDef.position.set(worldX, worldY);
-            Body body = world.createBody(bodyDef);
-            PolygonShape shape = new PolygonShape();
-            shape.setAsBox((rect.width / 2f) * UNIT_SCALE, (rect.height / 2f) * UNIT_SCALE);
+        for (Rectangle r : mergedRectangles) {
+            BodyDef bd = new BodyDef();
+            bd.type = BodyDef.BodyType.StaticBody;
+            float worldX = (r.x + r.width / 2f) * UNIT_SCALE;
+            float worldY = (r.y + r.height / 2f) * UNIT_SCALE;
+            bd.position.set(worldX, worldY);
 
-            FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.shape = shape;
-            fixtureDef.friction = 0.2f;
-            fixtureDef.restitution = 0f;
-            body.createFixture(fixtureDef);
+            Body body = world.createBody(bd);
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox((r.width / 2f)  * UNIT_SCALE,
+                (r.height / 2f) * UNIT_SCALE);
+
+            FixtureDef fd = new FixtureDef();
+            fd.shape      = shape;
+            fd.friction   = 0.2f;
+            fd.restitution= 0f;
+            body.createFixture(fd);
             shape.dispose();
 
-            // Tag the body as ground.
             body.setUserData("ground");
             collisionBodies.add(body);
         }
     }
 
     public void dispose() {
-        if (tiledMap != null)
-            tiledMap.dispose();
-        if (mapRenderer != null)
-            mapRenderer.dispose();
+        if (tiledMap   != null) tiledMap.dispose();
+        if (mapRenderer!= null) mapRenderer.dispose();
+    }
+
+    /**
+     * @return merged collision rectangles in world units (meters)
+     */
+    public List<Rectangle> getMergedWorldRectangles() {
+        List<Rectangle> out = new ArrayList<>();
+        for (Rectangle r : mergedRectangles) {
+            out.add(new Rectangle(
+                r.x * UNIT_SCALE,
+                r.y * UNIT_SCALE,
+                r.width  * UNIT_SCALE,
+                r.height * UNIT_SCALE
+            ));
+        }
+        return out;
+    }
+
+    public int getLayerWidth() {
+        return layerWidth;
+    }
+
+    public int getLayerHeight() {
+        return layerHeight;
+    }
+
+    public float getCellSizeMeters() {
+        return cellSizeMeters;
     }
 }

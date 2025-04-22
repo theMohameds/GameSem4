@@ -43,6 +43,7 @@ public class PlayerPlugin implements ECSPlugin {
         fd.density = 0.5f;
         fd.friction = 0f;
         fd.restitution = 0f;
+        fd.filter.groupIndex   = -1;
         body.createFixture(fd);
         shape.dispose();
 
@@ -64,5 +65,3 @@ public class PlayerPlugin implements ECSPlugin {
         return 2;
     }
 }
-
-

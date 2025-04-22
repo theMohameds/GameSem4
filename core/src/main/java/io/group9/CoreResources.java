@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
+import plugins.GameMapProvider;
 
 public class CoreResources {
     private static World world;
@@ -29,4 +30,16 @@ public class CoreResources {
 
     public static void setContactDispatcher(CoreContactDispatcher dispatcher) { contactDispatcher = dispatcher; }
     public static CoreContactDispatcher getContactDispatcher() { return contactDispatcher; }
+
+    private static GameMapProvider gameMapProvider;
+
+    public static void setGameMapProvider(GameMapProvider prov) {
+        gameMapProvider = prov;
+    }
+
+    public static GameMapProvider getGameMapProvider() {
+        return gameMapProvider;
+    }
+
+
 }
