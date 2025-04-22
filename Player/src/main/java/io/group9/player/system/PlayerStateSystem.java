@@ -85,7 +85,7 @@ public class PlayerStateSystem extends EntitySystem {
     private void disableWallHang(PlayerComponent pc) {
         pc.wallHanging = false;
         pc.wallHangingTimer = 0f;
-        pc.jumpsLeft = pc.maxJumps;
+        //pc.jumpsLeft = pc.maxJumps;
     }
 
     // Freeze the player's movement while wall hanging.
@@ -100,7 +100,7 @@ public class PlayerStateSystem extends EntitySystem {
     private void slideDown(PlayerComponent pc) {
         pc.body.setGravityScale(FALL_MULTIPLIER);
         Vector2 vel = pc.body.getLinearVelocity();
-        vel.x = 0f;
+        //vel.x = 0f;
         pc.body.setLinearVelocity(vel);
     }
 
@@ -114,19 +114,45 @@ public class PlayerStateSystem extends EntitySystem {
     }
 
     // Normal state update when not wall hanging.
+
     private void updateNormalState(PlayerComponent pc) {
+        boolean onGround = Math.abs(pc.body.getLinearVelocity().y) < 0.01f;
+
         if (!pc.attacking) {
-            if (pc.jumpsLeft == pc.maxJumps) {
+            if (onGround) {
+                System.out.println(pc.body.getLinearVelocity().x);
                 // On-ground: decide between RUN and IDLE.
-                pc.state = (Math.abs(pc.body.getLinearVelocity().x) > 0.1f)
-                    ? PlayerComponent.State.RUN : PlayerComponent.State.IDLE;
+                PlayerComponent.State newState;
+                float absVelX = Math.abs(pc.body.getLinearVelocity().x);
+
+                if(absVelX > 14.5f){
+                    newState = PlayerComponent.State.DASH;
+                }else if (absVelX > 0.1f && absVelX < 14.5f) {
+                    newState = PlayerComponent.State.RUN;
+                } else {
+                    newState = PlayerComponent.State.IDLE;
+                }
+
+                if (pc.state != newState) {
+                    pc.state = newState;
+                }
+
             } else {
                 // In-air: choose between jump and air spin.
-                pc.state = (pc.body.getLinearVelocity().y > 0.1f)
-                    ? PlayerComponent.State.JUMP : PlayerComponent.State.AIRSPIN;
+                PlayerComponent.State newState;
+                if(pc.jumpsLeft == 0){
+                    newState = PlayerComponent.State.AIRSPIN;
+                }else {
+                    newState = PlayerComponent.State.JUMP;
+                }
+
+                if (pc.state != newState) {
+                    pc.state = newState;
+                }
             }
         }
     }
+
 
     // Adjust gravity based on player's vertical movement.
     private void applyGravityScaling(PlayerComponent pc) {

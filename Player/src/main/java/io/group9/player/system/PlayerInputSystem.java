@@ -24,19 +24,18 @@ public class PlayerInputSystem extends EntitySystem {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
 
-
             // --- Horizontal Movement ---
             float horizontal = 0f;
-        if (!pc.wallHanging) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                horizontal = -pc.speed;
-                pc.facingLeft = true;
-            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                horizontal = pc.speed;
-                pc.facingLeft = false;
+            if (!pc.wallHanging) {
+                if (Gdx.input.isKeyPressed(Input.Keys.A)) horizontal -= pc.speed;
+                if (Gdx.input.isKeyPressed(Input.Keys.D)) horizontal += pc.speed;
             }
-        }
-            // Preserve current vertical velocity.
+
+            if (horizontal != 0) {
+                pc.facingLeft = horizontal < 0;
+            }
+
+
             Vector2 vel = pc.body.getLinearVelocity();
             pc.body.setLinearVelocity(horizontal, vel.y);
 
@@ -44,10 +43,8 @@ public class PlayerInputSystem extends EntitySystem {
             if (Gdx.input.isKeyJustPressed(Input.Keys.W) && pc.jumpsLeft > 0) {
                 if (pc.jumpsLeft == pc.maxJumps) { // First jump.
                     pc.body.setLinearVelocity(vel.x, PlayerComponent.FIRST_JUMP_VELOCITY);
-                    pc.state = PlayerComponent.State.JUMP;
                 } else { // Double jump.
                     pc.body.setLinearVelocity(vel.x, PlayerComponent.DOUBLE_JUMP_VELOCITY);
-                    pc.state = PlayerComponent.State.AIRSPIN;
                 }
                 pc.jumpsLeft--;
             }
@@ -57,6 +54,7 @@ public class PlayerInputSystem extends EntitySystem {
             if (Gdx.input.isKeyJustPressed(Input.Keys.J) && !pc.attacking) {
                 pc.attackRequested = true;
             }
+
         }
     }
 }

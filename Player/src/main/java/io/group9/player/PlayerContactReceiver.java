@@ -49,7 +49,7 @@ public class PlayerContactReceiver implements ContactReceiver {
         pc.jumpsLeft = pc.maxJumps;
         pc.wallHanging = false;
         pc.state = PlayerComponent.State.IDLE;
-        Gdx.app.log("PlayerContactReceiver", "Ground contact detected. Reset jumps and state to IDLE.");
+        //Gdx.app.log("PlayerContactReceiver", "Ground contact detected. Reset jumps and state to IDLE.");
     }
 
     private void processWallContact(PlayerComponent pc, Vector2 normal) {
@@ -66,6 +66,6 @@ public class PlayerContactReceiver implements ContactReceiver {
         pc.wallHanging = true;
         pc.wallHangingTimer = 0f; // Reset hanging timer.
         pc.state = PlayerComponent.State.LAND_WALL;
-        Gdx.app.log("PlayerContactReceiver", "Wall contact detected. Engaging wall hang.");
+        //Gdx.app.log("PlayerContactReceiver", "Wall contact detected. Engaging wall hang.");
     }
 }
