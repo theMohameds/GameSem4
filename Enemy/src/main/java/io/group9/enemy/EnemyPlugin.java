@@ -12,7 +12,7 @@ public class EnemyPlugin implements ECSPlugin {
     @Override
     public void registerSystems(Engine engine) {
         float cellSize = 64f / CoreResources.PPM;
-        GridGraph grid = new GridGraph(100, 20, cellSize);
+        GridGraph grid = new GridGraph(150, 20, cellSize);
 
         engine.addSystem(new EnemyPathfindingSystem(grid));
         engine.addSystem(new EnemyAIControlSystem(grid));
