@@ -60,7 +60,7 @@ public class EnemyComponent implements Component {
     public float recalcTimer = 0f;
 
     // Reaction delay (AI)
-    public float reactionDelay = 0.3f;
+    public float reactionDelay = 0f;
     public float reactionTimer = 0f;
 
     // Facing & animation

@@ -3,6 +3,7 @@ package io.group9.enemy.systems;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -48,8 +49,12 @@ public class EnemyAnimationRenderer extends EntitySystem {
     public void update(float dt) {
         OrthographicCamera cam = CoreResources.getCamera();
         cam.update();
+
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
+
+        // tint everything you draw to blue
+        batch.setColor(Color.LIGHT_GRAY);
 
         for (Entity e : entities) {
             EnemyComponent ec = e.getComponent(EnemyComponent.class);
@@ -63,13 +68,18 @@ public class EnemyAnimationRenderer extends EntitySystem {
 
             Vector2 p = ec.body.getPosition();
             float w = 48f / CoreResources.PPM, h = 48f / CoreResources.PPM;
-            if (ec.facingLeft)
+            if (ec.facingLeft) {
                 batch.draw(frame, p.x + w / 2, p.y - h / 2, -w, h);
-            else
+            } else {
                 batch.draw(frame, p.x - w / 2, p.y - h / 2,  w, h);
+            }
         }
+
+        // reset tint so nothing else gets colored
+        batch.setColor(Color.WHITE);
         batch.end();
     }
+
 
     @Override public void removedFromEngine(Engine e) { batch.dispose(); }
 }
