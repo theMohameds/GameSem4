@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 
 public class GameCameraSystem extends EntitySystem {
-    private OrthographicCamera camera;
-    private boolean followPlayer;
+    private final OrthographicCamera camera;
+    private final boolean followPlayer;
 
     public GameCameraSystem(float viewportWidth, float viewportHeight, float initialX, float initialY, boolean followPlayer) {
         camera = new OrthographicCamera(viewportWidth, viewportHeight);
@@ -16,17 +16,23 @@ public class GameCameraSystem extends EntitySystem {
         this.followPlayer = followPlayer;
     }
 
-    public OrthographicCamera getCamera() { return camera; }
-    public void setCameraPos(float x, float y) { camera.position.set(x, y+ 6.25f, 0); camera.update(); }
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
+
+    public void setCameraPos(float x, float y) {
+        camera.position.set(x, y, 0);
+        camera.update();
+    }
 
     @Override
     public void update(float deltaTime) {
         if (followPlayer && CoreResources.getPlayerBody() != null) {
             Vector2 playerPos = CoreResources.getPlayerBody().getPosition();
-            setCameraPos(playerPos.x, playerPos.y);
+            // preserve current Y
+            float y = camera.position.y;
+            camera.position.set(playerPos.x, y, 0);
         }
         camera.update();
     }
 }
-
-
