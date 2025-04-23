@@ -49,6 +49,10 @@ public class WeaponPlugin implements ECSPlugin {
         for (int i = 0; i < INITIAL_WEAPONS; i++) {
             spawnWeapon(pooledEngine, world);
         }
+        if(INITIAL_WEAPONS==0){
+            spawnWeapon(pooledEngine, world);
+        }
+
     }
 
     // Spawns a weapon with two fixtures:
