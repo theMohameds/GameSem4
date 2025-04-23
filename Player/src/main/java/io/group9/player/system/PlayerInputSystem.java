@@ -14,7 +14,6 @@ public class PlayerInputSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(com.badlogic.ashley.core.Engine engine) {
-        // Process all entities that have a PlayerComponent.
         entities = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
     }
 
@@ -22,38 +21,36 @@ public class PlayerInputSystem extends EntitySystem {
     public void update(float deltaTime) {
         for (Entity e : entities) {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
+            // ❌ skip all input if dead or hurt
+            if (pc.state == PlayerComponent.State.DEAD ||
+                pc.state == PlayerComponent.State.HURT) continue;
             if (pc.body == null) continue;
 
-
-            // --- Horizontal Movement ---
+            // horizontal move
             float horizontal = 0f;
-        if (!pc.wallHanging) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                horizontal = -pc.speed;
-                pc.facingLeft = true;
-            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                horizontal = pc.speed;
-                pc.facingLeft = false;
+            if (!pc.wallHanging) {
+                if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                    horizontal = -pc.speed; pc.facingLeft = true;
+                } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                    horizontal = pc.speed;  pc.facingLeft = false;
+                }
             }
-        }
-            // Preserve current vertical velocity.
             Vector2 vel = pc.body.getLinearVelocity();
             pc.body.setLinearVelocity(horizontal, vel.y);
 
-            // --- Jump Input ---
+            // jump
             if (Gdx.input.isKeyJustPressed(Input.Keys.W) && pc.jumpsLeft > 0) {
-                if (pc.jumpsLeft == pc.maxJumps) { // First jump.
+                if (pc.jumpsLeft == pc.maxJumps) {
                     pc.body.setLinearVelocity(vel.x, PlayerComponent.FIRST_JUMP_VELOCITY);
                     pc.state = PlayerComponent.State.JUMP;
-                } else { // Double jump.
+                } else {
                     pc.body.setLinearVelocity(vel.x, PlayerComponent.DOUBLE_JUMP_VELOCITY);
                     pc.state = PlayerComponent.State.AIRSPIN;
                 }
                 pc.jumpsLeft--;
             }
 
-            // --- Attack Input ---
-            // If attack key is pressed and not already attacking, set attackRequested flag.
+            // attack
             if (Gdx.input.isKeyJustPressed(Input.Keys.J) && !pc.attacking) {
                 pc.attackRequested = true;
             }

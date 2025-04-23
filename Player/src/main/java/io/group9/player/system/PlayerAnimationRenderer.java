@@ -12,11 +12,12 @@ import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
 import java.util.EnumMap;
+import com.badlogic.gdx.graphics.Color;
 
 public class PlayerAnimationRenderer extends EntitySystem {
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
-    public float stateTime = 0f;
+    private float stateTime = 0f;
     private EnumMap<PlayerComponent.State, Animation<TextureRegion>> animations;
     Animation<TextureRegion> oldAnim;
 
@@ -28,33 +29,32 @@ public class PlayerAnimationRenderer extends EntitySystem {
 
         // Load animations from assets.
 
-        animations.put(PlayerComponent.State.IDLE, loadAnimation("player/Player_idle.png", 0.066f, 10));
-        animations.put(PlayerComponent.State.RUN, loadAnimation("player/Player_run.png", 0.066f, 8));
-        animations.put(PlayerComponent.State.JUMP, loadAnimation("player/Player_jump.png", 0.066f, 6));
-        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("player/Player_airSpin.png", 0.066f, 6));
-        animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("player/Punch_cross.png", 0.066f, 7));
-        animations.put(PlayerComponent.State.LAND_WALL, loadAnimation("player/Player_landWall.png", 0.297f, 6));
-        animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("player/Punch_jab.png", 0.033f, 10));
-        animations.put(PlayerComponent.State.DASH, loadAnimation("player/Player_dash.png", 0.066f, 9));
-
+        animations.put(PlayerComponent.State.IDLE, loadAnimation("character/Enemy_idle.png", 0.066f, 10, true));
+        animations.put(PlayerComponent.State.RUN, loadAnimation("character/Enemy_run.png", 0.066f, 8,true));
+        animations.put(PlayerComponent.State.JUMP, loadAnimation("character/Enemy_jump.png", 0.066f, 6,true));
+        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("character/Enemy_airSpin.png", 0.066f, 6,true));
+        animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("character/Enemy_punchCross.png", 0.066f, 7,true));
+        animations.put(PlayerComponent.State.LAND_WALL, loadAnimation("character/Enemy_landWall.png", 0.297f, 6,true));
+        animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("character/Enemy_punchJab.png", 0.066f, 10,true));
+        animations.put(PlayerComponent.State.HURT, loadAnimation("character/Enemy_hurt.png", 0.066f, 4,true ));
+        animations.put(PlayerComponent.State.DEAD, loadAnimation("character/Enemy_dead.png",0.100f,10,false));
+        //animations.put(PlayerComponent.State.DASH, loadAnimation("character/Enemy_dash.png",0.100f,10,true));
     }
 
-    private Animation<TextureRegion> loadAnimation(String filePath, float frameDuration, int numFrames) {
-        Texture texture = new Texture(Gdx.files.internal(filePath));
-        int frameWidth = texture.getWidth() / numFrames;
-        int frameHeight = texture.getHeight(); // one row.
-        TextureRegion[][] tmp = TextureRegion.split(texture, frameWidth, frameHeight);
-        TextureRegion[] frames = new TextureRegion[numFrames];
-        for (int i = 0; i < numFrames; i++) {
-            frames[i] = tmp[0][i];
-        }
-        Animation<TextureRegion> anim = new Animation<>(frameDuration, frames);
-        anim.setPlayMode(Animation.PlayMode.LOOP);
+    private Animation<TextureRegion> loadAnimation(String path, float dur, int frames, boolean loop) {
+        Texture tex = new Texture(Gdx.files.internal(path));
+        int fw = tex.getWidth() / frames, fh = tex.getHeight();
+        TextureRegion[][] split = TextureRegion.split(tex, fw, fh);
+        TextureRegion[] arr = new TextureRegion[frames];
+        for (int i = 0; i < frames; i++) arr[i] = split[0][i];
+        Animation<TextureRegion> anim = new Animation<>(dur, arr);
+        anim.setPlayMode(loop ? Animation.PlayMode.LOOP : Animation.PlayMode.NORMAL);
         return anim;
     }
 
     @Override
     public void update(float deltaTime) {
+        stateTime += deltaTime;
 
         // Mom get the camera.
         OrthographicCamera cam = CoreResources.getCamera();
@@ -70,6 +70,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
 
 
         batch.begin();
+        batch.setColor(Color.LIME);
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             PlayerComponent pc = entity.getComponent(PlayerComponent.class);
@@ -77,7 +78,6 @@ public class PlayerAnimationRenderer extends EntitySystem {
             Vector2 pos = pc.body.getPosition();
 
             Animation<TextureRegion> currentAnim = animations.get(pc.state);
-
             if (currentAnim == null) {
                 currentAnim = animations.get(PlayerComponent.State.IDLE);
             }
@@ -134,6 +134,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
                 batch.draw(frame, pos.x - targetWidth / 2, pos.y - targetHeight / 2, targetWidth, targetHeight);
             }
         }
+        batch.setColor(Color.WHITE);
         batch.end();
     }
 

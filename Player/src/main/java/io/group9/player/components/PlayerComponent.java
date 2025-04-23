@@ -26,7 +26,7 @@ public class PlayerComponent implements Component {
    public boolean wallHanging = false;
    public float wallHangCooldownTimer = 0f;
    public float wallHangCooldownDuration = 1f; // Duration in seconds
-   public float wallHangingDuration = 0.3f; // Duration in seconds
+   public float wallHangingDuration = 2f; // Duration in seconds
    public float wallHangingTimer = 0f;
    public boolean wallOnLeft = false; //
 
@@ -40,8 +40,15 @@ public class PlayerComponent implements Component {
         DEAD,
         DASH,
         BLOCK,
-        LAND_WALL
+        LAND_WALL,
+        HURT
     }
+
+    // Combat
+    public int   health         = 100;
+    public float hurtDuration   = 0.264f;
+    public float hurtTimer      = 0f;
+    public boolean isHurt       = false;
 
     public State state = State.IDLE;
 }

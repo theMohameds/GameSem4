@@ -25,13 +25,13 @@ public class EnemyAnimationRenderer extends EntitySystem {
         batch = new SpriteBatch();
         anims = new EnumMap<>(EnemyState.class);
 
-        anims.put(EnemyState.IDLE, load("enemy/Enemy_idle.png",     0.066f, 10, true));
-        anims.put(EnemyState.RUN, load("enemy/Enemy_run.png",      0.066f,  8, true));
-        anims.put(EnemyState.JUMP, load("enemy/Enemy_jump.png",     0.066f,  6, true));
-        anims.put(EnemyState.AIRSPIN, load("enemy/Enemy_AirSpin.png",  0.066f,  6, true));
-        anims.put(EnemyState.ATTACK, load("enemy/Enemy_punchJab.png", 0.066f, 10, true));
-        anims.put(EnemyState.HURT, load("enemy/Enemy_hurt.png",     0.066f,  4, true));
-        anims.put(EnemyState.DEAD, load("enemy/Enemy_dead.png",     0.100f, 10, false));
+        anims.put(EnemyState.IDLE, load("character/Enemy_idle.png",     0.066f, 10, true));
+        anims.put(EnemyState.RUN, load("character/Enemy_run.png",      0.066f,  8, true));
+        anims.put(EnemyState.JUMP, load("character/Enemy_jump.png",     0.066f,  6, true));
+        anims.put(EnemyState.AIRSPIN, load("character/Enemy_AirSpin.png",  0.066f,  6, true));
+        anims.put(EnemyState.ATTACK, load("character/Enemy_punchJab.png", 0.066f, 10, true));
+        anims.put(EnemyState.HURT, load("character/Enemy_hurt.png",     0.066f,  4, true));
+        anims.put(EnemyState.DEAD, load("character/Enemy_dead.png",     0.100f, 10, false));
     }
 
     private Animation<TextureRegion> load(String path, float dur, int frames, boolean loop) {
