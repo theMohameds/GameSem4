@@ -54,7 +54,6 @@ public class PlayerAnimationRenderer extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        stateTime += deltaTime;
 
         // Mom get the camera.
         OrthographicCamera cam = CoreResources.getCamera();
@@ -122,8 +121,6 @@ public class PlayerAnimationRenderer extends EntitySystem {
             }else {
                 frame = currentAnim.getKeyFrame(stateTime);
             }
-
-
 
             float targetWidth = 48f / CoreResources.PPM;
             float targetHeight = 48f / CoreResources.PPM;
