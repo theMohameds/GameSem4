@@ -114,10 +114,40 @@ public class PlayerAnimationRenderer extends EntitySystem {
                 }
             } else if (currentAnim == animations.get(PlayerComponent.State.AIRSPIN)) {
                 float airspinDuration = currentAnim.getAnimationDuration();
-                float airspinEndTime = airspinDuration - 0.0001f;
-                stateTime = Math.min(stateTime, airspinEndTime);
-                frame = currentAnim.getKeyFrame(stateTime, false);
 
+                if (stateTime < airspinDuration) {
+                    // Still playing airspin normally
+                    float playTime = Math.min(stateTime, airspinDuration - 0.0001f);
+                    frame = currentAnim.getKeyFrame(playTime, false);
+
+                } else {
+                    Animation<TextureRegion> jumpAnim = animations.get(PlayerComponent.State.JUMP);
+                    float playTime = 0;
+                    float clipStartTime = 0;
+                    if (pc.body.getLinearVelocity().y < 0){
+                        // AIRSPIN finished: play only the last 4 frames of JUMP
+                        int totalJumpFrames = jumpAnim.getKeyFrames().length;
+                        int clipFrameCount = 4;
+
+                        // Calculate start frame index (e.g., if totalJumpFrames=6, startFrame=2)
+                        int startFrameIndex = Math.max(0, totalJumpFrames - clipFrameCount);
+
+                        // Convert frame index to time
+                        float frameDuration = jumpAnim.getFrameDuration();
+                        clipStartTime = startFrameIndex * frameDuration;
+                        float clipDuration = clipFrameCount * frameDuration;
+
+                        // Calculate how long we've been into the jump clip
+                        float elapsedSinceAirspin = stateTime - airspinDuration;
+                        playTime = Math.min(elapsedSinceAirspin, clipDuration - 0.0001f);
+
+                        // Get the appropriate frame from the jump animation
+
+                    }
+
+                    frame = jumpAnim.getKeyFrame(clipStartTime + playTime, false);
+
+                }
             }else {
                 frame = currentAnim.getKeyFrame(stateTime);
             }
