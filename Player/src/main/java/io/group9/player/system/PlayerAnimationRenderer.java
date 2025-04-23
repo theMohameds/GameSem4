@@ -115,38 +115,10 @@ public class PlayerAnimationRenderer extends EntitySystem {
                 }
             } else if (currentAnim == animations.get(PlayerComponent.State.AIRSPIN)) {
                 float airspinDuration = currentAnim.getAnimationDuration();
-                Animation<TextureRegion> jumpAnim = animations.get(PlayerComponent.State.JUMP);
-                float jumpFrameDuration = jumpAnim.getFrameDuration();
-
-                if (stateTime >= airspinDuration) {
-                    // After airspin completes, use the stored jump time
-                    float jumpTime = 0.066f *5; // Use the preserved jump animation time
-
-                    // Get the proper jump animation frame based on vertical velocity
-                    if (pc.body.getLinearVelocity().y > 0) {
-                        // Cap at first 3 jump frames during ascent
-                        float maxAscentTime = jumpFrameDuration * 3;
-                        jumpTime = Math.min(jumpTime, maxAscentTime);
-                    } else {
-                        // Use frames 3-5 during descent
-                        float minDescentTime = jumpFrameDuration * 3;
-                        float maxDescentTime = jumpAnim.getAnimationDuration() - 0.0001f;
-                        jumpTime = Math.min(Math.max(jumpTime, minDescentTime), maxDescentTime);
-                    }
-
-                    // Get the frame from JUMP animation using calculated time
-                    frame = jumpAnim.getKeyFrame(jumpTime, false);
-
-                    // Optional: Automatically transition back to JUMP state
-                    // pc.state = PlayerComponent.State.JUMP;
-                } else {
-                    // Normal airspin playback (first 6 frames)
-                    float airspinEndTime = airspinDuration - 0.0001f;
-                    stateTime = Math.min(stateTime, airspinEndTime);
-                    frame = currentAnim.getKeyFrame(stateTime, false);
-                }
-            } else if (currentAnim == animations.get(PlayerComponent.State.DASH)){
+                float airspinEndTime = airspinDuration - 0.0001f;
+                stateTime = Math.min(stateTime, airspinEndTime);
                 frame = currentAnim.getKeyFrame(stateTime, false);
+
             }else {
                 frame = currentAnim.getKeyFrame(stateTime);
             }
