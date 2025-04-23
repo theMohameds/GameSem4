@@ -16,8 +16,8 @@ public class EnemyAIControlSystem extends EntitySystem {
     private final Vector2 playerPos = new Vector2();
 
     // tuning constants
-    private static final float SMOOTHING      = 8f;
-    private static final float BLOCKED_VX     = 0.2f;
+    private static final float SMOOTHING = 8f;
+    private static final float BLOCKED_VX = 0.2f;
     private static final float JUMP_HEIGHT_TH = 0.3f;
 
     public EnemyAIControlSystem(float cellSize) {

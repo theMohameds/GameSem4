@@ -11,8 +11,8 @@ import io.group9.enemy.systems.EnemyPathfindingSystem;
 
 
 public class PathfindingPlugin implements ECSPlugin {
-    private static final String MAP_PATH            = "map/New4.tmx";
-    private static final int    COLLISION_LAYER_IDX = 2;
+    private static final String MAP_PATH = "map/New4.tmx";
+    private static final int COLLISION_LAYER_IDX = 2;
 
     @Override
     public void registerSystems(Engine engine) {
@@ -33,14 +33,12 @@ public class PathfindingPlugin implements ECSPlugin {
                 Cell cell = collisionLayer.getCell(x, y);
                 terrainCosts[y][x] = (cell != null && cell.getTile() != null)
                     ? Float.POSITIVE_INFINITY   // blocked
-                    : 1.0f;                      // normal ground
+                    : 1.0f; // normal ground
             }
         }
 
         // 3) Register the advanced A* system
-        engine.addSystem(
-            new EnemyPathfindingSystem(terrainCosts, cellSize)
-        );
+        engine.addSystem(new EnemyPathfindingSystem(terrainCosts, cellSize));
     }
 
     @Override
