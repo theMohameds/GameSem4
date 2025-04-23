@@ -39,7 +39,7 @@ public class EnemyComponent implements Component {
     public boolean attackRequested     = false;
     public boolean attacking           = false;
     public boolean pendingRemoveSensor = false;
-    public float attackCooldown        = 1.0f;
+    public float attackCooldown        = 1f;
     public float attackCooldownTimer   = 0f;
 
     /* ─── Hurt / stun ─── */

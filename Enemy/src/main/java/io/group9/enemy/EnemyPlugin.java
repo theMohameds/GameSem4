@@ -2,8 +2,10 @@ package io.group9.enemy;
 
 import com.badlogic.ashley.core.Engine;
 import io.group9.CoreResources;
-import io.group9.enemy.pathfinding.GridGraph;
-import io.group9.enemy.systems.*;
+import io.group9.enemy.systems.EnemyAIControlSystem;
+import io.group9.enemy.systems.EnemyAttackSystem;
+import io.group9.enemy.systems.EnemyAnimationRenderer;
+import io.group9.enemy.systems.EnemyStateSystem;
 import plugins.ECSPlugin;
 
 public class EnemyPlugin implements ECSPlugin {
@@ -12,10 +14,8 @@ public class EnemyPlugin implements ECSPlugin {
     @Override
     public void registerSystems(Engine engine) {
         float cellSize = 64f / CoreResources.PPM;
-        GridGraph grid = new GridGraph(150, 20, cellSize);
 
-        engine.addSystem(new EnemyPathfindingSystem(grid));
-        engine.addSystem(new EnemyAIControlSystem(grid));
+        engine.addSystem(new EnemyAIControlSystem(cellSize));
         engine.addSystem(new EnemyStateSystem());
         engine.addSystem(new EnemyAttackSystem());
         engine.addSystem(new EnemyAnimationRenderer());

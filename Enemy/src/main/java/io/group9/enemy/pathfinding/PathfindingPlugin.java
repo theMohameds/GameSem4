@@ -1,50 +1,55 @@
 package io.group9.enemy.pathfinding;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import io.group9.CoreResources;
 import plugins.ECSPlugin;
 import io.group9.enemy.systems.EnemyPathfindingSystem;
 
-import java.util.List;
 
-/**
- * Creates the navigation grid and registers the systems that use it.
- * Adjust width/height to match your Tiled map bounds.
- */
 public class PathfindingPlugin implements ECSPlugin {
-
-    private static final int GRID_W = 100;
-    private static final int GRID_H = 20;
-
-    private static final float CELL_SIZE = 64f / CoreResources.PPM;
+    private static final String MAP_PATH            = "map/New4.tmx";
+    private static final int    COLLISION_LAYER_IDX = 2;
 
     @Override
     public void registerSystems(Engine engine) {
-        List<Rectangle> obstacles = gatherObstacleRects();
+        // 1) Load the map and collision layer
+        TiledMap map = new TmxMapLoader().load(MAP_PATH);
+        TiledMapTileLayer collisionLayer =
+            (TiledMapTileLayer)map.getLayers().get(COLLISION_LAYER_IDX);
 
-        GridGraph navGraph = new GridGraph(GRID_W, GRID_H, CELL_SIZE);
+        int cols = collisionLayer.getWidth();
+        int rows = collisionLayer.getHeight();
+        float tilePx = collisionLayer.getTileWidth();
+        float cellSize = tilePx / CoreResources.PPM;
 
-
-        engine.addSystem(new EnemyPathfindingSystem(navGraph));
-    }
-
-    @Override public void createEntities(Engine eng) { /* nothing */ }
-
-    @Override public int getPriority() { return 3; }
-
-    /* ------------------------------------------------------------------ */
-
-    private List<Rectangle> gatherObstacleRects() {
-        return java.util.Collections.emptyList();
-    }
-
-    @SuppressWarnings("unused")
-    private void markBlocked(GridGraph g, List<Rectangle> rects) {
-        for (Rectangle r : rects) {
-            int gx = (int) (r.x / g.getCellSize());
-            int gy = (int) (r.y / g.getCellSize());
-            // Override GridGraph and implement isBlocked() with your own data.
+        // 2) Build terrainCosts[y][x]: 1f = walkable, ∞ = blocked
+        float[][] terrainCosts = new float[rows][cols];
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                Cell cell = collisionLayer.getCell(x, y);
+                terrainCosts[y][x] = (cell != null && cell.getTile() != null)
+                    ? Float.POSITIVE_INFINITY   // blocked
+                    : 1.0f;                      // normal ground
+            }
         }
+
+        // 3) Register the advanced A* system
+        engine.addSystem(
+            new EnemyPathfindingSystem(terrainCosts, cellSize)
+        );
+    }
+
+    @Override
+    public void createEntities(Engine engine) {
+        // No map‐specific entities to spawn here
+    }
+
+    @Override
+    public int getPriority() {
+        return 3;
     }
 }

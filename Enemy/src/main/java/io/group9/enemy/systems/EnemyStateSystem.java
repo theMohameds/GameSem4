@@ -43,7 +43,7 @@ public class EnemyStateSystem extends EntitySystem {
             /* On‑ground vs air */
             if(ec.isGrounded()){
                 ec.state = Math.abs(ec.body.getLinearVelocity().x) > 0.1f
-                    ? EnemyState.CHASE : EnemyState.IDLE;
+                    ? EnemyState.RUN : EnemyState.IDLE;
             }else{
                 ec.state = ec.body.getLinearVelocity().y > 0
                     ? EnemyState.JUMP : EnemyState.AIRSPIN;

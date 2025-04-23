@@ -64,7 +64,7 @@ public class EnemyContactReceiver implements ContactReceiver {
         }
     }
 
-    /** Apply damage or kill */
+    //Apply damage or kill
     private void hit(EnemyComponent ec) {
         if (ec == null || ec.state == EnemyState.DEAD) return;
 
