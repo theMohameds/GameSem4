@@ -2,31 +2,31 @@ package io.group9.gamecamera.system;
 
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import io.group9.CoreResources;
 
 public class GameCameraSystem extends EntitySystem {
     private OrthographicCamera camera;
-    private boolean followPLayer;
+    private boolean followPlayer;
 
-    public GameCameraSystem(int width, int height, float initialX, float initialY, boolean followPlayer) {
-        //Standard Width 640 and Height 360
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, width, height);
-        camera.position.set(initialX + 40, initialY + 100, 0);  // Set initial camera position
+    public GameCameraSystem(float viewportWidth, float viewportHeight, float initialX, float initialY, boolean followPlayer) {
+        camera = new OrthographicCamera(viewportWidth, viewportHeight);
+        camera.position.set(initialX, initialY, 0);
         camera.update();
-
-        this.followPLayer = followPlayer;
+        this.followPlayer = followPlayer;
     }
 
-    public OrthographicCamera getCamera() {
-        return camera;
-    }
-    public boolean isFollowingPLayer() {
-        return followPLayer;
-    }
-    public void setCameraPos(float x, float y) {
-        camera.position.set(x + 40, y + 100, 0);
-        camera.update();  // Move update after setting the position
-    }
+    public OrthographicCamera getCamera() { return camera; }
+    public void setCameraPos(float x, float y) { camera.position.set(x, y+ 6.25f, 0); camera.update(); }
 
-
+    @Override
+    public void update(float deltaTime) {
+        if (followPlayer && CoreResources.getPlayerBody() != null) {
+            Vector2 playerPos = CoreResources.getPlayerBody().getPosition();
+            setCameraPos(playerPos.x, playerPos.y);
+        }
+        camera.update();
+    }
 }
+
+

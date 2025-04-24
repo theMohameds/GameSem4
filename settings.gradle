@@ -11,4 +11,5 @@ include 'GameCamera'
 include 'GameCamera'
 include 'Common'
 include 'Player'
+include 'Enemy'
 
