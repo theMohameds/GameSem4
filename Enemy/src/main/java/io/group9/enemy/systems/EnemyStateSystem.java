@@ -1,3 +1,4 @@
+// src/io/group9/enemy/systems/EnemyStateSystem.java
 package io.group9.enemy.systems;
 
 import com.badlogic.ashley.core.Engine;
@@ -11,7 +12,8 @@ import io.group9.enemy.ai.EnemyState;
 
 public class EnemyStateSystem extends EntitySystem {
     private ImmutableArray<Entity> entities;
-    private static final float UP = 5.5f, DOWN = 5.5f;
+    private static final float UP   = 5.5f;
+    private static final float DOWN = 5.5f;
 
     @Override
     public void addedToEngine(Engine eng) {
@@ -23,20 +25,29 @@ public class EnemyStateSystem extends EntitySystem {
         for (Entity e : entities) {
             EnemyComponent ec = e.getComponent(EnemyComponent.class);
 
+            // ---- 1) Death freeze ----
             if (ec.state == EnemyState.DEAD && ec.needsFreeze) {
-                float vy = ec.body.getLinearVelocity().y;
-                ec.body.setLinearVelocity(0f, vy);
-                ec.body.setGravityScale(1f);
-                ec.body.setType(BodyDef.BodyType.DynamicBody);
+                ec.body.setLinearVelocity(0f, 0f);
+                ec.body.setGravityScale(0f);
+                ec.body.setType(BodyDef.BodyType.StaticBody);
                 ec.needsFreeze = false;
             }
             if (ec.state == EnemyState.DEAD) continue;
 
+            // ---- 2) Landing detection & jump refill ----
+            boolean nowGrounded = ec.isGrounded();
+            if (nowGrounded && !ec.wasGrounded) {
+                // landed this frame!
+                ec.jumpsLeft = ec.maxJumps;
+            }
+            ec.wasGrounded = nowGrounded;
+
+            // ---- 3) Hurt state ----
             if (ec.state == EnemyState.HURT) {
                 ec.hurtTimer -= dt;
                 if (ec.hurtTimer <= 0f) {
-                    ec.state = EnemyState.IDLE;
-                    ec.isHurt = false;
+                    ec.state    = EnemyState.IDLE;
+                    ec.isHurt   = false;
                     ec.animTime = 0f;
                 }
                 continue;
@@ -44,16 +55,21 @@ public class EnemyStateSystem extends EntitySystem {
 
             if (ec.attacking) continue;
 
-            if (ec.isGrounded()) {
+            // ---- 4) State machine ----
+            if (nowGrounded) {
                 ec.state = Math.abs(ec.body.getLinearVelocity().x) > 0.1f
-                    ? EnemyState.RUN : EnemyState.IDLE;
+                    ? EnemyState.RUN
+                    : EnemyState.IDLE;
             } else {
                 ec.state = ec.body.getLinearVelocity().y > 0
-                    ? EnemyState.JUMP : EnemyState.AIRSPIN;
+                    ? EnemyState.JUMP
+                    : EnemyState.AIRSPIN;
             }
 
+            // ---- 5) Variable gravity for jump arcs ----
             ec.body.setGravityScale(
-                ec.body.getLinearVelocity().y > 0 ? UP : DOWN);
+                ec.body.getLinearVelocity().y > 0 ? UP : DOWN
+            );
         }
     }
 }
