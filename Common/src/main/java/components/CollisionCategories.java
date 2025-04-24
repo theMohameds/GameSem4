@@ -10,4 +10,7 @@ public class CollisionCategories {
     public static final short WALL = 0x0007;
     public static final short ENEMY_ATTACK = 0x0400;
 
+    public static final short WEAPON = 0x0009;
+
+    // Optionally, add more, such as ground, projectiles, etc.
 }
