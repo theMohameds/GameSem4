@@ -21,6 +21,7 @@ public class PlayerInputSystem extends EntitySystem {
     public void update(float deltaTime) {
         for (Entity e : entities) {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
+            // ❌ skip all input if dead or hurt
             if (pc.state == PlayerComponent.State.DEAD ||
                 pc.state == PlayerComponent.State.HURT) continue;
             if (pc.body == null) continue;
