@@ -78,7 +78,6 @@ public class FirstScreen implements Screen {
         }
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         accumulator += delta;
         while (accumulator >= fixedTimeStep) {
             world.step(fixedTimeStep, 6, 2);
