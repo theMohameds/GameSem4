@@ -53,8 +53,7 @@ public class EnemyAnimationRenderer extends EntitySystem {
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
 
-        // tint everything you draw to blue
-        batch.setColor(Color.LIGHT_GRAY);
+        batch.setColor(Color.ROYAL);
 
         for (Entity e : entities) {
             EnemyComponent ec = e.getComponent(EnemyComponent.class);
@@ -75,7 +74,6 @@ public class EnemyAnimationRenderer extends EntitySystem {
             }
         }
 
-        // reset tint so nothing else gets colored
         batch.setColor(Color.WHITE);
         batch.end();
     }

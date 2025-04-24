@@ -1,51 +1,56 @@
 package io.group9.player;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import io.group9.ContactReceiver;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
 
 public class AttackContactReceiver implements ContactReceiver {
+
     @Override
     public void beginContact(Contact contact) {
-        // Fixture userData
-        Object fA = contact.getFixtureA().getUserData();
-        Object fB = contact.getFixtureB().getUserData();
-        // Body userData
-        Object bA = contact.getFixtureA().getBody().getUserData();
-        Object bB = contact.getFixtureB().getBody().getUserData();
 
-        // Did an enemyAttack sensor hit the player body?
-        boolean aIsEnemyAtk   = "enemyAttack".equals(fA);
-        boolean bIsEnemyAtk   = "enemyAttack".equals(fB);
-        boolean aIsPlayerBody = "player".equals(bA);
-        boolean bIsPlayerBody = "player".equals(bB);
+        Object fxA = contact.getFixtureA().getUserData();
+        Object fxB = contact.getFixtureB().getUserData();
+        Object bdA = contact.getFixtureA().getBody().getUserData();
+        Object bdB = contact.getFixtureB().getBody().getUserData();
 
-        if ((aIsEnemyAtk && bIsPlayerBody) || (bIsEnemyAtk && aIsPlayerBody)) {
-            hitPlayer();
+        boolean aEnemyAtk = "enemyAttack".equals(fxA);
+        boolean bEnemyAtk = "enemyAttack".equals(fxB);
+
+        boolean aIsPlayerBody = isPlayerBody(bdA);
+        boolean bIsPlayerBody = isPlayerBody(bdB);
+
+        if ((aEnemyAtk && bIsPlayerBody) || (bEnemyAtk && aIsPlayerBody)) {
+            applyDamageToPlayer();
         }
     }
 
-    @Override
-    public void endContact(Contact contact) { }
+    @Override public void endContact(Contact contact) { }
 
-    private void hitPlayer() {
-        if (CoreResources.getPlayerEntity() == null) return;
-        PlayerComponent pc = CoreResources
-            .getPlayerEntity()
+    private boolean isPlayerBody(Object bodyUserData) {
+        if (bodyUserData == null) return false;
+
+        if ("player".equals(bodyUserData)) return true;
+
+        return bodyUserData == CoreResources.getPlayerEntity()
+            .getComponent(PlayerComponent.class);
+    }
+
+    private void applyDamageToPlayer() {
+        PlayerComponent pc = CoreResources.getPlayerEntity()
             .getComponent(PlayerComponent.class);
         if (pc == null || pc.state == PlayerComponent.State.DEAD) return;
 
         pc.health -= 10;
+        CoreResources.setPlayerHealth(pc.health);
+
         if (pc.health <= 0) {
             pc.state = PlayerComponent.State.DEAD;
-            Gdx.app.log("AttackContactReceiver", "Player has died!");
         } else {
             pc.state     = PlayerComponent.State.HURT;
             pc.hurtTimer = pc.hurtDuration;
             pc.isHurt    = true;
-            Gdx.app.log("AttackContactReceiver", "Player was hurt! HP=" + pc.health);
         }
     }
 }

@@ -109,7 +109,6 @@ public class AStar {
         while (idx < n) {
             out.add(raw.get(idx));
             int nextIdx = idx + 1;
-            // try to jump as far forward as still in a straight line
             for (int j = n - 1; j > nextIdx; j--) {
                 if (collinear(raw.get(idx), raw.get(j), raw)) {
                     nextIdx = j;

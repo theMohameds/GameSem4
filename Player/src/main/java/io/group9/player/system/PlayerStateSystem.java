@@ -8,6 +8,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import io.group9.player.components.PlayerComponent;
 
 public class PlayerStateSystem extends EntitySystem {
@@ -28,25 +29,29 @@ public class PlayerStateSystem extends EntitySystem {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
 
-            // 1) Hurt state: countdown, then revert to IDLE
             if (pc.state == PlayerComponent.State.HURT) {
                 pc.hurtTimer -= deltaTime;
                 if (pc.hurtTimer <= 0f) {
-                    pc.state = PlayerComponent.State.IDLE;
+                    pc.state  = PlayerComponent.State.IDLE;
                     pc.isHurt = false;
                 }
                 continue;
             }
 
-            // 2) Dead state: freeze completely
-            if (pc.state == PlayerComponent.State.DEAD) {
-                // zero horizontal motion but allow gravity to drop them
+
+            if (pc.state == PlayerComponent.State.DEAD && pc.needsFreeze) {
                 Vector2 vel = pc.body.getLinearVelocity();
                 pc.body.setLinearVelocity(0f, vel.y);
+                pc.body.setGravityScale(FALL_MULTIPLIER);
+                pc.body.setType(BodyDef.BodyType.DynamicBody);
+                pc.needsFreeze = false;
+            }
+
+            if (pc.state == PlayerComponent.State.DEAD) {
                 continue;
             }
 
-            // 3) Wall‐hang cooldown decrement
+
             if (pc.wallHangCooldownTimer > 0f) {
                 pc.wallHangCooldownTimer -= deltaTime;
                 if (pc.wallHangCooldownTimer < 0f) {
@@ -54,13 +59,12 @@ public class PlayerStateSystem extends EntitySystem {
                 }
             }
 
-            // 4) If wall‐hanging, handle that
+
             if (pc.wallHanging) {
                 updateWallHanging(pc, deltaTime);
                 continue;
             }
 
-            // 5) Normal in‐air / on‐ground state & gravity
             updateNormalState(pc);
             applyGravityScaling(pc);
         }

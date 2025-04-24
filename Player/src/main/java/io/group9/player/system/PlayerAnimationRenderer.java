@@ -1,5 +1,6 @@
 package io.group9.player.system;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
@@ -27,12 +28,10 @@ public class PlayerAnimationRenderer extends EntitySystem {
         batch = new SpriteBatch();
         animations = new EnumMap<>(PlayerComponent.State.class);
 
-        // Load animations from assets.
-
         animations.put(PlayerComponent.State.IDLE, loadAnimation("character/Enemy_idle.png", 0.066f, 10, true));
         animations.put(PlayerComponent.State.RUN, loadAnimation("character/Enemy_run.png", 0.066f, 8,true));
         animations.put(PlayerComponent.State.JUMP, loadAnimation("character/Enemy_jump.png", 0.066f, 6,true));
-        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("character/Enemy_airSpin.png", 0.066f, 6,true));
+        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("character/Enemy_AirSpin.png", 0.066f, 6,true));
         animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("character/Enemy_punchCross.png", 0.066f, 7,true));
         animations.put(PlayerComponent.State.LAND_WALL, loadAnimation("character/Enemy_landWall.png", 0.297f, 6,true));
         animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("character/Enemy_punchJab.png", 0.066f, 10,true));
@@ -55,7 +54,6 @@ public class PlayerAnimationRenderer extends EntitySystem {
     @Override
     public void update(float deltaTime) {
 
-        // Mom get the camera.
         OrthographicCamera cam = CoreResources.getCamera();
         if (cam == null) {
             Gdx.app.error("PlayerAnimationRenderer", "Camera is null, using fallback.");
@@ -166,7 +164,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
     }
 
     @Override
-    public void removedFromEngine(com.badlogic.ashley.core.Engine engine) {
+    public void removedFromEngine(Engine engine) {
         batch.dispose();
     }
 }

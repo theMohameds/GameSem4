@@ -1,10 +1,8 @@
 package io.group9.enemy.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import io.group9.enemy.ai.EnemyLocation;
@@ -22,7 +20,6 @@ public class EnemyComponent implements Component {
     // AI wrappers
     public final EnemyLocation location = new EnemyLocation(this);
     public EnemyState state = EnemyState.IDLE;
-    public SteeringBehavior<Vector2> steering;
 
     // Steering caps
     public float maxLinearSpeed = 14f;

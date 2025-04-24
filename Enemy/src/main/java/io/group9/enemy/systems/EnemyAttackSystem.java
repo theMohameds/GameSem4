@@ -1,4 +1,3 @@
-// File: src/main/java/io/group9/enemy/systems/EnemyAttackSystem.java
 package io.group9.enemy.systems;
 
 import com.badlogic.ashley.core.*;
@@ -23,17 +22,14 @@ public class EnemyAttackSystem extends EntitySystem {
         for (Entity e : enemies) {
             EnemyComponent ec = e.getComponent(EnemyComponent.class);
 
-            // 1) start attack if requested
             if (ec.attackRequested && !ec.attacking) {
                 ec.attacking       = true;
                 ec.attackTimer     = ec.attackDuration;
                 ec.attackRequested = false;
 
-                // create a sensor fixture for the attack
                 PolygonShape shape = new PolygonShape();
                 float w = ec.sensorW / CoreResources.PPM;
                 float h = ec.sensorH / CoreResources.PPM;
-                // offset in front of enemy body
                 float offsetX = ec.facingLeft
                     ? -((ec.boundingRadius) + w/2)
                     :  (ec.boundingRadius + w/2);
@@ -50,11 +46,9 @@ public class EnemyAttackSystem extends EntitySystem {
                 shape.dispose();
             }
 
-            // 2) if attacking, count down timer and remove sensor when done
             if (ec.attacking) {
                 ec.attackTimer -= deltaTime;
                 if (ec.attackTimer <= 0f) {
-                    // destroy the attack sensor
                     if (ec.attackSensor != null) {
                         ec.body.destroyFixture(ec.attackSensor);
                         ec.attackSensor = null;

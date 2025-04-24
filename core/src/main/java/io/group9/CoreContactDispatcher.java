@@ -21,7 +21,6 @@ public class CoreContactDispatcher implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        // Forward to each ContactReceiver
         for (ContactReceiver r : receivers) {
             r.beginContact(contact);
         }
@@ -36,11 +35,9 @@ public class CoreContactDispatcher implements ContactListener {
 
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
-        // Not used by your ContactReceiver interface
     }
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
-        // Not used by your ContactReceiver interface
     }
 }

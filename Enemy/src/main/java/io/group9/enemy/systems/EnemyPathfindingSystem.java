@@ -27,7 +27,6 @@ public class EnemyPathfindingSystem extends EntitySystem {
 
     @Override
     public void update(float dt) {
-        // Compute goal once per frame
         Vector2 playerPos = CoreResources.getPlayerBody().getPosition();
         int goalX = (int)(playerPos.x / cellSize);
         int goalY = (int)(playerPos.y / cellSize);
@@ -38,10 +37,8 @@ public class EnemyPathfindingSystem extends EntitySystem {
             int sx = (int)(pos.x / cellSize);
             int sy = (int)(pos.y / cellSize);
 
-            // Run the search
             List<PathNode> raw = astar.findPath(sx, sy, goalX, goalY);
 
-            // Populate the component’s GraphPath
             ec.path.clear();
             for (PathNode n : raw) {
                 ec.path.add(n);

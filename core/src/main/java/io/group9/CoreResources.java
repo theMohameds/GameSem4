@@ -41,5 +41,24 @@ public class CoreResources {
         return gameMapProvider;
     }
 
+    private static int playerHealth;
+    private static int enemyHealth;
+
+    public static void setPlayerHealth(int hp) { playerHealth = hp; }
+    public static int getPlayerHealth() { return playerHealth; }
+
+    public static void setEnemyHealth(int hp) { enemyHealth  = hp; }
+    public static int getEnemyHealth() { return enemyHealth; }
+
+    private static Body enemyBody;
+
+    public static void setEnemyBody(Body body)       { enemyBody = body; }
+    public static Body getEnemyBody()                { return enemyBody; }
+    private static volatile boolean roundFrozen = true;
+    public static void   setRoundFrozen(boolean f) { roundFrozen = f; }
+    public static boolean isRoundFrozen() { return roundFrozen; }
+
+
+
 
 }

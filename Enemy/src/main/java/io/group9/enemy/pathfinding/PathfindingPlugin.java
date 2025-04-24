@@ -16,7 +16,6 @@ public class PathfindingPlugin implements ECSPlugin {
 
     @Override
     public void registerSystems(Engine engine) {
-        // 1) Load the map and collision layer
         TiledMap map = new TmxMapLoader().load(MAP_PATH);
         TiledMapTileLayer collisionLayer =
             (TiledMapTileLayer)map.getLayers().get(COLLISION_LAYER_IDX);
@@ -26,7 +25,6 @@ public class PathfindingPlugin implements ECSPlugin {
         float tilePx = collisionLayer.getTileWidth();
         float cellSize = tilePx / CoreResources.PPM;
 
-        // 2) Build terrainCosts[y][x]: 1f = walkable, ∞ = blocked
         float[][] terrainCosts = new float[rows][cols];
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
@@ -37,13 +35,11 @@ public class PathfindingPlugin implements ECSPlugin {
             }
         }
 
-        // 3) Register the advanced A* system
         engine.addSystem(new EnemyPathfindingSystem(terrainCosts, cellSize));
     }
 
     @Override
     public void createEntities(Engine engine) {
-        // No map‐specific entities to spawn here
     }
 
     @Override

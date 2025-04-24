@@ -4,10 +4,10 @@ import java.util.Objects;
 
 public class PathNode {
     public final int x, y;
-    public float g;           // cost from start
-    public float h;           // heuristic to goal
-    public PathNode parent;   // backpointer
-    public final float terrainCost; // tile‐specific weight
+    public float g;
+    public float h;
+    public PathNode parent;
+    public final float terrainCost;
 
     public PathNode(int x, int y) {
         this(x, y, 1f);

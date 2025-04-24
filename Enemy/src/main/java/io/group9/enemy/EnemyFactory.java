@@ -21,49 +21,36 @@ public final class EnemyFactory {
         Body body = world.createBody(bd);
         body.setLinearDamping(0f);
         body.setSleepingAllowed(false);
+        CoreResources.setEnemyBody(body);
 
-        // Main fixture: ground & walls only, same negative group as player
-        PolygonShape mainShape = new PolygonShape();
-        mainShape.setAsBox(8f / CoreResources.PPM, 15f / CoreResources.PPM);
-        FixtureDef mainFD = new FixtureDef();
-        mainFD.shape = mainShape;
-        mainFD.density = 0.5f;
-        mainFD.friction = 0f;
-        mainFD.filter.categoryBits = CollisionCategories.ENEMY;
-        mainFD.filter.maskBits     = (short)(
-            CollisionCategories.GROUND |
-                CollisionCategories.WALL
-        );
-        mainFD.filter.groupIndex   = -1;  // never collide with same group
-        body.createFixture(mainFD).setUserData("enemyBody");
-        mainShape.dispose();
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(8f / CoreResources.PPM, 15f / CoreResources.PPM);
+        FixtureDef fd = new FixtureDef();
+        fd.shape = shape;
+        fd.density  = 0.5f;
+        fd.friction = 0f;
+        fd.filter.categoryBits = CollisionCategories.ENEMY;
+        fd.filter.maskBits     = (short)(CollisionCategories.GROUND | CollisionCategories.WALL);
+        fd.filter.groupIndex   = -1;
+        body.createFixture(fd).setUserData("enemyBody");
+        shape.dispose();
 
-        // Foot sensor (ground detection)
         PolygonShape footShape = new PolygonShape();
-        footShape.setAsBox(
-            6f / CoreResources.PPM,
-            2f / CoreResources.PPM,
-            new Vector2(0f, -15f / CoreResources.PPM),
-            0f
-        );
+        footShape.setAsBox(6f / CoreResources.PPM, 2f / CoreResources.PPM, new Vector2(0f, -15f / CoreResources.PPM), 0f);
         FixtureDef footFD = new FixtureDef();
-        footFD.shape = footShape;
-        footFD.isSensor = true;
+        footFD.shape       = footShape;
+        footFD.isSensor    = true;
         footFD.filter.categoryBits = CollisionCategories.ENEMY;
-        footFD.filter.maskBits     = (short)(
-            CollisionCategories.GROUND |
-                CollisionCategories.WALL
-        );
+        footFD.filter.maskBits     = (short)(CollisionCategories.GROUND | CollisionCategories.WALL);
         Fixture footFx = body.createFixture(footFD);
         footFx.setUserData("footSensor");
         footShape.dispose();
 
-        // Hurtbox sensor (hit by player attacks)
         PolygonShape hurtShape = new PolygonShape();
         hurtShape.setAsBox(8f / CoreResources.PPM, 15f / CoreResources.PPM);
         FixtureDef hurtFD = new FixtureDef();
-        hurtFD.shape = hurtShape;
-        hurtFD.isSensor = true;
+        hurtFD.shape       = hurtShape;
+        hurtFD.isSensor    = true;
         hurtFD.filter.categoryBits = CollisionCategories.ENEMY_HURTBOX;
         hurtFD.filter.maskBits     = CollisionCategories.ATTACK;
         Fixture hurtFx = body.createFixture(hurtFD);
@@ -74,8 +61,11 @@ public final class EnemyFactory {
         ec.body          = body;
         ec.footSensor    = footFx;
         ec.hurtboxSensor = hurtFx;
-        body.setUserData(ec);
+        ec.facingLeft = true;
 
+        CoreResources.setEnemyHealth(ec.health);
+
+        body.setUserData(ec);
         Entity e = new Entity();
         e.add(ec);
         engine.addEntity(e);

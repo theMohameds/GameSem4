@@ -1,6 +1,5 @@
 package io.group9.player;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
@@ -12,60 +11,49 @@ public class PlayerContactReceiver implements ContactReceiver {
 
     @Override
     public void beginContact(Contact contact) {
-        Object dataA = contact.getFixtureA().getBody().getUserData();
-        Object dataB = contact.getFixtureB().getBody().getUserData();
 
-        // Only proceed if one of the bodies is the player.
-        boolean isAPlayer = "player".equals(dataA);
-        boolean isBPlayer = "player".equals(dataB);
-        if (!isAPlayer && !isBPlayer) {
-            return;
-        }
-        Object otherData = isAPlayer ? dataB : dataA;
+        Object bdA = contact.getFixtureA().getBody().getUserData();
+        Object bdB = contact.getFixtureB().getBody().getUserData();
 
-        // Process contact only if colliding with ground or wall.
-        if ("ground".equals(otherData) || "wall".equals(otherData)) {
-            WorldManifold manifold = contact.getWorldManifold();
-            Vector2 normal = manifold.getNormal();
+        boolean isAPlayer = isPlayerBody(bdA);
+        boolean isBPlayer = isPlayerBody(bdB);
+        if (!isAPlayer && !isBPlayer) return;
 
-            // Use the player component from the global resources.
-            if (CoreResources.getPlayerEntity() == null) {
-                return;
-            }
-            PlayerComponent pc = CoreResources.getPlayerEntity().getComponent(PlayerComponent.class);
+        Object otherData = isAPlayer ? bdB : bdA;
 
-            if (normal.y > 0.5f) {
-                processGroundContact(pc);
-            } else if (Math.abs(normal.x) > Math.abs(normal.y)) {
-                processWallContact(pc, normal);
-            }
+
+        if (!"ground".equals(otherData) && !"wall".equals(otherData)) return;
+
+        PlayerComponent pc = CoreResources.getPlayerEntity()
+            .getComponent(PlayerComponent.class);
+        if (pc == null) return;
+
+        WorldManifold manifold = contact.getWorldManifold();
+        Vector2 normal = manifold.getNormal();
+
+        if (normal.y > 0.5f) {
+            pc.jumpsLeft   = pc.maxJumps;
+            pc.wallHanging = false;
+            pc.state       = PlayerComponent.State.IDLE;
+        } else if (Math.abs(normal.x) > Math.abs(normal.y)) {
+            // LAND on wall
+            if (pc.jumpsLeft == pc.maxJumps) return;
+            pc.wallOnLeft  = normal.x > 0;
+            pc.facingLeft  = pc.wallOnLeft;
+            pc.wallHanging = true;
+            pc.wallHangingTimer = 0f;
+            pc.state       = PlayerComponent.State.LAND_WALL;
         }
     }
 
-    @Override
-    public void endContact(Contact contact) {}
+    @Override public void endContact(Contact contact) {}
 
-    private void processGroundContact(PlayerComponent pc) {
-        pc.jumpsLeft = pc.maxJumps;
-        pc.wallHanging = false;
-        pc.state = PlayerComponent.State.IDLE;
-        Gdx.app.log("PlayerContactReceiver", "Ground contact detected. Reset jumps and state to IDLE.");
-    }
 
-    private void processWallContact(PlayerComponent pc, Vector2 normal) {
-        if(pc.jumpsLeft == pc.maxJumps) return ;
-        if (normal.x > 0) {
-            // Wall is on the left; player should face left.
-            pc.wallOnLeft = true;
-            pc.facingLeft = true;
-        } else {
-            // Wall is on the right; player should face right.
-            pc.wallOnLeft = false;
-            pc.facingLeft = false;
-        }
-        pc.wallHanging = true;
-        pc.wallHangingTimer = 0f; // Reset hanging timer.
-        pc.state = PlayerComponent.State.LAND_WALL;
-        Gdx.app.log("PlayerContactReceiver", "Wall contact detected. Engaging wall hang.");
+    private boolean isPlayerBody(Object userData) {
+        if (userData == null) return false;
+        if ("player".equals(userData)) return true;
+        PlayerComponent pc = CoreResources.getPlayerEntity()
+            .getComponent(PlayerComponent.class);
+        return userData == pc;
     }
 }

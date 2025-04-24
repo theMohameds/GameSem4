@@ -8,7 +8,7 @@ public class PlayerComponent implements Component {
     public float speed = 14f;
     public int maxJumps = 2;
     public int jumpsLeft = 2;
-    public Fixture attackSensorFixture; // To keep track of the attack hitbox.
+    public Fixture attackSensorFixture;
 
     public boolean attacking = false;
     public float attackDuration = 0.3f;
@@ -29,6 +29,7 @@ public class PlayerComponent implements Component {
    public float wallHangingDuration = 2f; // Duration in seconds
    public float wallHangingTimer = 0f;
    public boolean wallOnLeft = false; //
+    public boolean needsFreeze = false;
 
     public enum State {
         IDLE,
