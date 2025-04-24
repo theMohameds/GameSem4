@@ -1,4 +1,3 @@
-// src/io/group9/gameManager/RoundManager.java
 package io.group9.gameManager;
 
 import com.badlogic.ashley.core.EntitySystem;
@@ -116,14 +115,13 @@ public final class RoundManager extends EntitySystem {
     private void respawnPlayer(Body body, Vector2 spawnPoint) {
         if (body == null) return;
 
-        // 1) CoreResources health
+        // CoreResources health
         CoreResources.setPlayerHealth(100);
 
         Object comp = body.getUserData();
         if (comp != null) {
             Class<?> cls = comp.getClass();
 
-            // 2) Reset reflected fields (health, jumps, flags, timers, state, facing)
             safelySetInt(comp, cls, "health", 100);
             int maxJ = safelyGetInt(comp, cls, "maxJumps", 0);
             safelySetInt(comp, cls, "jumpsLeft", maxJ);
@@ -135,14 +133,14 @@ public final class RoundManager extends EntitySystem {
             for (String t : new String[]{"reactionTimer","recalcTimer","hurtTimer","animTime"})
                 safelySetFloat(comp, cls, t, 0f);
 
-            // 3) Force “on ground” so player always starts able to jump
+            // Force “on ground” so player always starts able to jump
             safelySetInt(comp, cls, "groundContacts", 1);
             safelySetBoolean(comp, cls, "wasGrounded",   true);
 
             safelySetBoolean(comp, cls, "facingLeft", false);
         }
 
-        // 4) Physics & position
+        // Physics & position
         resetBodyPhysics(body);
         body.setTransform(
             spawnPoint.x / CoreResources.PPM,
@@ -156,7 +154,7 @@ public final class RoundManager extends EntitySystem {
     private void respawnEnemy(Body body, Vector2 spawnPoint, boolean died) {
         if (body == null) return;
 
-        // 1) CoreResources health
+        // CoreResources health
         CoreResources.setEnemyHealth(100);
 
         Object comp = body.getUserData();
@@ -164,7 +162,7 @@ public final class RoundManager extends EntitySystem {
         if (comp != null) {
             Class<?> cls = comp.getClass();
 
-            // 2) Reset reflected fields
+            // Reset reflected fields
             safelySetInt(comp, cls, "health", 100);
             maxJ = safelyGetInt(comp, cls, "maxJumps", 0);
             safelySetInt(comp, cls, "jumpsLeft", maxJ);
@@ -176,7 +174,7 @@ public final class RoundManager extends EntitySystem {
             for (String t : new String[]{"reactionTimer","recalcTimer","hurtTimer","animTime"})
                 safelySetFloat(comp, cls, t, 0f);
 
-            // 3) Ground logic differs if it actually died vs. if it won
+            // Ground logic differs if it actually died vs. if it won
             if (died) {
                 // died → start “airborne” so landing refills jumps properly
                 safelySetInt(comp, cls, "groundContacts", 0);
@@ -187,11 +185,11 @@ public final class RoundManager extends EntitySystem {
                 safelySetBoolean(comp, cls, "wasGrounded",   true);
             }
 
-            // 4) Facing direction
+            // Facing direction
             safelySetBoolean(comp, cls, "facingLeft", true);
         }
 
-        // 5) Physics & position
+        // Physics & position
         resetBodyPhysics(body);
         body.setTransform(
             spawnPoint.x / CoreResources.PPM,
@@ -203,7 +201,6 @@ public final class RoundManager extends EntitySystem {
             "Enemy respawned (maxJumps=" + maxJ + ", died=" + died + ")");
     }
 
-    // Utilities for safe reflection:
     private void safelySetInt(Object comp, Class<?> cls, String name, int val) {
         try {
             Field f = cls.getDeclaredField(name);
