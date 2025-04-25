@@ -7,6 +7,20 @@ import com.badlogic.gdx.physics.box2d.World;
 import plugins.GameMapProvider;
 
 public class CoreResources {
+
+    private static float elapsedTime = 0f;
+
+
+    public static void updateTime(float delta) {
+        elapsedTime += delta;
+    }
+
+
+    public static float getCurrentTime() {
+        return elapsedTime; // Or use a custom timer
+    }
+
+
     private static World world;
     private static OrthographicCamera camera;
     private static Body playerBody;
