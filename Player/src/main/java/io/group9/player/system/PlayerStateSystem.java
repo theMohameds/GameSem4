@@ -137,7 +137,6 @@ public class PlayerStateSystem extends EntitySystem {
 
         if (!pc.attacking) {
             if (onGround) {
-                System.out.println(pc.body.getLinearVelocity().x);
                 // On-ground: decide between RUN and IDLE.
                 PlayerComponent.State newState;
                 float absVelX = Math.abs(pc.body.getLinearVelocity().x);

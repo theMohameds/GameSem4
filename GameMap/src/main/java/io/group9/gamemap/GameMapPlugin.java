@@ -19,7 +19,6 @@ public class GameMapPlugin implements ECSPlugin {
         mapSystem = new GameMapSystem(
             CoreResources.getWorld(),
             "map2/map.tmx",
-            10,
             CoreResources.getCamera()
         );
         engine.addSystem(mapSystem);

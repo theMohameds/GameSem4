@@ -37,18 +37,23 @@ public class GameMapSystem extends EntitySystem {
 
     public GameMapSystem(World world,
                          String mapPath,
-                         int collisionLayerIndex,
                          OrthographicCamera camera) {
-        this.world    = world;
-        this.camera   = camera;
+        this.world = world;
+        this.camera = camera;
+
         // Load the TiledMap and renderer
-        tiledMap      = new TmxMapLoader().load(mapPath);
-        mapRenderer   = new OrthogonalTiledMapRenderer(tiledMap, UNIT_SCALE);
-        collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get(collisionLayerIndex);
+        tiledMap = new TmxMapLoader().load(mapPath);
+        mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, UNIT_SCALE);
+
+        // Find the layer named "Ground"
+        collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("Ground");
+        if (collisionLayer == null) {
+            throw new IllegalArgumentException("Tiled map is missing a layer named 'Ground'");
+        }
 
         // Capture layer dimensions and tile size in meters
-        this.layerWidth     = collisionLayer.getWidth();
-        this.layerHeight    = collisionLayer.getHeight();
+        this.layerWidth = collisionLayer.getWidth();
+        this.layerHeight = collisionLayer.getHeight();
         this.cellSizeMeters = collisionLayer.getTileWidth() * UNIT_SCALE;
 
         // Build collision rectangles and Box2D bodies
