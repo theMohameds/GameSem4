@@ -66,11 +66,13 @@ public final class RoundManager extends EntitySystem {
     }
 
     private boolean someoneDied() {
-        if (CoreResources.getPlayerHealth() <= 0) {
+        if (CoreResources.getPlayerHealth() <= 0 || CoreResources.getPlayerBody().getPosition().y < -1) {
+            CoreResources.setPlayerHealth(0);
             enemyWins++;
             return true;
         }
-        if (CoreResources.getEnemyHealth() <= 0) {
+        if (CoreResources.getEnemyHealth() <= 0 || CoreResources.getEnemyBody().getPosition().y < -1) {
+            CoreResources.setEnemyHealth(0);
             playerWins++;
             return true;
         }
