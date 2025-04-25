@@ -30,8 +30,8 @@ public class GameCameraSystem extends EntitySystem {
         if (followPlayer && CoreResources.getPlayerBody() != null) {
             Vector2 playerPos = CoreResources.getPlayerBody().getPosition();
             // preserve current Y
-            float y = camera.position.y;
-            camera.position.set(playerPos.x, y, 0);
+            //float y = camera.position.y;
+            camera.position.set(playerPos.x, playerPos.y, 0);
         }
         camera.update();
     }
