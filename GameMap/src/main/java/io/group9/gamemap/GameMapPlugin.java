@@ -18,8 +18,8 @@ public class GameMapPlugin implements ECSPlugin {
         Gdx.app.log("GameMapPlugin", "Initializing GameMapSystem…");
         mapSystem = new GameMapSystem(
             CoreResources.getWorld(),
-            "map/New4.tmx",
-            2,
+            "map2/map.tmx",
+            10,
             CoreResources.getCamera()
         );
         engine.addSystem(mapSystem);

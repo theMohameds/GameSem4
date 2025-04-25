@@ -11,7 +11,7 @@ import io.group9.enemy.systems.EnemyPathfindingSystem;
 
 
 public class PathfindingPlugin implements ECSPlugin {
-    private static final String MAP_PATH = "map/New4.tmx";
+    private static final String MAP_PATH = "map2/map.tmx";
     private static final int COLLISION_LAYER_IDX = 2;
 
     @Override
