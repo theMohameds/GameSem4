@@ -17,7 +17,7 @@ public final class RoundManager extends EntitySystem {
     private static final float END_FREEZE = 3f;
 
     private static final Vector2 PLAYER_SPAWN = new Vector2(100, 150);
-    private static final Vector2 ENEMY_SPAWN  = new Vector2(200, 150);
+    private static final Vector2 ENEMY_SPAWN  = new Vector2(500, 150);
 
     private enum Phase { INTRO, FIGHT, ROUND_END }
     private Phase phase = Phase.INTRO;

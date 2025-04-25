@@ -59,7 +59,7 @@ public final class UIPlugin implements ECSPlugin {
 
         gen.dispose();
 
-        Pixmap pm = new Pixmap(1, 1, Format.RGBA8888);
+        Pixmap pm = new Pixmap(1, 8, Format.RGBA8888);
         pm.setColor(Color.WHITE);
         pm.fill();
         TextureRegionDrawable white = new TextureRegionDrawable(

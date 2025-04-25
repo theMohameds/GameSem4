@@ -17,7 +17,7 @@ public final class EnemyFactory {
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.DynamicBody;
         bd.fixedRotation = true;
-        bd.position.set(200f / CoreResources.PPM, 150f / CoreResources.PPM);
+        bd.position.set(500f / CoreResources.PPM, 150f / CoreResources.PPM);
         Body body = world.createBody(bd);
         body.setLinearDamping(0f);
         body.setSleepingAllowed(false);
