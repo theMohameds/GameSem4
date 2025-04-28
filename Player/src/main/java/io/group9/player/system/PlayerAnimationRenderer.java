@@ -6,167 +6,162 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
+import services.IInventoryService;
+import services.IWeapon;
+
 import java.util.EnumMap;
-import com.badlogic.gdx.graphics.Color;
+import java.util.Optional;
 
 public class PlayerAnimationRenderer extends EntitySystem {
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
     private float stateTime = 0f;
-    private EnumMap<PlayerComponent.State, Animation<TextureRegion>> animations;
-    Animation<TextureRegion> oldAnim;
+    private EnumMap<PlayerComponent.State, Animation<TextureRegion>> anims;
+    private Animation<TextureRegion> oldAnim;
 
     @Override
-    public void addedToEngine(com.badlogic.ashley.core.Engine engine) {
+    public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
-        batch = new SpriteBatch();
-        animations = new EnumMap<>(PlayerComponent.State.class);
+        batch    = new SpriteBatch();
+        anims    = new EnumMap<>(PlayerComponent.State.class);
 
-        animations.put(PlayerComponent.State.IDLE, loadAnimation("character/Enemy_idle.png", 0.066f, 10, true));
-        animations.put(PlayerComponent.State.RUN, loadAnimation("character/Enemy_run.png", 0.066f, 8,true));
-        animations.put(PlayerComponent.State.JUMP, loadAnimation("character/Enemy_jump.png", 0.066f, 6,true));
-        animations.put(PlayerComponent.State.AIRSPIN, loadAnimation("character/Enemy_AirSpin.png", 0.066f, 6,true));
-        animations.put(PlayerComponent.State.HEAVY_ATTACK, loadAnimation("character/Enemy_punchCross.png", 0.066f, 7,true));
-        animations.put(PlayerComponent.State.LAND_WALL, loadAnimation("character/Enemy_landWall.png", 0.297f, 6,true));
-        animations.put(PlayerComponent.State.LIGHT_ATTACK, loadAnimation("character/Enemy_punchJab.png", 0.066f, 10,true));
-        animations.put(PlayerComponent.State.HURT, loadAnimation("character/Enemy_hurt.png", 0.066f, 4,true ));
-        animations.put(PlayerComponent.State.DEAD, loadAnimation("character/Enemy_dead.png",0.100f,10,false));
-        //animations.put(PlayerComponent.State.DASH, loadAnimation("character/Enemy_dash.png",0.100f,10,true));
+        // Base animations
+        anims.put(PlayerComponent.State.IDLE, load("character/Enemy_idle.png",    0.066f, 10, true));
+        anims.put(PlayerComponent.State.RUN, load("character/Enemy_run.png",     0.066f,  8, true));
+        anims.put(PlayerComponent.State.JUMP, load("character/Enemy_jump.png",    0.066f,  6, true));
+        anims.put(PlayerComponent.State.AIRSPIN, load("character/Enemy_AirSpin.png", 0.066f,  6, true));
+        anims.put(PlayerComponent.State.LIGHT_ATTACK, load("character/Enemy_punchJab.png",   0.066f, 10, false));
+        anims.put(PlayerComponent.State.HEAVY_ATTACK, load("character/Enemy_punchCross.png", 0.066f,  7, false));
+        anims.put(PlayerComponent.State.LAND_WALL, load("character/Enemy_landWall.png",   0.297f,  6, false));
+        anims.put(PlayerComponent.State.HURT, load("character/Enemy_hurt.png",       0.066f,  4, false));
+        anims.put(PlayerComponent.State.DEAD, load("character/Enemy_dead.png",       0.100f, 10, false));
+
+        // Sword animations
+        anims.put(PlayerComponent.State.SWORD_IDLE, load("character/sword/idle.png",   0.066f, 10, true));
+        anims.put(PlayerComponent.State.SWORD_RUN, load("character/sword/run.png",    0.066f,  8, true));
+        anims.put(PlayerComponent.State.SWORD_ATTACK, load("character/sword/attack.png", 0.066f,  6, false));
     }
 
-    private Animation<TextureRegion> loadAnimation(String path, float dur, int frames, boolean loop) {
+    private Animation<TextureRegion> load(
+        String path, float frameDuration,
+        int frames, boolean loop
+    ) {
         Texture tex = new Texture(Gdx.files.internal(path));
-        int fw = tex.getWidth() / frames, fh = tex.getHeight();
+        int fw = tex.getWidth()  / frames;
+        int fh = tex.getHeight();
         TextureRegion[][] split = TextureRegion.split(tex, fw, fh);
         TextureRegion[] arr = new TextureRegion[frames];
         for (int i = 0; i < frames; i++) arr[i] = split[0][i];
-        Animation<TextureRegion> anim = new Animation<>(dur, arr);
-        anim.setPlayMode(loop ? Animation.PlayMode.LOOP : Animation.PlayMode.NORMAL);
-        return anim;
+        Animation<TextureRegion> a = new Animation<>(frameDuration, arr);
+        a.setPlayMode(loop
+            ? Animation.PlayMode.LOOP
+            : Animation.PlayMode.NORMAL);
+        return a;
     }
 
     @Override
     public void update(float deltaTime) {
+        IInventoryService inv = CoreResources.getInventoryService();
 
         OrthographicCamera cam = CoreResources.getCamera();
         if (cam == null) {
-            Gdx.app.error("PlayerAnimationRenderer", "Camera is null, using fallback.");
             cam = new OrthographicCamera(40, 22.5f);
             cam.position.set(20, 11.25f, 0);
-            cam.update();
-        } else {
-            cam.update();
         }
+        cam.update();
         batch.setProjectionMatrix(cam.combined);
-
 
         batch.begin();
         batch.setColor(Color.LIME);
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
-            PlayerComponent pc = entity.getComponent(PlayerComponent.class);
+
+        for (Entity e : entities) {
+            PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
             Vector2 pos = pc.body.getPosition();
 
-            Animation<TextureRegion> currentAnim = animations.get(pc.state);
-            if (currentAnim == null) {
-                currentAnim = animations.get(PlayerComponent.State.IDLE);
+            PlayerComponent.State state = pc.state;
+
+            if (inv != null && inv.getCurrentWeapon(e)
+                .map(w -> "Sword".equals(w.getName()))
+                .orElse(false)) {
+                switch (state) {
+                    case IDLE:         state = PlayerComponent.State.SWORD_IDLE;  break;
+                    case RUN:          state = PlayerComponent.State.SWORD_RUN;   break;
+                    case LIGHT_ATTACK:
+                    case HEAVY_ATTACK:
+                    case SWORD_ATTACK: state = PlayerComponent.State.SWORD_ATTACK;break;
+                    default:
+                }
             }
 
-            if (currentAnim != oldAnim){
-                stateTime = 0;
-                oldAnim = currentAnim;
+            Animation<TextureRegion> anim =
+                anims.getOrDefault(state, anims.get(PlayerComponent.State.IDLE));
+            if (anim != oldAnim) {
+                stateTime = 0f;
+                oldAnim   = anim;
             }
-
             stateTime += deltaTime;
 
-            TextureRegion frame;
+            TextureRegion frame = anim.getKeyFrame(stateTime);
 
-
-
-            if (currentAnim == animations.get(PlayerComponent.State.JUMP)){
-                if (pc.body.getLinearVelocity().y > 0){
-                    if (stateTime > currentAnim.getFrameDuration() * 1){
-                        stateTime = currentAnim.getFrameDuration() * 1;
-                    }
-                    frame = currentAnim.getKeyFrame(stateTime, false);
-                }else {
-                    float frameDuration = currentAnim.getFrameDuration();
-                    float startTime = frameDuration * 2; // frame 2 starts
-                    float endTime = frameDuration * 6;   // frame 5 starts
-
-                    if (stateTime < startTime) {
-                        stateTime = startTime;
-                    }
-                    if (stateTime > endTime) {
-                        stateTime = endTime - 0.0001f; // Stay just before frame 6 starts
-                    }
-
-                    frame = currentAnim.getKeyFrame(stateTime, false); // Don't loop
-                }
-            } else if (currentAnim == animations.get(PlayerComponent.State.AIRSPIN)) {
-                float airspinDuration = currentAnim.getAnimationDuration();
-
-                if (stateTime < airspinDuration) {
-                    // Still playing airspin normally
-                    float playTime = Math.min(stateTime, airspinDuration - 0.0001f);
-                    frame = currentAnim.getKeyFrame(playTime, false);
-
+            if (anim == anims.get(PlayerComponent.State.JUMP)) {
+                boolean up = pc.body.getLinearVelocity().y > 0;
+                float maxUp = anim.getFrameDuration() * 1;
+                if (up) {
+                    if (stateTime > maxUp) stateTime = maxUp;
+                    frame = anim.getKeyFrame(stateTime, false);
                 } else {
-                    Animation<TextureRegion> jumpAnim = animations.get(PlayerComponent.State.JUMP);
-                    float playTime = 0;
-                    float clipStartTime = 0;
-                    if (pc.body.getLinearVelocity().y < 0){
-                        // AIRSPIN finished: play only the last 4 frames of JUMP
-                        int totalJumpFrames = jumpAnim.getKeyFrames().length;
-                        int clipFrameCount = 4;
-
-                        // Calculate start frame index (e.g., if totalJumpFrames=6, startFrame=2)
-                        int startFrameIndex = Math.max(0, totalJumpFrames - clipFrameCount);
-
-                        // Convert frame index to time
-                        float frameDuration = jumpAnim.getFrameDuration();
-                        clipStartTime = startFrameIndex * frameDuration;
-                        float clipDuration = clipFrameCount * frameDuration;
-
-                        // Calculate how long we've been into the jump clip
-                        float elapsedSinceAirspin = stateTime - airspinDuration;
-                        playTime = Math.min(elapsedSinceAirspin, clipDuration - 0.0001f);
-
-                        // Get the appropriate frame from the jump animation
-
-                    }
-
-                    frame = jumpAnim.getKeyFrame(clipStartTime + playTime, false);
-
+                    float fd = anim.getFrameDuration();
+                    float start = fd * 2, end = fd * 6;
+                    if (stateTime < start) stateTime = start;
+                    if (stateTime > end)   stateTime = end - 0.0001f;
+                    frame = anim.getKeyFrame(stateTime, false);
                 }
-            }else {
-                frame = currentAnim.getKeyFrame(stateTime);
+            } else if (anim == anims.get(PlayerComponent.State.AIRSPIN)) {
+                float dur = anim.getAnimationDuration();
+                if (stateTime < dur) {
+                    frame = anim.getKeyFrame(stateTime, false);
+                } else {
+                    Animation<TextureRegion> j = anims.get(PlayerComponent.State.JUMP);
+                    float fd = j.getFrameDuration();
+                    int total = j.getKeyFrames().length;
+                    int clipF = 4;
+                    int start = Math.max(0, total - clipF);
+                    float clipStart = start * fd;
+                    float el = stateTime - dur;
+                    float pt = Math.min(el, clipF * fd - 0.0001f);
+                    frame = j.getKeyFrame(clipStart + pt, false);
+                }
             }
 
-            float targetWidth = 48f / CoreResources.PPM;
-            float targetHeight = 48f / CoreResources.PPM;
-
+            float w2 = 48f / CoreResources.PPM;
+            float h2 = 48f / CoreResources.PPM;
             if (pc.facingLeft) {
-                batch.draw(frame, pos.x + targetWidth / 2, pos.y - targetHeight / 2, -targetWidth, targetHeight);
+                batch.draw(frame,
+                    pos.x + w2/2, pos.y - h2/2,
+                    -w2, h2);
             } else {
-                batch.draw(frame, pos.x - targetWidth / 2, pos.y - targetHeight / 2, targetWidth, targetHeight);
+                batch.draw(frame,
+                    pos.x - w2/2, pos.y - h2/2,
+                    w2, h2);
             }
         }
+
         batch.setColor(Color.WHITE);
         batch.end();
     }
+
+
 
     @Override
     public void removedFromEngine(Engine engine) {
         batch.dispose();
     }
 }
-
-

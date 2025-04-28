@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import plugins.GameMapProvider;
+import services.IInventoryService;
 
 public class CoreResources {
     private static World world;
@@ -12,6 +13,7 @@ public class CoreResources {
     private static Body playerBody;
     private static Entity playerEntity;
     private static CoreContactDispatcher contactDispatcher;
+    private static Entity enemyEntity;
 
     // Pixels per meter conversion.
     public static final float PPM = 16f;
@@ -57,6 +59,17 @@ public class CoreResources {
     private static volatile boolean roundFrozen = true;
     public static void   setRoundFrozen(boolean f) { roundFrozen = f; }
     public static boolean isRoundFrozen() { return roundFrozen; }
+
+    public static void setEnemyEntity(Entity entity) { enemyEntity = entity; }
+    public static Entity getEnemyEntity() { return enemyEntity; }
+
+    private static IInventoryService inventoryService;
+    public static void setInventoryService(IInventoryService svc) {
+        inventoryService = svc;
+    }
+    public static IInventoryService getInventoryService() {
+        return inventoryService;
+    }
 
 
 

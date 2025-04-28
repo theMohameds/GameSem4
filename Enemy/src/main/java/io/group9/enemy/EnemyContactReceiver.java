@@ -6,6 +6,10 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import io.group9.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.ai.EnemyState;
+import services.IInventoryService;
+import services.IWeapon;
+
+import java.util.Optional;
 
 public class EnemyContactReceiver implements ContactReceiver {
 
@@ -65,22 +69,26 @@ public class EnemyContactReceiver implements ContactReceiver {
 
     // Apply damage or kill
     private void hit(EnemyComponent ec) {
-        if (ec == null || ec.state == EnemyState.DEAD) return;
+        if (ec == null || ec.state == EnemyState.DEAD) {
+            return;
+        }
 
-        ec.health -= 50;
+        IInventoryService inv = CoreResources.getInventoryService();
+        Optional<IWeapon> w = inv.getCurrentWeapon(CoreResources.getPlayerEntity());
+        int damage = w.map(ws -> "Sword".equals(ws.getName()) ? 20 : 50).orElse(50);
+
+        ec.health -= damage;
         CoreResources.setEnemyHealth(ec.health);
 
         if (ec.health <= 0) {
             ec.state      = EnemyState.DEAD;
             ec.needsFreeze= true;
-            ec.animTime   = 0f;
             Gdx.app.log("EnemyContactReceiver", "Enemy killed");
         } else {
             ec.state      = EnemyState.HURT;
             ec.hurtTimer  = ec.hurtDuration;
             ec.isHurt     = true;
-            ec.animTime   = 0f;
-            Gdx.app.log("EnemyContactReceiver", "Enemy hurt");
+            Gdx.app.log("EnemyContactReceiver", "Enemy hurt for " + damage);
         }
     }
 }

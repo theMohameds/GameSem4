@@ -69,5 +69,6 @@ public final class EnemyFactory {
         Entity e = new Entity();
         e.add(ec);
         engine.addEntity(e);
+        CoreResources.setEnemyEntity(e);
     }
 }

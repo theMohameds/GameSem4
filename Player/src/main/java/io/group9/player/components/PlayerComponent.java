@@ -42,7 +42,10 @@ public class PlayerComponent implements Component {
         DASH,
         BLOCK,
         LAND_WALL,
-        HURT
+        HURT,
+        SWORD_ATTACK,
+        SWORD_IDLE,
+        SWORD_RUN
     }
 
     // Combat
