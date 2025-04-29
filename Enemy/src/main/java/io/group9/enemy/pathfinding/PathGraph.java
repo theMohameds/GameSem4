@@ -15,41 +15,60 @@ public class PathGraph {
     }
 
     public void connectNodes() {
-        float maxDistanceX = 32f;          // Max horizontal distance for walking
-        float maxDistanceY = 1f;           // Max vertical tolerance for walking
-        float maxJumpHeight = 64f;          // Adjust to your single jump height
-        float maxDoubleJumpHeight = 128f;    // Adjust to your double jump height
-        float maxJumpHorizontalDistance = 224f; // Max horizontal jump distance
+        float maxWalkX = 32f;
+        float maxWalkY = 1f;
+        float maxJumpY = 60f;
+        float maxDoubleJumpY = 120f;
+        float maxJumpHorizontalDistance = 224f;
 
+        // Clear existing neighbors
         for (PathNode node : nodes) {
             node.neighbors.clear();
+            node.setRequiresJump(false);
+            node.setRequiresDoubleJump(false);
+        }
+
+        // First pass: Connect only walkable nodes
+        for (PathNode node : nodes) {
             for (PathNode other : nodes) {
                 if (node == other) continue;
 
                 float dx = other.x - node.x;
                 float dy = other.y - node.y;
+                float absDx = Math.abs(dx);
+                float absDy = Math.abs(dy);
 
-                // Walking (existing code)
-                if (Math.abs(dy) <= maxDistanceY) {
-                    if (Math.abs(dx) > 0 && Math.abs(dx) <= maxDistanceX) {
-                        node.neighbors.add(other);
-                        continue;
+                // Walkable connection
+                if (absDy <= maxWalkY && absDx > 0 && absDx <= maxWalkX) {
+                    node.neighbors.add(other);
+                }
+            }
+        }
+
+        // Second pass: Add jumps only if walkable path is not possible
+        for (PathNode node : nodes) {
+            for (PathNode other : nodes) {
+                if (node == other) continue;
+                if (node.neighbors.contains(other)) continue; // already connected via walk
+
+                float dx = other.x - node.x;
+                float dy = other.y - node.y;
+                float absDx = Math.abs(dx);
+                float absDy = Math.abs(dy);
+
+                // Jump path
+                if (absDy <= maxDoubleJumpY && absDx <= maxJumpHorizontalDistance) {
+                    node.neighbors.add(other);
+
+                    // Mark jump level
+                    if (absDy <= maxJumpY) {
+                        other.setRequiresJump(true);
+                    } else {
+                        other.setRequiresDoubleJump(true);
                     }
                 }
-
-                // Jumping (upwards)
-                if (other.y > node.y) {
-                    float horizontalDistance = Math.abs(dx);
-                    float verticalDistance = dy;
-
-                    // Single jump check
-                    if (verticalDistance <= maxJumpHeight && horizontalDistance <= maxJumpHorizontalDistance) {
-                        node.neighbors.add(other);
-                        node.setRequiresDoubleJump(true);
-                    }
-                }
-
             }
         }
     }
+
 }

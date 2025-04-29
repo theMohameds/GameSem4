@@ -58,8 +58,8 @@ public class EnemyAIControlSystem extends EntitySystem {
                 allNodes.add(new PathNode(position.x, position.y));
             }
 
-            PathNode start = new PathNode(320, 96);
-            PathNode goal = new PathNode(736, 224);
+            PathNode start = new PathNode(ec.body.getPosition().x * CoreResources.PPM, ec.body.getPosition().y * CoreResources.PPM);
+            PathNode goal = new PathNode(playerPos.x * CoreResources.PPM, playerPos.y * CoreResources.PPM);
             PathGraph graph = new PathGraph();
             graph.addNode(start);
             graph.addNode(goal);
@@ -67,7 +67,6 @@ public class EnemyAIControlSystem extends EntitySystem {
             for (PathNode node : allNodes) {
                 graph.addNode(node);
             }
-            PathGraph pathGraph = new PathGraph();
 
             graph.connectNodes();
             PathGraphVisualizer visualizer = new PathGraphVisualizer(graph, CoreResources.getCamera(), 1/CoreResources.PPM);
@@ -83,15 +82,40 @@ public class EnemyAIControlSystem extends EntitySystem {
 
             List<PathNode> path = astar.aStarSearch(start, goal, heuristic);
 
+            if (path != null && !path.isEmpty()) {
+                visualizer.renderPath(path);
+            }
             // Check if path is different from lastPrintedPath
             if (!pathsEqual(path, lastPrintedPath)) {
                 lastPrintedPath = path;
 
                 if (path != null && !path.isEmpty()) {
                     System.out.println("Path found:");
-                    for (PathNode node : path) {
-                        System.out.println("Node: (" + node.x + ", " + node.y + ")");
+                    for (int i = 0; i < path.size() - 1; i++) {
+                        PathNode curr = path.get(i);
+                        PathNode next = path.get(i + 1);
+
+                        // determine move type by inspecting the flags on the *next* node
+                        String move;
+                        if (next.requiresDoubleJump) {
+                            move = "DOUBLE_JUMP";
+                        } else if (next.requiresJump) {
+                            move = "JUMP";
+                        } else {
+                            move = "RUN";
+                        }
+
+                        System.out.printf(
+                            "  Step %d → (%5.1f, %5.1f) → (%5.1f, %5.1f) : %s%n",
+                            i,
+                            curr.x, curr.y,
+                            next.x, next.y,
+                            move
+                        );
                     }
+                    // optionally, print the last node alone
+                    PathNode last = path.get(path.size() - 1);
+                    System.out.printf("  Final → (%5.1f, %5.1f)%n", last.x, last.y);
                 } else {
                     System.out.println("No path found!");
                 }
