@@ -26,9 +26,7 @@ public class WeaponsPlugin implements ECSPlugin {
 
         CoreResources.getContactDispatcher().addReceiver(new WeaponPickupReceiver());
 
-
-        // Spawn one sword and register its entity
-        WeaponFactory.spawnSword(200, 200);
+        WeaponFactory.spawnSword(160, 200);
 
     }
 
