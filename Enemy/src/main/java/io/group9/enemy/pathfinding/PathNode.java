@@ -1,42 +1,47 @@
 package io.group9.enemy.pathfinding;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class PathNode {
-    public final int x, y;
-    public float g;
-    public float h;
-    public PathNode parent;
-    public final float terrainCost;
+    public float x, y;
+    public float gCost, hCost;
+    public boolean requiresJump;
+    public boolean requiresDoubleJump;
+    public boolean edge;
+    public List<PathNode> neighbors;
 
-    public PathNode(int x, int y) {
-        this(x, y, 1f);
-    }
-
-    public PathNode(int x, int y, float terrainCost) {
+    public PathNode(float x, float y) {
         this.x = x;
         this.y = y;
-        this.terrainCost = terrainCost;
-        this.g = Float.POSITIVE_INFINITY;
-        this.h = 0f;
-        this.parent = null;
+        this.edge = false;
+        requiresJump = false;
+        requiresDoubleJump = false;
+        this.neighbors = new ArrayList<>();
     }
 
-    public float f() {
-        return g + h;
+    public float fCost() {
+        return gCost + hCost;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PathNode)) return false;
+        PathNode p = (PathNode)o;
+        return this.x == p.x && this.y == p.y;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
     }
+    public void setRequiresJump(boolean requiresJump) {
+        this.requiresJump = requiresJump;
+    }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof PathNode)) return false;
-        PathNode o = (PathNode)obj;
-        return o.x == x && o.y == y;
+    public void setRequiresDoubleJump(boolean requiresDoubleJump) {
+        this.requiresDoubleJump = requiresDoubleJump;
     }
 }
-

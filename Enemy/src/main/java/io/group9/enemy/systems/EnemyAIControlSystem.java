@@ -7,7 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.components.EnemyComponent;
+import io.group9.enemy.pathfinding.AStar;
+import io.group9.enemy.pathfinding.PathGraph;
+import io.group9.enemy.pathfinding.PathGraphVisualizer;
 import io.group9.enemy.pathfinding.PathNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class EnemyAIControlSystem extends EntitySystem {
@@ -18,6 +24,7 @@ public class EnemyAIControlSystem extends EntitySystem {
     private static final float SMOOTHING      = 8f;
     private static final float BLOCKED_VX     = 0.2f;
     private static final float JUMP_HEIGHT_TH = 0.3f;
+    private List<PathNode> lastPrintedPath = null;
 
     public EnemyAIControlSystem(float cellSize) { this.cellSize = cellSize; }
 
@@ -25,7 +32,8 @@ public class EnemyAIControlSystem extends EntitySystem {
         enemies = eng.getEntitiesFor(Family.all(EnemyComponent.class).get());
     }
 
-    @Override public void update(float dt) {
+    @Override
+    public void update(float dt) {
         if (CoreResources.isRoundFrozen()) return;
 
         playerPos.set(CoreResources.getPlayerBody().getPosition());
@@ -42,30 +50,67 @@ public class EnemyAIControlSystem extends EntitySystem {
             float dx = Math.abs(playerPos.x - pos.x);
             float dy = Math.abs(playerPos.y - pos.y);
 
-            if (ec.state == EnemyState.ATTACK || ec.state == EnemyState.HURT) {
-                ec.body.setLinearVelocity(0f, ec.body.getLinearVelocity().y);
-                continue;
+            // --- Pathfinding section ---
+            List<Vector2> positions = CoreResources.getNodePositions();
+            List<PathNode> allNodes = new ArrayList<>();
+
+            for (Vector2 position : positions) {
+                allNodes.add(new PathNode(position.x, position.y));
             }
 
-            if (dx <= ec.attackRange && dy <= ec.attackRange && ec.attackCooldownTimer <= 0f) {
-                ec.state = EnemyState.ATTACK;
-                ec.attackRequested = true;
-                ec.animTime = 0f;
-                ec.body.setLinearVelocity(0f, ec.body.getLinearVelocity().y);
-                continue;
-            }
+            PathNode start = new PathNode(320, 96);
+            PathNode goal = new PathNode(736, 224);
+            PathGraph graph = new PathGraph();
+            graph.addNode(start);
+            graph.addNode(goal);
 
-            if (dx <= ec.attackRange) {
-                ec.state = EnemyState.IDLE;
-                ec.body.setLinearVelocity(0f, ec.body.getLinearVelocity().y);
-                continue;
+            for (PathNode node : allNodes) {
+                graph.addNode(node);
             }
+            PathGraph pathGraph = new PathGraph();
 
-            ec.state = EnemyState.RUN;
-            handleJumps(ec);
-            float targetVX = computeTargetVX(ec);
-            smoothHorizontal(ec, dt, targetVX);
+            graph.connectNodes();
+            PathGraphVisualizer visualizer = new PathGraphVisualizer(graph);
+
+            visualizer.renderNodes();
+            visualizer.renderConnections();
+
+            AStar astar = new AStar();
+            AStar.Heuristic heuristic = (node, g) -> {
+                double dxh = node.x - g.x;
+                double dyh = node.y - g.y;
+                return Math.sqrt(dxh * dxh + dyh * dyh);
+            };
+
+            List<PathNode> path = astar.aStarSearch(start, goal, heuristic);
+
+            // Check if path is different from lastPrintedPath
+            if (!pathsEqual(path, lastPrintedPath)) {
+                lastPrintedPath = path;
+
+                if (path != null && !path.isEmpty()) {
+                    System.out.println("Path found:");
+                    for (PathNode node : path) {
+                        System.out.println("Node: (" + node.x + ", " + node.y + ")");
+                    }
+                } else {
+                    System.out.println("No path found!");
+                }
+            }
         }
+    }
+
+    // Helper method to compare two paths
+    private boolean pathsEqual(List<PathNode> p1, List<PathNode> p2) {
+        if (p1 == null && p2 == null) return true;
+        if (p1 == null || p2 == null) return false;
+        if (p1.size() != p2.size()) return false;
+        for (int i = 0; i < p1.size(); i++) {
+            PathNode n1 = p1.get(i);
+            PathNode n2 = p2.get(i);
+            if (n1.x != n2.x || n1.y != n2.y) return false;
+        }
+        return true;
     }
 
     private void handleJumps(EnemyComponent ec) {

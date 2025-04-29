@@ -2,20 +2,19 @@
 package io.group9.gamemap.system;
 
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import io.group9.CoreResources;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameMapSystem extends EntitySystem {
     private TiledMap tiledMap;
@@ -35,6 +34,8 @@ public class GameMapSystem extends EntitySystem {
     private final int   layerHeight;
     private final float cellSizeMeters;
 
+    private final List<Body> nodeBodies = new ArrayList<>();
+
     public GameMapSystem(World world,
                          String mapPath,
                          OrthographicCamera camera) {
@@ -50,6 +51,9 @@ public class GameMapSystem extends EntitySystem {
         if (collisionLayer == null) {
             throw new IllegalArgumentException("Tiled map is missing a layer named 'Ground'");
         }
+        CoreResources.setCollisionLayer(collisionLayer);
+
+
 
         // Capture layer dimensions and tile size in meters
         this.layerWidth = collisionLayer.getWidth();
@@ -58,8 +62,12 @@ public class GameMapSystem extends EntitySystem {
 
         // Build collision rectangles and Box2D bodies
         gatherCollisionTiles();
+        generateNodeEdges();
         mergeRectangles();
+        createNodeBodies();
         createCollisionBodies();
+
+        CoreResources.setNodePositions(nodePositions);
     }
 
     @Override
@@ -190,5 +198,65 @@ public class GameMapSystem extends EntitySystem {
 
     public float getCellSizeMeters() {
         return cellSizeMeters;
+    }
+
+    public ArrayList<Vector2> nodePositions = new ArrayList<>();
+
+    public void generateNodeEdges() {
+        int layerW = collisionLayer.getWidth();
+        int layerH = collisionLayer.getHeight();
+        int tileW  = (int) collisionLayer.getTileWidth();
+        int tileH  = (int) collisionLayer.getTileHeight();
+
+        Set<Vector2> nodeSet = new HashSet<>(); // Use a Set first
+
+        for (int y = 1; y < layerH; y++) {
+            for (int x = 0; x < layerW; x++) {
+                TiledMapTileLayer.Cell current = collisionLayer.getCell(x, y);
+                TiledMapTileLayer.Cell below   = collisionLayer.getCell(x, y - 1);
+
+                // if this cell is empty but there is ground directly beneath
+                if (current == null && below != null && below.getTile() != null) {
+                    float posY = y * tileH;
+                    float leftX = x * tileW;
+                    float rightX = (x + 1) * tileW;
+
+                    nodeSet.add(new Vector2(leftX, posY));
+                    nodeSet.add(new Vector2(rightX, posY));
+                }
+            }
+        }
+
+        nodePositions = new ArrayList<>(nodeSet); // Dump set into the ArrayList
+    }
+
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private void createNodeBodies() {
+        CoreResources.setShapeRenderer(shapeRenderer);
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED); // change to whatever you want
+        float radius = (collisionLayer.getTileWidth() * 0.1f) * UNIT_SCALE; // 30% of tile size
+
+        for (Vector2 pos : nodePositions) {
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.type = BodyDef.BodyType.StaticBody;
+            bodyDef.position.set(pos.x * UNIT_SCALE, pos.y * UNIT_SCALE);
+
+            Body body = world.createBody(bodyDef);
+
+            CircleShape circle = new CircleShape();
+            circle.setRadius(radius);
+
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = circle;
+            fixtureDef.isSensor = true; // So it doesn't collide physically
+            body.createFixture(fixtureDef);
+
+            circle.dispose();
+
+            body.setUserData("node");
+            nodeBodies.add(body);
+        }
     }
 }

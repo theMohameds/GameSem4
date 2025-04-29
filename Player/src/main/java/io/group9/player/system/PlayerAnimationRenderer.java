@@ -67,7 +67,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
 
 
         batch.begin();
-        batch.setColor(Color.LIME);
+        batch.setColor(Color.GRAY);
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             PlayerComponent pc = entity.getComponent(PlayerComponent.class);

@@ -64,7 +64,7 @@ public class FirstScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.4f, 0.6f, 0.9f, 1); // RGBA
+        Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1); // RGBA
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         accumulator += delta;
         while (accumulator >= fixedTimeStep) {
