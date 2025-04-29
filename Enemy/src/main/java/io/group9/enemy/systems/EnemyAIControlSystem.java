@@ -70,10 +70,9 @@ public class EnemyAIControlSystem extends EntitySystem {
             PathGraph pathGraph = new PathGraph();
 
             graph.connectNodes();
-            PathGraphVisualizer visualizer = new PathGraphVisualizer(graph);
+            PathGraphVisualizer visualizer = new PathGraphVisualizer(graph, CoreResources.getCamera(), 1/CoreResources.PPM);
 
-            visualizer.renderNodes();
-            visualizer.renderConnections();
+            visualizer.render();
 
             AStar astar = new AStar();
             AStar.Heuristic heuristic = (node, g) -> {

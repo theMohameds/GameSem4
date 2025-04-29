@@ -2,8 +2,6 @@
 package io.group9.gamemap.system;
 
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -24,17 +22,16 @@ public class GameMapSystem extends EntitySystem {
     private final List<Rectangle> mergedRectangles = new ArrayList<>();
     private World world;
     private OrthographicCamera camera;
-    private final List<Body> collisionBodies       = new ArrayList<>();
+    private final List<Body> collisionBodies = new ArrayList<>(); // Don't think we need it
 
     // Conversion factor from pixels to meters.
     private static final float UNIT_SCALE = 1 / CoreResources.PPM;
 
     // Grid info for A* nav‑graph
-    private final int   layerWidth;
-    private final int   layerHeight;
+    private final int layerWidth;
+    private final int layerHeight;
     private final float cellSizeMeters;
-
-    private final List<Body> nodeBodies = new ArrayList<>();
+    public ArrayList<Vector2> nodePositions = new ArrayList<>();
 
     public GameMapSystem(World world,
                          String mapPath,
@@ -53,9 +50,6 @@ public class GameMapSystem extends EntitySystem {
         }
         CoreResources.setCollisionLayer(collisionLayer);
 
-
-
-        // Capture layer dimensions and tile size in meters
         this.layerWidth = collisionLayer.getWidth();
         this.layerHeight = collisionLayer.getHeight();
         this.cellSizeMeters = collisionLayer.getTileWidth() * UNIT_SCALE;
@@ -64,7 +58,6 @@ public class GameMapSystem extends EntitySystem {
         gatherCollisionTiles();
         generateNodeEdges();
         mergeRectangles();
-        createNodeBodies();
         createCollisionBodies();
 
         CoreResources.setNodePositions(nodePositions);
@@ -80,8 +73,8 @@ public class GameMapSystem extends EntitySystem {
     private void gatherCollisionTiles() {
         int layerW = collisionLayer.getWidth();
         int layerH = collisionLayer.getHeight();
-        int tileW  = (int) collisionLayer.getTileWidth();
-        int tileH  = (int) collisionLayer.getTileHeight();
+        int tileW  = collisionLayer.getTileWidth();
+        int tileH  = collisionLayer.getTileHeight();
 
         for (int y = 0; y < layerH; y++) {
             for (int x = 0; x < layerW; x++) {
@@ -167,48 +160,13 @@ public class GameMapSystem extends EntitySystem {
         }
     }
 
-    public void dispose() {
-        if (tiledMap   != null) tiledMap.dispose();
-        if (mapRenderer!= null) mapRenderer.dispose();
-    }
-
-    /**
-     * @return merged collision rectangles in world units (meters)
-     */
-    public List<Rectangle> getMergedWorldRectangles() {
-        List<Rectangle> out = new ArrayList<>();
-        for (Rectangle r : mergedRectangles) {
-            out.add(new Rectangle(
-                r.x * UNIT_SCALE,
-                r.y * UNIT_SCALE,
-                r.width  * UNIT_SCALE,
-                r.height * UNIT_SCALE
-            ));
-        }
-        return out;
-    }
-
-    public int getLayerWidth() {
-        return layerWidth;
-    }
-
-    public int getLayerHeight() {
-        return layerHeight;
-    }
-
-    public float getCellSizeMeters() {
-        return cellSizeMeters;
-    }
-
-    public ArrayList<Vector2> nodePositions = new ArrayList<>();
-
     public void generateNodeEdges() {
         int layerW = collisionLayer.getWidth();
         int layerH = collisionLayer.getHeight();
-        int tileW  = (int) collisionLayer.getTileWidth();
-        int tileH  = (int) collisionLayer.getTileHeight();
+        int tileW  = collisionLayer.getTileWidth();
+        int tileH  = collisionLayer.getTileHeight();
 
-        Set<Vector2> nodeSet = new HashSet<>(); // Use a Set first
+        Set<Vector2> nodeSet = new HashSet<>();
 
         for (int y = 1; y < layerH; y++) {
             for (int x = 0; x < layerW; x++) {
@@ -227,36 +185,37 @@ public class GameMapSystem extends EntitySystem {
             }
         }
 
-        nodePositions = new ArrayList<>(nodeSet); // Dump set into the ArrayList
+        nodePositions = new ArrayList<>(nodeSet);
     }
-
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-    private void createNodeBodies() {
-        CoreResources.setShapeRenderer(shapeRenderer);
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.RED); // change to whatever you want
-        float radius = (collisionLayer.getTileWidth() * 0.1f) * UNIT_SCALE; // 30% of tile size
-
-        for (Vector2 pos : nodePositions) {
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(pos.x * UNIT_SCALE, pos.y * UNIT_SCALE);
-
-            Body body = world.createBody(bodyDef);
-
-            CircleShape circle = new CircleShape();
-            circle.setRadius(radius);
-
-            FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.shape = circle;
-            fixtureDef.isSensor = true; // So it doesn't collide physically
-            body.createFixture(fixtureDef);
-
-            circle.dispose();
-
-            body.setUserData("node");
-            nodeBodies.add(body);
+    public List<Rectangle> getMergedWorldRectangles() {
+        List<Rectangle> out = new ArrayList<>();
+        for (Rectangle r : mergedRectangles) {
+            out.add(new Rectangle(
+                r.x * UNIT_SCALE,
+                r.y * UNIT_SCALE,
+                r.width  * UNIT_SCALE,
+                r.height * UNIT_SCALE
+            ));
         }
+        return out;
     }
+
+    public void dispose() {
+        if (tiledMap   != null) tiledMap.dispose();
+        if (mapRenderer!= null) mapRenderer.dispose();
+    }
+
+    public int getLayerWidth() {
+        return layerWidth;
+    }
+
+    public int getLayerHeight() {
+        return layerHeight;
+    }
+
+    public float getCellSizeMeters() {
+        return cellSizeMeters;
+    }
+
+
 }

@@ -72,7 +72,7 @@ public class FirstScreen implements Screen {
             accumulator -= fixedTimeStep;
         }
         engine.update(delta);
-        debugRenderer.render(world, CoreResources.getCamera().combined);
+        //debugRenderer.render(world, CoreResources.getCamera().combined);
 
     }
 
