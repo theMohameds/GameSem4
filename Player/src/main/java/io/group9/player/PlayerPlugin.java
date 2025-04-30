@@ -27,7 +27,7 @@ public class PlayerPlugin implements ECSPlugin {
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.DynamicBody;
         bd.fixedRotation = true;
-        bd.position.set(100f / CoreResources.PPM, 150f / CoreResources.PPM);
+        bd.position.set(250f / CoreResources.PPM, 950f / CoreResources.PPM);
         Body body = w.createBody(bd);
         body.setSleepingAllowed(false);
         body.setLinearDamping(0f);

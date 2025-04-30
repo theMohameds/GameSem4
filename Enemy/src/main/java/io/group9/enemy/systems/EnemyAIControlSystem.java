@@ -92,7 +92,6 @@ public class EnemyAIControlSystem extends EntitySystem {
             // Debug print (optional)
             if (!pathsEqual(path, lastPrintedPath)) {
                 lastPrintedPath = path;
-                // printPathDebug(path);
             }
         }
     }
@@ -165,31 +164,6 @@ public class EnemyAIControlSystem extends EntitySystem {
             ec.body.setLinearVelocity(vx, ec.body.getLinearVelocity().y);
         }
 
-    }
-    private void printPathDebug(List<PathNode> path) {
-        if (path != null && !path.isEmpty()) {
-            System.out.println("Path found:");
-            for (int i = 0; i < path.size() - 1; i++) {
-                PathNode curr = path.get(i);
-                PathNode next = path.get(i + 1);
-                String move;
-                if (next.requiresDoubleJump) {
-                    move = "DOUBLE_JUMP";
-                } else if (next.requiresJump) {
-                    move = "JUMP";
-                } else {
-                    move = "RUN";
-                }
-                System.out.printf(
-                    "  Step %d → (%.1f, %.1f) → (%.1f, %.1f) : %s%n",
-                    i, curr.x, curr.y, next.x, next.y, move
-                );
-            }
-            PathNode last = path.get(path.size() - 1);
-            System.out.printf("  Final → (%.1f, %.1f)%n", last.x, last.y);
-        } else {
-            System.out.println("No path found!");
-        }
     }
 
     private boolean pathsEqual(List<PathNode> p1, List<PathNode> p2) {

@@ -63,17 +63,8 @@ public class PathGraphVisualizer {
         for (PathNode node : pathGraph.getNodes()) {
             float x = node.x * unitScale;
             float y = node.y * unitScale;
+            shapeRenderer.setColor(NORMAL_NODE_COLOR);
 
-            // Set color based on movement requirements
-            if (node.requiresJump && node.requiresDoubleJump) {
-                shapeRenderer.setColor(ALL_JUMP_NODE_COLOR);
-            } else if (node.requiresDoubleJump) {
-                shapeRenderer.setColor(DOUBLE_JUMP_NODE_COLOR);
-            } else if (node.requiresJump) {
-                shapeRenderer.setColor(JUMP_NODE_COLOR);
-            } else {
-                shapeRenderer.setColor(NORMAL_NODE_COLOR);
-            }
 
             shapeRenderer.circle(x, y, radius);
         }
@@ -94,14 +85,8 @@ public class PathGraphVisualizer {
             Vector2 from = new Vector2(curr.x, curr.y).scl(unitScale);
             Vector2 to = new Vector2(next.x, next.y).scl(unitScale);
 
-            // Set color by movement type
-            if (next.requiresDoubleJump) {
-                shapeRenderer.setColor(DOUBLE_JUMP_COLOR);
-            } else if (next.requiresJump) {
-                shapeRenderer.setColor(JUMP_COLOR);
-            } else {
-                shapeRenderer.setColor(RUN_COLOR);
-            }
+            shapeRenderer.setColor(RUN_COLOR);
+
 
             shapeRenderer.rectLine(from, to, thickness);
         }
