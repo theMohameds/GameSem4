@@ -44,7 +44,7 @@ public class PathGraph {
                 }
             }
         }
-        /*
+
         // Second pass: Add jumps only if walkable path is not possible
         for (PathNode node : nodes) {
             for (PathNode other : nodes) {
@@ -70,7 +70,6 @@ public class PathGraph {
             }
         }
 
-         */
     }
 
 }

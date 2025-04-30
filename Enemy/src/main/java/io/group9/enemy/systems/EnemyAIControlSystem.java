@@ -25,7 +25,9 @@ public class EnemyAIControlSystem extends EntitySystem {
     private static final float JUMP_HEIGHT_TH = 0.3f;
     private List<PathNode> lastPrintedPath = null;
 
-    public EnemyAIControlSystem(float cellSize) { this.cellSize = cellSize; }
+    public EnemyAIControlSystem(float cellSize) {
+        this.cellSize = cellSize;
+    }
 
     @Override public void addedToEngine(Engine eng) {
         enemies = eng.getEntitiesFor(Family.all(EnemyComponent.class).get());
@@ -42,7 +44,6 @@ public class EnemyAIControlSystem extends EntitySystem {
             if (ec.state == EnemyState.DEAD) continue;
 
             tickCooldown(ec, dt);
-            ec.facingLeft = ec.body.getPosition().x > playerPos.x;
             Vector2 pos = ec.body.getPosition();
 
             // --- Pathfinding section ---
@@ -80,20 +81,43 @@ public class EnemyAIControlSystem extends EntitySystem {
 
             // Use the stored path for movement
             List<PathNode> path = ec.currentPath;
-            moveAlongHorizontalPath(ec, path, dt);
 
             if (path != null && !path.isEmpty()) {
                 visualizer.renderPath(path);
             }
 
             // Always process movement (even if path is null/empty)
+            handleJump(ec, path, dt);
             moveAlongHorizontalPath(ec, path, dt);
-
             // Debug print (optional)
             if (!pathsEqual(path, lastPrintedPath)) {
                 lastPrintedPath = path;
                 // printPathDebug(path);
             }
+        }
+    }
+
+    private void handleJump(EnemyComponent ec, List<PathNode> path, float dt) {
+        if (ec == null || ec.body == null || path == null || path.isEmpty()) {
+            if (ec != null && ec.body != null) {
+                ec.body.setLinearVelocity(0, ec.body.getLinearVelocity().y);
+            }
+            return;
+        }
+
+        // Prevent out-of-bounds access
+        if (ec.currentNode >= path.size()) {
+            return;
+        }
+
+        Vector2 currentPos = ec.body.getPosition();
+        PathNode node = path.get(ec.currentNode);
+        Vector2 target = new Vector2(node.x / CoreResources.PPM, node.y / CoreResources.PPM);
+        Vector2 toTarget = target.cpy().sub(currentPos);
+
+        if (toTarget.y > 15f / CoreResources.PPM) {
+            doJump(ec, ec.body.getLinearVelocity().x, ec.FIRST_JUMP_VELOCITY, EnemyState.JUMP);
+            System.out.println("Jump");
         }
     }
 
@@ -113,7 +137,8 @@ public class EnemyAIControlSystem extends EntitySystem {
         }
 
         Vector2 currentPos = ec.body.getPosition();
-        float deadZone = 1f; // Meters (physics units)
+        float deadZone = 1.5f; // Meters (physics units)
+        ec.facingLeft = ec.body.getLinearVelocity().x < 0;
 
         PathNode node = path.get(ec.currentNode);
         Vector2 target = new Vector2(node.x / CoreResources.PPM, node.y / CoreResources.PPM);
