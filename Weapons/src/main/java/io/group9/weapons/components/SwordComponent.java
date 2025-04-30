@@ -2,11 +2,16 @@ package io.group9.weapons.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import services.IWeapon;
 import services.IPickable;
 
 public class SwordComponent implements Component, IWeapon, IPickable {
     private Entity owner;
+
+    private static final TextureRegion SPRITE = new TextureRegion(new Texture(Gdx.files.internal("weapons/sword_item_32.png")));
 
     @Override
     public String getName() {
@@ -16,6 +21,7 @@ public class SwordComponent implements Component, IWeapon, IPickable {
     @Override
     public void use(Entity user) {
     }
+
     @Override
     public void onPickUp(Entity picker) {
         this.owner = picker;
@@ -27,4 +33,10 @@ public class SwordComponent implements Component, IWeapon, IPickable {
             this.owner = null;
         }
     }
+
+    @Override
+    public TextureRegion getSprite() {
+        return SPRITE;
+    }
 }
+

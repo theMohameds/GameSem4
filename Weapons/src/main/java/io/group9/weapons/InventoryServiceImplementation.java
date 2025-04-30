@@ -6,13 +6,13 @@ import com.badlogic.ashley.core.Entity;
 import java.util.*;
 
 public class InventoryServiceImplementation implements IInventoryService {
-    private final Map<Entity, List<IWeapon>> invs    = new HashMap<>();
-    private final Map<Entity, IWeapon>        current = new HashMap<>();
+    private final Map<Entity, List<IWeapon>> invs = new HashMap<>();
+    private final Map<Entity, IWeapon> current = new HashMap<>();
 
     @Override
     public void add(Entity owner, IWeapon weapon) {
         invs.computeIfAbsent(owner, e -> new ArrayList<>()).add(weapon);
-        // no auto-equip
+        // auto-equip
         //current.putIfAbsent(owner, weapon);
     }
 
@@ -44,8 +44,6 @@ public class InventoryServiceImplementation implements IInventoryService {
 
     @Override
     public List<IWeapon> getInventory(Entity owner) {
-        return Collections.unmodifiableList(
-            invs.getOrDefault(owner, Collections.emptyList())
-        );
+        return Collections.unmodifiableList(invs.getOrDefault(owner, Collections.emptyList()));
     }
 }

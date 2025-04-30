@@ -3,9 +3,10 @@ package io.group9.weapons.plugins;
 import com.badlogic.gdx.physics.box2d.*;
 import io.group9.CoreResources;
 import io.group9.weapons.components.SwordComponent;
+import services.IWeapon;
 
 public class WeaponFactory {
-    public static void spawnSword(float xPx, float yPx) {
+    public static void spawnWeapon(IWeapon weapon, float xPx, float yPx) {
         World world = CoreResources.getWorld();
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.DynamicBody;
@@ -13,7 +14,6 @@ public class WeaponFactory {
         bd.position.set(xPx / CoreResources.PPM, yPx / CoreResources.PPM);
         Body body = world.createBody(bd);
 
-        // Main body
         CircleShape dropShape = new CircleShape();
         dropShape.setRadius(6f / CoreResources.PPM);
         FixtureDef dropFd = new FixtureDef();
@@ -22,17 +22,19 @@ public class WeaponFactory {
         body.createFixture(dropFd);
         dropShape.dispose();
 
-        // Sensor for pickup
-        SwordComponent weapon = new SwordComponent();
         CircleShape sensorShape = new CircleShape();
         sensorShape.setRadius(10f / CoreResources.PPM);
         FixtureDef sensorFd = new FixtureDef();
         sensorFd.shape = sensorShape;
         sensorFd.isSensor = true;
         Fixture sensorFx = body.createFixture(sensorFd);
+        sensorShape.dispose();
 
         sensorFx.setUserData(weapon);
-        sensorShape.dispose();
+    }
+
+    public static void spawnSword(float xPx, float yPx) {
+        spawnWeapon(new SwordComponent(), xPx, yPx);
     }
 
 }
