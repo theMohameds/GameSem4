@@ -16,7 +16,7 @@ public class PathGraph {
 
     public void connectNodes() {
         float maxWalkX = 32f;
-        float maxWalkY = 1f;
+        float maxWalkY = 20f;
         float maxJumpY = 60f;
         float maxDoubleJumpY = 120f;
         float maxJumpHorizontalDistance = 224f;
@@ -44,7 +44,7 @@ public class PathGraph {
                 }
             }
         }
-
+        /*
         // Second pass: Add jumps only if walkable path is not possible
         for (PathNode node : nodes) {
             for (PathNode other : nodes) {
@@ -69,6 +69,8 @@ public class PathGraph {
                 }
             }
         }
+
+         */
     }
 
 }
