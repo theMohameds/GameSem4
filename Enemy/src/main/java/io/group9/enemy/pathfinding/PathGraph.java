@@ -24,8 +24,6 @@ public class PathGraph {
         // Clear existing neighbors
         for (PathNode node : nodes) {
             node.neighbors.clear();
-            node.setRequiresJump(false);
-            node.setRequiresDoubleJump(false);
         }
 
         // First pass: Connect only walkable nodes
@@ -59,13 +57,6 @@ public class PathGraph {
                 // Jump path
                 if (absDy <= maxDoubleJumpY && absDx <= maxJumpHorizontalDistance) {
                     node.neighbors.add(other);
-
-                    // Mark jump level
-                    if (absDy <= maxJumpY) {
-                        other.setRequiresJump(true);
-                    } else {
-                        other.setRequiresDoubleJump(true);
-                    }
                 }
             }
         }
