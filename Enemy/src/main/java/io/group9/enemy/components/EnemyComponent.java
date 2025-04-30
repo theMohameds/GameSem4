@@ -55,7 +55,7 @@ public class EnemyComponent implements Component {
     // Path-finding
     public GraphPath<PathNode> path;
     public int currentNode = 0;
-    public float recalcInterval = 0.25f;
+    public float recalcInterval = 0.25f; // nice!
     public float recalcTimer = 0f;
 
     // Reaction delay (AI)

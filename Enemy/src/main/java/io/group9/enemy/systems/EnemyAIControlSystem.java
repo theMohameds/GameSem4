@@ -61,29 +61,33 @@ public class EnemyAIControlSystem extends EntitySystem {
             for (PathNode node : allNodes) graph.addNode(node);
             graph.connectNodes();
 
-            PathGraphVisualizer visualizer = new PathGraphVisualizer(graph, CoreResources.getCamera(), 1 / CoreResources.PPM);
+            PathGraphVisualizer visualizer = new PathGraphVisualizer(graph, CoreResources.getCamera(), 1f / CoreResources.PPM);
             visualizer.render();
 
-            AStar astar = new AStar();
-            AStar.Heuristic heuristic = (node, g) -> {
-                double dxh = node.x - g.x;
-                double dyh = node.y - g.y;
-                return Math.sqrt(dxh * dxh + dyh * dyh);
-            };
+            ec.recalcTimer -= dt;
+            if (ec.recalcTimer <= 0f) {
+                ec.recalcTimer = MathUtils.random(0.3f, 0.8f); // or use ec.recalcInterval for fixed interval.
 
-            List<PathNode> newPath = astar.aStarSearch(start, goal, heuristic);
+                AStar astar = new AStar();
+                AStar.Heuristic heuristic = (node, g) -> {
+                    double dxh = node.x - g.x;
+                    double dyh = node.y - g.y;
+                    return Math.sqrt(dxh * dxh + dyh * dyh);
+                };
 
-            // Check if the new path is different from the current one
-            if (!pathsEqual(newPath, ec.currentPath)) {
-                ec.currentNode = 0; // Reset progress only if the path changed
-                ec.currentPath = newPath; // Store the new path
+                List<PathNode> newPath = astar.aStarSearch(start, goal, heuristic);
+                // Check if the new path is different from the current one
+                if (!pathsEqual(newPath, ec.currentPath)) {
+                    ec.currentNode = 0; // Reset progress only if the path changed
+                    ec.currentPath = newPath; // Store the new path
+                }
             }
 
             // Use the stored path for movement
             List<PathNode> path = ec.currentPath;
 
-            if (path != null && !path.isEmpty()) {
-                visualizer.renderPath(path);
+            if (ec.currentPath != null && !ec.currentPath.isEmpty()) {
+                visualizer.renderPath(ec.currentPath);
             }
 
             // Always process movement (even if path is null/empty)
