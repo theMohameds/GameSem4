@@ -50,11 +50,13 @@ public class EnemyComponent implements Component {
     public final int maxJumps = 2;
     public int jumpsLeft = maxJumps;
     public static final float FIRST_JUMP_VELOCITY = 23f;
-    public static final float DOUBLE_JUMP_VELOCITY = 27f;
+    public Float jumpDirectionLocked = null; // null = not locked
+    public static final float DOUBLE_JUMP_VELOCITY = 23f;
 
     // Path-finding
     public GraphPath<PathNode> path;
     public int currentNode = 0;
+    public int lastJumpNode = -1;
     public float recalcInterval = 0.25f; // nice!
     public float recalcTimer = 0f;
 

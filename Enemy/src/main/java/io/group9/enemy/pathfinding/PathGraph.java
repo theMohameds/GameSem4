@@ -19,7 +19,7 @@ public class PathGraph {
         float maxWalkY = 20f;
         float maxJumpY = 60f;
         float maxDoubleJumpY = 120f;
-        float maxJumpHorizontalDistance = 224f;
+        float maxJumpHorizontalDistance = 120f;
 
         // Clear existing neighbors
         for (PathNode node : nodes) {
