@@ -7,16 +7,11 @@ import io.group9.CoreResources;
 import io.group9.weapons.BodyDestroySystem;
 import locators.InventoryServiceLocator;
 import locators.PlayerServiceLocator;
-import services.IPickable;
-import services.IWeapon;
-import services.IInventoryService;
+import services.weapon.IPickable;
+import services.weapon.IWeapon;
+import services.weapon.IInventoryService;
 import io.group9.ContactReceiver;
 import services.player.IPlayerService;
-
-import java.util.Collection;
-import java.util.ServiceLoader;
-
-import static java.util.stream.Collectors.toList;
 
 public class WeaponPickupReceiver implements ContactReceiver {
     private final IPlayerService playerSvc = PlayerServiceLocator.get();

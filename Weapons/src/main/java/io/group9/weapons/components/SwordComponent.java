@@ -5,8 +5,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import services.IWeapon;
-import services.IPickable;
+import services.weapon.IWeapon;
+import services.weapon.IPickable;
 
 public class SwordComponent implements Component, IWeapon, IPickable {
     private Entity owner;

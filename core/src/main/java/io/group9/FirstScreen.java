@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,10 +18,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import data.WorldProvider;
-import jdk.javadoc.internal.tool.Start;
+import locators.CameraServiceLocator;
 import plugins.ECSPlugin;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -50,6 +50,9 @@ public class FirstScreen implements Screen {
     private Pixmap pausePixmap = null;
     private BitmapFont fpsFont;
     private Label fpsLabel;
+    OrthographicCamera cam;
+
+
 
     public FirstScreen(Main game) throws URISyntaxException {
         this.game = game;
@@ -83,6 +86,11 @@ public class FirstScreen implements Screen {
             Gdx.app.log("FirstScreen", "Initialized plugin: " + plugin.getClass().getName());
         }
 
+
+        cam = CameraServiceLocator.get().getCamera();
+        if (cam == null) {
+            Gdx.app.error("FirstScreen", "CameraService returned null camera!");
+        }
 
         //pause knappen
         stage = new Stage(new ScreenViewport());
@@ -128,6 +136,8 @@ public class FirstScreen implements Screen {
         pauseWindow.setMovable(false);
         pauseWindow.setVisible(false);
 
+
+
         TextButton resumeButton = new TextButton("Continue", skin);
         TextButton exitButton = new TextButton("Exit", skin);
 
@@ -151,6 +161,7 @@ public class FirstScreen implements Screen {
         pauseWindow.add(exitButton).width(125f).height(35f).pad(10).row();
 
         stage.addActor(pauseWindow);
+
     }
 
     float accumulator = 0;
@@ -160,6 +171,7 @@ public class FirstScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1); // RGBA
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 
         if (!isPaused) {
             accumulator += delta;
@@ -176,7 +188,7 @@ public class FirstScreen implements Screen {
             stage.getBatch().draw(pauseSnapshot, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             stage.getBatch().end();
         } else {
-            debugRenderer.render(world, CoreResources.getCamera().combined);
+            debugRenderer.render(world, cam.combined);
         }
 
         fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());

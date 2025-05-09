@@ -1,7 +1,7 @@
 package io.group9.weapons;
 
-import services.IInventoryService;
-import services.IWeapon;
+import services.weapon.IInventoryService;
+import services.weapon.IWeapon;
 import com.badlogic.ashley.core.Entity;
 import java.util.*;
 

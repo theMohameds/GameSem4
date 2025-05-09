@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import data.WorldProvider;
 import io.group9.CoreResources;
 import io.group9.weapons.components.SwordComponent;
-import services.IWeapon;
+import services.weapon.IWeapon;
 
 public class WeaponFactory {
     public static void spawnWeapon(IWeapon weapon, float xPx, float yPx) {

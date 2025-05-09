@@ -1,4 +1,4 @@
-package services;
+package services.weapon;
 
 import com.badlogic.ashley.core.Entity;
 import java.util.List;

@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.components.EnemyComponent;
+import locators.CameraServiceLocator;
 
 import java.util.EnumMap;
 
@@ -50,7 +51,7 @@ public class EnemyAnimationRenderer extends EntitySystem {
     @Override
     public void update(float deltaTime) {
 
-        OrthographicCamera cam = CoreResources.getCamera();
+        OrthographicCamera cam = CameraServiceLocator.get().getCamera();
         if (cam == null) {
             Gdx.app.error("EnemyAnimationRenderer", "Camera is null, using fallback.");
             cam.update();

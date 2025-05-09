@@ -2,6 +2,7 @@ package io.group9.enemy.systems;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 import io.group9.enemy.ai.EnemyState;
@@ -10,6 +11,7 @@ import io.group9.enemy.pathfinding.AStar;
 import io.group9.enemy.pathfinding.PathGraph;
 import io.group9.enemy.pathfinding.PathGraphVisualizer;
 import io.group9.enemy.pathfinding.PathNode;
+import locators.CameraServiceLocator;
 import locators.PlayerServiceLocator;
 import services.player.IPlayerService;
 
@@ -29,6 +31,8 @@ public class EnemyAIControlSystem extends EntitySystem {
     private static List<PathNode> sharedNodes;
 
     private final IPlayerService playerSvc = PlayerServiceLocator.get();
+    private final OrthographicCamera cam = CameraServiceLocator.get().getCamera();
+
 
     public EnemyAIControlSystem(float cellSize) {
         this.cellSize = cellSize;
@@ -75,7 +79,7 @@ public class EnemyAIControlSystem extends EntitySystem {
             graph.connectNodes();
 
             PathGraphVisualizer visualizer = new PathGraphVisualizer(graph,
-                CoreResources.getCamera(), 1f / CoreResources.PPM);
+                cam, 1f / CoreResources.PPM);
             visualizer.render();
 
             AStar astar = new AStar();

@@ -1,6 +1,6 @@
 package locators;
 
-import services.IInventoryService;
+import services.weapon.IInventoryService;
 
 import java.util.ServiceLoader;
 

@@ -5,16 +5,14 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import io.group9.CoreResources;
 import locators.InventoryServiceLocator;
 import locators.PlayerServiceLocator;
-import services.IInventoryService;
-import services.IWeapon;
+import services.weapon.IInventoryService;
+import services.weapon.IWeapon;
 import services.player.IPlayerService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 public class WeaponSwitchSystem extends EntitySystem {
 

@@ -29,13 +29,12 @@ import io.group9.CoreResources;
 import locators.InventoryServiceLocator;
 import services.player.IPlayerService;
 import locators.PlayerServiceLocator;
-import services.IInventoryService;
-import services.IWeapon;
+import services.weapon.IInventoryService;
+import services.weapon.IWeapon;
 import plugins.ECSPlugin;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 public final class UIPlugin implements ECSPlugin {
     private Stage stage;

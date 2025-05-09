@@ -8,12 +8,11 @@ import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.ai.EnemyState;
 import locators.InventoryServiceLocator;
 import locators.PlayerServiceLocator;
-import services.IInventoryService;
-import services.IWeapon;
+import services.weapon.IInventoryService;
+import services.weapon.IWeapon;
 import services.player.IPlayerService;
 
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 public class EnemyContactReceiver implements ContactReceiver {
 

@@ -12,7 +12,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import data.WorldProvider;
 import io.group9.CoreResources;
-import services.IWeapon;
+import locators.CameraServiceLocator;
+import services.weapon.IWeapon;
 
 public class WeaponRenderSystem extends EntitySystem {
     private static final float SCALE = 0.6f;
@@ -20,7 +21,7 @@ public class WeaponRenderSystem extends EntitySystem {
 
     @Override
     public void update(float dt) {
-        OrthographicCamera cam = CoreResources.getCamera();
+        OrthographicCamera cam = CameraServiceLocator.get().getCamera();
         cam.update();
         batch.setProjectionMatrix(cam.combined);
 

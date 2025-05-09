@@ -7,9 +7,6 @@ import io.group9.weapons.BodyDestroySystem;
 import io.group9.weapons.WeaponSwitchSystem;
 import io.group9.weapons.systems.WeaponRenderSystem;
 import plugins.ECSPlugin;
-import services.IInventoryService;
-
-import java.util.ServiceLoader;
 
 public class WeaponsPlugin implements ECSPlugin {
     @Override

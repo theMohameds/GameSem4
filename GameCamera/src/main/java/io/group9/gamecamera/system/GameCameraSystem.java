@@ -5,14 +5,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
+import locators.CameraServiceLocator;
 import locators.PlayerServiceLocator;
 import plugins.GameMapProvider;
+import services.gameCamera.ICameraService;
 import services.player.IPlayerService;
 
 public class GameCameraSystem extends EntitySystem {
     private final OrthographicCamera camera;
     private final boolean followPlayer;
     private final IPlayerService playerSvc = PlayerServiceLocator.get();
+    private final ICameraService cameraSvc = CameraServiceLocator.get();
 
     public GameCameraSystem(float viewportWidth, float viewportHeight, float initialX, float initialY, boolean followPlayer) {
         camera = new OrthographicCamera(viewportWidth, viewportHeight);
