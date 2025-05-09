@@ -3,6 +3,8 @@ package io.group9.player.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.graphics.Color;
+
 
 public class PlayerComponent implements Component {
     public float speed = 14f;
@@ -26,6 +28,8 @@ public class PlayerComponent implements Component {
     public boolean facingLeft = false;
 
     public Body body;
+    public Color color = Color.WHITE;
+
 
     public static final float FIRST_JUMP_VELOCITY = 23f;
     public static final float DOUBLE_JUMP_VELOCITY = 23f;
@@ -38,6 +42,7 @@ public class PlayerComponent implements Component {
    public float wallHangingTimer = 0f;
    public boolean wallOnLeft = false; //
     public boolean needsFreeze = false;
+    public Color color;
 
     public enum State {
         IDLE,
