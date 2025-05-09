@@ -42,7 +42,6 @@ public class PlayerComponent implements Component {
    public float wallHangingTimer = 0f;
    public boolean wallOnLeft = false; //
     public boolean needsFreeze = false;
-    public Color color;
 
     public enum State {
         IDLE,
