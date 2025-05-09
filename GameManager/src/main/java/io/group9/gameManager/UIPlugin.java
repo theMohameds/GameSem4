@@ -40,7 +40,12 @@ public final class UIPlugin implements ECSPlugin {
         eng.addSystem(new StageSys(stage, 1000));
     }
 
-    @Override public void createEntities(Engine e) { }
+    @Override
+    public void createEntities(Engine e) {
+        rm.reset();
+        //rm.startNextRound();
+        rm.freezeAllBodies();
+    }
     @Override public int getPriority() { return 6; }
 
     private void buildStage() {

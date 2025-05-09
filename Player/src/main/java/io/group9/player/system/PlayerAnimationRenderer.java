@@ -79,11 +79,11 @@ public class PlayerAnimationRenderer extends EntitySystem {
         batch.setProjectionMatrix(cam.combined);
 
         batch.begin();
-        batch.setColor(Color.LIME);
 
         for (Entity e : entities) {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
+            batch.setColor(pc.color !=null ? pc.color : Color.WHITE);
             Vector2 pos = pc.body.getPosition();
 
             PlayerComponent.State state = pc.state;

@@ -26,6 +26,8 @@ public final class RoundManager extends EntitySystem {
     private int roundNo = 1;
     private int playerWins = 0, enemyWins = 0;
 
+    private boolean fightStarted = false;
+
     public RoundManager(int priority) {
         super(priority);
     }
@@ -33,10 +35,15 @@ public final class RoundManager extends EntitySystem {
     @Override
     public void update(float dt) {
         phaseTimer -= dt;
+
+        if(!fightStarted && phase == Phase.INTRO && phaseTimer <= 1f) {
+            fightStarted = true;
+            CoreResources.setRoundFrozen(true);
+        }
+
         switch (phase) {
             case INTRO:
                 if (phaseTimer <= 0f) {
-                    CoreResources.setRoundFrozen(false);
                     phase = Phase.FIGHT;
                     phaseTimer = ROUND_TIME;
                 }
@@ -79,7 +86,7 @@ public final class RoundManager extends EntitySystem {
         return false;
     }
 
-    private void freezeAllBodies() {
+    public void freezeAllBodies() {
         for (Body b : new Body[]{
             CoreResources.getPlayerBody(),
             CoreResources.getEnemyBody()
@@ -98,7 +105,7 @@ public final class RoundManager extends EntitySystem {
         }
     }
 
-    private void startNextRound() {
+    void startNextRound() {
         // figure out who actually died
         boolean playerDied = CoreResources.getPlayerHealth() <= 0;
         boolean enemyDied  = CoreResources.getEnemyHealth()  <= 0;
@@ -269,6 +276,18 @@ public final class RoundManager extends EntitySystem {
         if (phaseTimer > 2f) return "2";
         if (phaseTimer > 1f) return "1";
         return "FIGHT";
+    }
+
+    public void reset(){
+        this.phase = Phase.INTRO;
+        this.phaseTimer = INTRO_TIME;
+        this.roundNo = 1;
+        this.playerWins = 0;
+        this.enemyWins = 0;
+        fightStarted = false;
+
+        CoreResources.setRoundFrozen(true);
+
     }
 
     public float getRoundTimer() {

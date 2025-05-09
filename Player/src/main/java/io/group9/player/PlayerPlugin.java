@@ -4,9 +4,11 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
 import io.group9.CoreResources;
+import io.group9.SettingsManager;
 import io.group9.player.components.PlayerComponent;
 import io.group9.player.system.*;
 import plugins.ECSPlugin;
+import com.badlogic.gdx.graphics.Color;
 
 public class PlayerPlugin implements ECSPlugin {
 
@@ -46,6 +48,8 @@ public class PlayerPlugin implements ECSPlugin {
         pc.body      = body;
         pc.jumpsLeft = pc.maxJumps;
         pc.facingLeft = false;
+        pc.color = SettingsManager.getPlayerColor();
+
 
         body.setUserData(pc);
         CoreResources.setPlayerBody(body);
@@ -55,6 +59,7 @@ public class PlayerPlugin implements ECSPlugin {
         playerE.add(pc);
         eng.addEntity(playerE);
         CoreResources.setPlayerEntity(playerE);
+
     }
 
     @Override public int getPriority() { return 2; }

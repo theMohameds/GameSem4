@@ -1,5 +1,6 @@
 package io.group9;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -70,8 +71,5 @@ public class CoreResources {
     public static IInventoryService getInventoryService() {
         return inventoryService;
     }
-
-
-
 
 }
