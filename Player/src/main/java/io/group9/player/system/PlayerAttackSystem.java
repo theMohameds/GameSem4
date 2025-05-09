@@ -9,7 +9,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.*;
 import io.group9.CoreResources;
+import components.CollisionCategories;
 import io.group9.player.components.PlayerComponent;
 import components.CollisionCategories;
 
@@ -31,14 +33,19 @@ public class PlayerAttackSystem extends EntitySystem {
 
             // Start attack if requested
             if (pc.attackRequested && !pc.attacking) {
-                pc.attacking      = true;
-                pc.attackTimer    = pc.attackDuration;
+                pc.attacking = true;
+                pc.attackTimer = pc.attackDuration;
+
+                if (pc.attackType == PlayerComponent.AttackType.HEAVY)
+                    pc.state = PlayerComponent.State.HEAVY_ATTACK;
+                else
+                    pc.state = PlayerComponent.State.LIGHT_ATTACK;
+
                 pc.attackRequested = false;
-                pc.state          = PlayerComponent.State.LIGHT_ATTACK;
                 createAttackSensor(pc);
             }
 
-            // attack timer
+            // If attack is active, count down the timer.
             if (pc.attacking) {
                 pc.attackTimer -= deltaTime;
                 if (pc.attackTimer <= 0f) {
@@ -53,6 +60,11 @@ public class PlayerAttackSystem extends EntitySystem {
                         } else {
                             pc.state = PlayerComponent.State.AIRSPIN;
                         }
+                    }
+
+                    if (pc.isBlocking) {
+                        pc.attackRequested = false;
+                        return;
                     }
                 }
             }

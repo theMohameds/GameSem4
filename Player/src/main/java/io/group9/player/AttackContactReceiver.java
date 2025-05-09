@@ -1,5 +1,6 @@
 package io.group9.player;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import io.group9.ContactReceiver;
 import io.group9.CoreResources;
@@ -23,6 +24,15 @@ public class AttackContactReceiver implements ContactReceiver {
 
         if ((aEnemyAtk && bIsPlayerBody) || (bEnemyAtk && aIsPlayerBody)) {
             applyDamageToPlayer();
+        // Check collisions:
+        }if (aIsPlayerAttack && bIsEnemyHurtbox || bIsPlayerAttack && aIsEnemyHurtbox) {
+            PlayerComponent pc = CoreResources.getPlayerEntity().getComponent(PlayerComponent.class);
+            if (pc.state == PlayerComponent.State.BLOCK) {
+                Gdx.app.log("BLOCK", "Skade reduceret med 50%!");
+                // Tilføj skadereduktionslogik her (f.eks. halver skaden)
+            } else {
+                // Normal skade
+            }
         }
     }
 

@@ -15,6 +15,14 @@ public class PlayerComponent implements Component {
     public float attackTimer = 0f;
     public boolean attackRequested = false;
 
+
+    public boolean isBlocking=false;
+    public float blockDuration = 1.5f;
+    public float blockTimer = 0f;
+
+
+
+
     public boolean facingLeft = false;
 
     public Body body;
@@ -48,11 +56,14 @@ public class PlayerComponent implements Component {
         SWORD_RUN
     }
 
-    // Combat
     public int   health         = 100;
     public float hurtDuration   = 0.264f;
     public float hurtTimer      = 0f;
     public boolean isHurt       = false;
+
+    public enum AttackType { LIGHT, HEAVY }
+
+    public AttackType attackType = AttackType.LIGHT; // standard
 
     public State state = State.IDLE;
 }

@@ -38,6 +38,12 @@ public class PlayerStateSystem extends EntitySystem {
                 continue;
             }
 
+            if (pc.isBlocking && pc.jumpsLeft == pc.maxJumps) {
+                pc.state = PlayerComponent.State.BLOCK;
+                pc.blockTimer = pc.blockDuration;
+                continue; // Spring over andre tilstandsændringer
+            }
+
 
             if (pc.state == PlayerComponent.State.DEAD && pc.needsFreeze) {
                 Vector2 vel = pc.body.getLinearVelocity();

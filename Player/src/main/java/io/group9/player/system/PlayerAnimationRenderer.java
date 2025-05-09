@@ -47,6 +47,8 @@ public class PlayerAnimationRenderer extends EntitySystem {
         anims.put(PlayerComponent.State.SWORD_IDLE, load("character/sword/idle.png",   0.066f, 10, true));
         anims.put(PlayerComponent.State.SWORD_RUN, load("character/sword/run.png",    0.066f,  8, true));
         anims.put(PlayerComponent.State.SWORD_ATTACK, load("character/sword/attack.png", 0.066f,  6, false));
+        anims.put(PlayerComponent.State.BLOCK,load("character/push_pull.png", 0.066f, 8, true));
+
     }
 
     private Animation<TextureRegion> load(
