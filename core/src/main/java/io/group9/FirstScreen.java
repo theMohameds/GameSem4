@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import data.WorldProvider;
 import jdk.javadoc.internal.tool.Start;
 import plugins.ECSPlugin;
 import java.io.File;
@@ -31,7 +32,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 public class FirstScreen implements Screen {
-    private World world;
+    World world = WorldProvider.getWorld();
+
     private Engine engine;
     private Box2DDebugRenderer debugRenderer;
     private File jarLocation = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -57,9 +59,6 @@ public class FirstScreen implements Screen {
     @Override
     public void show() {
         Gdx.app.log("FirstScreen", "Initializing world, engine, and plugins...");
-        // Create Box2D world (gravity in world units)
-        world = new World(new Vector2(0, -10f), true);
-        CoreResources.setWorld(world);
 
         // Create and set contact dispatcher.
         CoreContactDispatcher dispatcher = new CoreContactDispatcher();

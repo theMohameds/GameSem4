@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import data.WorldProvider;
 import io.group9.CoreResources;
 import services.IWeapon;
 
@@ -23,7 +24,7 @@ public class WeaponRenderSystem extends EntitySystem {
         cam.update();
         batch.setProjectionMatrix(cam.combined);
 
-        World world = CoreResources.getWorld();
+        World world = WorldProvider.getWorld();
         Array<Body> bodies = new Array<>();
         world.getBodies(bodies);
 

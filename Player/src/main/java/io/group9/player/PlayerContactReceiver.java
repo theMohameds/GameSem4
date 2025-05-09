@@ -30,7 +30,6 @@ public class PlayerContactReceiver implements ContactReceiver {
             otherData = otherFx.getBody().getUserData();
         }
 
-        Gdx.app.log("PlayerContact", "otherData = " + otherData);
         if (!"ground".equals(otherData) && !"wall".equals(otherData)) return;
 
         PlayerComponent pc = (PlayerComponent) playerSvc.getPlayerBody().getUserData();

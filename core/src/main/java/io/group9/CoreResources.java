@@ -24,9 +24,6 @@ public class CoreResources {
     // Pixels per meter conversion.
     public static final float PPM = 16f;
 
-    public static void setWorld(World w) { world = w; }
-    public static World getWorld() { return world; }
-
     public static void setCamera(OrthographicCamera cam) { camera = cam; }
     public static OrthographicCamera getCamera() { return camera; }
     public static void setContactDispatcher(CoreContactDispatcher dispatcher) { contactDispatcher = dispatcher; }

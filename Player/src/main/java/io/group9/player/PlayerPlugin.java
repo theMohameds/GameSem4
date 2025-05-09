@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import data.WorldProvider;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
 import io.group9.player.system.*;
@@ -32,8 +33,8 @@ public class PlayerPlugin implements ECSPlugin {
     public void createEntities(Engine eng) {
         Gdx.app.log("PlayerPlugin", "Creating Player Entity");
 
-        // 1) Create the Box2D body
-        World world = CoreResources.getWorld();
+        World world = WorldProvider.getWorld();
+
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.DynamicBody;
         bd.fixedRotation = true;
@@ -53,33 +54,23 @@ public class PlayerPlugin implements ECSPlugin {
         body.createFixture(fd);
         shape.dispose();
 
-        // 2) Create & populate component
         PlayerComponent pc = new PlayerComponent();
         pc.body      = body;
         pc.jumpsLeft = pc.maxJumps;
-        // set color, etc. if you have settings:
-        // pc.color = YOUR_SETTINGS.getPlayerColor();
 
-        // link body → component for contacts
         body.setUserData(pc);
 
-        // 3) Make the Ashley entity
         Entity playerE = new Entity();
         playerE.add(pc);
         eng.addEntity(playerE);
 
-        // now complete cross-refs
         pc.entity = playerE;
 
-        // 4) initialize your SPI player service
         IPlayerService svc = PlayerServiceLocator.get();
         svc.setPlayerBody(body);
         svc.setPlayerEntity(playerE);
         svc.setHealth(pc.health);
         svc.setMaxHealth(pc.maxHealth);
-        //CoreResources.setPlayerBody(body);
-        //CoreResources.setPlayerEntity(playerE);
-        //CoreResources.setPlayerHealth(pc.health);
     }
 
     @Override public int getPriority() { return 2; }

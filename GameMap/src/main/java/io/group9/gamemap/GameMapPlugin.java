@@ -3,6 +3,8 @@ package io.group9.gamemap;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.World;
+import data.WorldProvider;
 import io.group9.CoreResources;
 import plugins.GameMapProvider;
 import io.group9.gamemap.system.GameMapSystem;
@@ -12,12 +14,14 @@ import java.util.List;
 
 public class GameMapPlugin implements ECSPlugin {
     private GameMapSystem mapSystem;
+    World world = WorldProvider.getWorld();
+
 
     @Override
     public void registerSystems(Engine engine) {
         Gdx.app.log("GameMapPlugin", "Initializing GameMapSystem…");
         mapSystem = new GameMapSystem(
-            CoreResources.getWorld(),
+            world,
             "map/mountain/mountains.tmx",
             CoreResources.getCamera()
         );
