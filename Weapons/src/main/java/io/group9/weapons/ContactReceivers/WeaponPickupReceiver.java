@@ -6,10 +6,12 @@ import com.badlogic.gdx.physics.box2d.*;
 import io.group9.CoreResources;
 import io.group9.weapons.BodyDestroySystem;
 import locators.InventoryServiceLocator;
+import locators.PlayerServiceLocator;
 import services.IPickable;
 import services.IWeapon;
 import services.IInventoryService;
 import io.group9.ContactReceiver;
+import services.player.IPlayerService;
 
 import java.util.Collection;
 import java.util.ServiceLoader;
@@ -17,6 +19,7 @@ import java.util.ServiceLoader;
 import static java.util.stream.Collectors.toList;
 
 public class WeaponPickupReceiver implements ContactReceiver {
+    private final IPlayerService playerSvc = PlayerServiceLocator.get();
     @Override public void beginContact(Contact c) {
         tryOne(c.getFixtureA(), c.getFixtureB());
         tryOne(c.getFixtureB(), c.getFixtureA());
@@ -29,7 +32,8 @@ public class WeaponPickupReceiver implements ContactReceiver {
 
         Body b = actorFx.getBody();
         Entity picker;
-        if      (b == CoreResources.getPlayerBody()) picker = CoreResources.getPlayerEntity();
+
+        if (b == playerSvc.getPlayerBody()) picker = playerSvc.getPlayerEntity();
         else if (b == CoreResources.getEnemyBody())  picker = CoreResources.getEnemyEntity();
         else return;
 

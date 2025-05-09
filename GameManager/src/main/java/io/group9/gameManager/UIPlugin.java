@@ -27,6 +27,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.group9.CoreResources;
 import locators.InventoryServiceLocator;
+import services.player.IPlayerService;
+import locators.PlayerServiceLocator;
 import services.IInventoryService;
 import services.IWeapon;
 import plugins.ECSPlugin;
@@ -44,7 +46,9 @@ public final class UIPlugin implements ECSPlugin {
     private Label slot1Lbl, slot2Lbl;
     private Image slot1Img, slot2Img;
     private Drawable borderDefault, borderSelected;
+
     IInventoryService inv = InventoryServiceLocator.getInventoryService();
+    private final IPlayerService playerSvc = PlayerServiceLocator.get();
 
     @Override
     public void registerSystems(Engine eng) {
@@ -170,7 +174,7 @@ public final class UIPlugin implements ECSPlugin {
         HudSys(int priority) { super(priority); }
 
         @Override public void update(float dt) {
-            playerHP.setValue(CoreResources.getPlayerHealth());
+            playerHP.setValue(playerSvc.getHealth());
             enemyHP.setValue(CoreResources.getEnemyHealth());
             timerLbl.setText(String.format("%02d", (int)Math.ceil(rm.getRoundTimer())));
             roundLbl.setText("ROUND " + rm.getRoundNumber());
@@ -192,7 +196,7 @@ public final class UIPlugin implements ECSPlugin {
                 splash.setVisible(false);
             }
 
-            Entity player = CoreResources.getPlayerEntity();
+            Entity player = playerSvc.getPlayerEntity();
             if (inv != null && player != null) {
                 List<IWeapon> invList = inv.getInventory(player);
                 Optional<IWeapon> cw = inv.getCurrentWeapon(player);

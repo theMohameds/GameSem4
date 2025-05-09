@@ -1,12 +1,16 @@
 package io.group9.player;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import io.group9.ContactReceiver;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
+import locators.PlayerServiceLocator;
+import services.player.IPlayerService;
 
 public class AttackContactReceiver implements ContactReceiver {
+    private final IPlayerService playerSvc = PlayerServiceLocator.get();
 
     @Override
     public void beginContact(Contact contact) {
@@ -30,14 +34,13 @@ public class AttackContactReceiver implements ContactReceiver {
 
         if ((aEnemyAtk && bIsPlayerBody) || (bEnemyAtk && aIsPlayerBody)) {
             applyDamageToPlayer();
-        // Check collisions:
+
+
         }if (aIsPlayerBody && bIsEnemyHurtbox || bIsPlayerAttack && aIsEnemyHurtbox) {
-            PlayerComponent pc = CoreResources.getPlayerEntity().getComponent(PlayerComponent.class);
+            PlayerComponent pc = playerSvc.getPlayerEntity().getComponent(PlayerComponent.class);
             if (pc.state == PlayerComponent.State.BLOCK) {
                 Gdx.app.log("BLOCK", "Skade reduceret med 50%!");
-                // Tilføj skadereduktionslogik her (f.eks. halver skaden)
             } else {
-                // Normal skade
             }
         }
     }
@@ -49,19 +52,19 @@ public class AttackContactReceiver implements ContactReceiver {
 
         if ("player".equals(bodyUserData)) return true;
 
-        return bodyUserData == CoreResources.getPlayerEntity()
-            .getComponent(PlayerComponent.class);
+        return bodyUserData == playerSvc.getPlayerBody();
     }
 
     private void applyDamageToPlayer() {
-        PlayerComponent pc = CoreResources.getPlayerEntity()
-            .getComponent(PlayerComponent.class);
+        Entity playerEnt = playerSvc.getPlayerEntity();
+        PlayerComponent pc = playerEnt.getComponent(PlayerComponent.class);
         if (pc == null || pc.state == PlayerComponent.State.DEAD) return;
 
-        pc.health -= 10;
-        CoreResources.setPlayerHealth(pc.health);
+        int newHealth = pc.health - 10;
+        pc.health = newHealth;
+        playerSvc.setHealth(newHealth);
 
-        if (pc.health <= 0) {
+        if (newHealth <= 0) {
             pc.state = PlayerComponent.State.DEAD;
         } else {
             pc.state     = PlayerComponent.State.HURT;

@@ -1,14 +1,20 @@
 package io.group9.player;
 
-import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import io.group9.CoreResources;
-import io.group9.SettingsManager;
 import io.group9.player.components.PlayerComponent;
 import io.group9.player.system.*;
 import plugins.ECSPlugin;
-import com.badlogic.gdx.graphics.Color;
+import services.player.IPlayerService;
+import locators.PlayerServiceLocator;
 
 public class PlayerPlugin implements ECSPlugin {
 
@@ -22,15 +28,18 @@ public class PlayerPlugin implements ECSPlugin {
         CoreResources.getContactDispatcher().addReceiver(new AttackContactReceiver());
     }
 
-    @Override public void createEntities(Engine eng) {
+    @Override
+    public void createEntities(Engine eng) {
         Gdx.app.log("PlayerPlugin", "Creating Player Entity");
-        World w = CoreResources.getWorld();
 
+        // 1) Create the Box2D body
+        World world = CoreResources.getWorld();
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.DynamicBody;
         bd.fixedRotation = true;
         bd.position.set(250f / CoreResources.PPM, 950f / CoreResources.PPM);
-        Body body = w.createBody(bd);
+
+        Body body = world.createBody(bd);
         body.setSleepingAllowed(false);
         body.setLinearDamping(0f);
 
@@ -44,22 +53,33 @@ public class PlayerPlugin implements ECSPlugin {
         body.createFixture(fd);
         shape.dispose();
 
+        // 2) Create & populate component
         PlayerComponent pc = new PlayerComponent();
         pc.body      = body;
         pc.jumpsLeft = pc.maxJumps;
-        pc.facingLeft = false;
-        pc.color = SettingsManager.getPlayerColor();
+        // set color, etc. if you have settings:
+        // pc.color = YOUR_SETTINGS.getPlayerColor();
 
-
+        // link body → component for contacts
         body.setUserData(pc);
-        CoreResources.setPlayerBody(body);
-        CoreResources.setPlayerHealth(pc.health);
 
+        // 3) Make the Ashley entity
         Entity playerE = new Entity();
         playerE.add(pc);
         eng.addEntity(playerE);
-        CoreResources.setPlayerEntity(playerE);
 
+        // now complete cross-refs
+        pc.entity = playerE;
+
+        // 4) initialize your SPI player service
+        IPlayerService svc = PlayerServiceLocator.get();
+        svc.setPlayerBody(body);
+        svc.setPlayerEntity(playerE);
+        svc.setHealth(pc.health);
+        svc.setMaxHealth(pc.maxHealth);
+        //CoreResources.setPlayerBody(body);
+        //CoreResources.setPlayerEntity(playerE);
+        //CoreResources.setPlayerHealth(pc.health);
     }
 
     @Override public int getPriority() { return 2; }

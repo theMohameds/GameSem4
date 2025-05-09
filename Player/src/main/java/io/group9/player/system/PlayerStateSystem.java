@@ -41,7 +41,7 @@ public class PlayerStateSystem extends EntitySystem {
             if (pc.isBlocking && pc.jumpsLeft == pc.maxJumps) {
                 pc.state = PlayerComponent.State.BLOCK;
                 pc.blockTimer = pc.blockDuration;
-                continue; // Spring over andre tilstandsændringer
+                continue;
             }
 
 

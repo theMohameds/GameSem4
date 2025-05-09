@@ -7,8 +7,10 @@ import io.group9.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.ai.EnemyState;
 import locators.InventoryServiceLocator;
+import locators.PlayerServiceLocator;
 import services.IInventoryService;
 import services.IWeapon;
+import services.player.IPlayerService;
 
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -76,7 +78,8 @@ public class EnemyContactReceiver implements ContactReceiver {
         }
 
         IInventoryService inv = InventoryServiceLocator.getInventoryService();
-        Optional<IWeapon> w = inv.getCurrentWeapon(CoreResources.getPlayerEntity());
+        IPlayerService playerSvc = PlayerServiceLocator.get();
+        Optional<IWeapon> w = inv.getCurrentWeapon(playerSvc.getPlayerEntity());
         int damage = w.map(ws -> "Sword".equals(ws.getName()) ? 20 : 50).orElse(50);
 
         ec.health -= damage;

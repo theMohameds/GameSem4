@@ -10,6 +10,8 @@ import io.group9.enemy.pathfinding.AStar;
 import io.group9.enemy.pathfinding.PathGraph;
 import io.group9.enemy.pathfinding.PathGraphVisualizer;
 import io.group9.enemy.pathfinding.PathNode;
+import locators.PlayerServiceLocator;
+import services.player.IPlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,8 @@ public class EnemyAIControlSystem extends EntitySystem {
     // Shared graph and nodes
     private static PathGraph sharedGraph;
     private static List<PathNode> sharedNodes;
+
+    private final IPlayerService playerSvc = PlayerServiceLocator.get();
 
     public EnemyAIControlSystem(float cellSize) {
         this.cellSize = cellSize;
@@ -51,7 +55,7 @@ public class EnemyAIControlSystem extends EntitySystem {
     @Override
     public void update(float dt) {
         if (CoreResources.isRoundFrozen()) return;
-        playerPos.set(CoreResources.getPlayerBody().getPosition());
+        playerPos.set(playerSvc.getPlayerBody().getPosition());
 
         for (Entity ent : enemies) {
             EnemyComponent ec = ent.getComponent(EnemyComponent.class);

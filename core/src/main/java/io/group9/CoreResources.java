@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import plugins.GameMapProvider;
-import services.IInventoryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,6 @@ public class CoreResources {
 
     public static void setCamera(OrthographicCamera cam) { camera = cam; }
     public static OrthographicCamera getCamera() { return camera; }
-
-    public static void setPlayerBody(Body body) { playerBody = body; }
-    public static Body getPlayerBody() { return playerBody; }
-
-    public static void setPlayerEntity(Entity entity) { playerEntity = entity; }
-    public static Entity getPlayerEntity() { return playerEntity; }
-
     public static void setContactDispatcher(CoreContactDispatcher dispatcher) { contactDispatcher = dispatcher; }
     public static CoreContactDispatcher getContactDispatcher() { return contactDispatcher; }
 
@@ -50,11 +42,7 @@ public class CoreResources {
         return gameMapProvider;
     }
 
-    private static int playerHealth;
     private static int enemyHealth;
-
-    public static void setPlayerHealth(int hp) { playerHealth = hp; }
-    public static int getPlayerHealth() { return playerHealth; }
 
     public static void setEnemyHealth(int hp) { enemyHealth  = hp; }
     public static int getEnemyHealth() { return enemyHealth; }
@@ -70,15 +58,6 @@ public class CoreResources {
     public static void setEnemyEntity(Entity entity) { enemyEntity = entity; }
     public static Entity getEnemyEntity() { return enemyEntity; }
 
-    private static IInventoryService inventoryService;
-    public static void setInventoryService(IInventoryService svc) {
-        inventoryService = svc;
-    }
-    public static IInventoryService getInventoryService() {
-        return inventoryService;
-    }
-
-
     public static List<Vector2> getNodePositions() {
         return nodePositions;
     }
@@ -88,7 +67,6 @@ public class CoreResources {
     }
 
     public static List<Vector2> nodePositions = new ArrayList<>();
-
 
     public static TiledMapTileLayer getCollisionLayer() {
         return collisionLayer;

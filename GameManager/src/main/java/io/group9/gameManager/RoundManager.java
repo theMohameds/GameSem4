@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import io.group9.CoreResources;
+import locators.PlayerServiceLocator;
+import services.player.IPlayerService;
 
 import java.lang.reflect.Field;
 
@@ -27,6 +29,8 @@ public final class RoundManager extends EntitySystem {
     private int playerWins = 0, enemyWins = 0;
 
     private boolean fightStarted = false;
+
+    private final IPlayerService playerSvc = PlayerServiceLocator.get();
 
     public RoundManager(int priority) {
         super(priority);
@@ -74,8 +78,10 @@ public final class RoundManager extends EntitySystem {
     }
 
     private boolean someoneDied() {
-        if (CoreResources.getPlayerHealth() <= 0 || CoreResources.getPlayerBody().getPosition().y < -1) {
-            CoreResources.setPlayerHealth(0);
+        Body pBody = playerSvc.getPlayerBody();
+        int  pHealth = playerSvc.getHealth();
+        if (pHealth <= 0 || (pBody != null && pBody.getPosition().y < -1)) {
+            playerSvc.setHealth(0);
             enemyWins++;
             return true;
         }
@@ -89,7 +95,7 @@ public final class RoundManager extends EntitySystem {
 
     public void freezeAllBodies() {
         for (Body b : new Body[]{
-            CoreResources.getPlayerBody(),
+            playerSvc.getPlayerBody(),
             CoreResources.getEnemyBody()
         }) {
             if (b == null) continue;
@@ -108,10 +114,10 @@ public final class RoundManager extends EntitySystem {
 
     void startNextRound() {
         // figure out who actually died
-        boolean playerDied = CoreResources.getPlayerHealth() <= 0;
+        boolean playerDied = playerSvc.getHealth() <= 0;
         boolean enemyDied  = CoreResources.getEnemyHealth()  <= 0;
 
-        Body pBody = CoreResources.getPlayerBody();
+        Body pBody = playerSvc.getPlayerBody();
         Body eBody = CoreResources.getEnemyBody();
 
         respawnPlayer(pBody, PLAYER_SPAWN);
@@ -126,8 +132,8 @@ public final class RoundManager extends EntitySystem {
     private void respawnPlayer(Body body, Vector2 spawnPoint) {
         if (body == null) return;
 
-        // CoreResources health
-        CoreResources.setPlayerHealth(100);
+        // reset via service
+        playerSvc.setHealth(100);
 
         Object comp = body.getUserData();
         if (comp != null) {
@@ -144,14 +150,11 @@ public final class RoundManager extends EntitySystem {
             for (String t : new String[]{"reactionTimer","recalcTimer","hurtTimer","animTime"})
                 safelySetFloat(comp, cls, t, 0f);
 
-            // Force “on ground” so player always starts able to jump
             safelySetInt(comp, cls, "groundContacts", 1);
-            safelySetBoolean(comp, cls, "wasGrounded",   true);
-
+            safelySetBoolean(comp, cls, "wasGrounded", true);
             safelySetBoolean(comp, cls, "facingLeft", false);
         }
 
-        // Physics & position
         resetBodyPhysics(body);
         body.setTransform(
             spawnPoint.x / CoreResources.PPM,

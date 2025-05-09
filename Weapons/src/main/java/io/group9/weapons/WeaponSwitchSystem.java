@@ -7,8 +7,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import io.group9.CoreResources;
 import locators.InventoryServiceLocator;
+import locators.PlayerServiceLocator;
 import services.IInventoryService;
 import services.IWeapon;
+import services.player.IPlayerService;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +26,8 @@ public class WeaponSwitchSystem extends EntitySystem {
     @Override
     public void update(float dt) {
         IInventoryService inv = InventoryServiceLocator.getInventoryService();
-        Entity player = CoreResources.getPlayerEntity();
+        IPlayerService playerSvc = PlayerServiceLocator.get();
+        Entity player = playerSvc.getPlayerEntity();
 
         if (inv == null || player == null) {
             Gdx.app.log("WeaponSwitch","inv or player null → inv=" + inv + ", player=" + player);
