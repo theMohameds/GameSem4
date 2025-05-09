@@ -22,10 +22,16 @@ public class AttackContactReceiver implements ContactReceiver {
         boolean aIsPlayerBody = isPlayerBody(bdA);
         boolean bIsPlayerBody = isPlayerBody(bdB);
 
+        boolean aIsPlayerAttack   = "playerAttack".equals(fxA);
+        boolean bIsPlayerAttack   = "playerAttack".equals(fxB);
+
+        boolean aIsEnemyHurtbox  = "enemyHurtbox".equals(fxA);
+        boolean bIsEnemyHurtbox  = "enemyHurtbox".equals(fxB);
+
         if ((aEnemyAtk && bIsPlayerBody) || (bEnemyAtk && aIsPlayerBody)) {
             applyDamageToPlayer();
         // Check collisions:
-        }if (aIsPlayerAttack && bIsEnemyHurtbox || bIsPlayerAttack && aIsEnemyHurtbox) {
+        }if (aIsPlayerBody && bIsEnemyHurtbox || bIsPlayerAttack && aIsEnemyHurtbox) {
             PlayerComponent pc = CoreResources.getPlayerEntity().getComponent(PlayerComponent.class);
             if (pc.state == PlayerComponent.State.BLOCK) {
                 Gdx.app.log("BLOCK", "Skade reduceret med 50%!");
