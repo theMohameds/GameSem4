@@ -9,6 +9,8 @@ import io.group9.enemy.ai.EnemyLocation;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.pathfinding.PathNode;
 
+import java.util.List;
+
 public class EnemyComponent implements Component {
 
     // Physics handles
@@ -48,12 +50,14 @@ public class EnemyComponent implements Component {
     public final int maxJumps = 2;
     public int jumpsLeft = maxJumps;
     public static final float FIRST_JUMP_VELOCITY = 23f;
-    public static final float DOUBLE_JUMP_VELOCITY = 27f;
+    public Float jumpDirectionLocked = null; // null = not locked
+    public static final float DOUBLE_JUMP_VELOCITY = 23f;
 
     // Path-finding
-    public GraphPath<PathNode> path = new DefaultGraphPath<>();
+    public GraphPath<PathNode> path;
     public int currentNode = 0;
-    public float recalcInterval = 0.25f;
+    public int lastJumpNode = -1;
+    public float recalcInterval = 0.25f; // nice!
     public float recalcTimer = 0f;
 
     // Reaction delay (AI)
@@ -78,4 +82,10 @@ public class EnemyComponent implements Component {
     // Attack sensor dimensions (pixels)
     public float sensorW = 16f;
     public float sensorH = 30f;
+
+    public List<PathNode> currentPath = null;
+    public int currentTargetIndex = 1; // index in path of the node enemy is moving to
+    public float stepDuration = 1f; // seconds per step
+    public float stepTimer = 0f; // timer counting time spent moving toward current target
+
 }

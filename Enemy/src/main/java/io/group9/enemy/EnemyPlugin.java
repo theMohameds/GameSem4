@@ -2,6 +2,7 @@ package io.group9.enemy;
 
 import com.badlogic.ashley.core.Engine;
 import io.group9.CoreResources;
+import io.group9.enemy.pathfinding.PathGraph;
 import io.group9.enemy.systems.EnemyAIControlSystem;
 import io.group9.enemy.systems.EnemyAttackSystem;
 import io.group9.enemy.systems.EnemyAnimationRenderer;
@@ -13,8 +14,7 @@ public class EnemyPlugin implements ECSPlugin {
 
     @Override
     public void registerSystems(Engine engine) {
-        float cellSize = 64f / CoreResources.PPM;
-
+        float cellSize = 32f / CoreResources.PPM;
         engine.addSystem(new EnemyAIControlSystem(cellSize));
         engine.addSystem(new EnemyStateSystem());
         engine.addSystem(new EnemyAttackSystem());

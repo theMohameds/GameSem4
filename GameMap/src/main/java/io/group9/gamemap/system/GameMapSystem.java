@@ -7,15 +7,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import io.group9.CoreResources;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameMapSystem extends EntitySystem {
     private TiledMap tiledMap;
@@ -25,15 +22,16 @@ public class GameMapSystem extends EntitySystem {
     private final List<Rectangle> mergedRectangles = new ArrayList<>();
     private World world;
     private OrthographicCamera camera;
-    private final List<Body> collisionBodies       = new ArrayList<>();
+    private final List<Body> collisionBodies = new ArrayList<>(); // Don't think we need it
 
     // Conversion factor from pixels to meters.
     private static final float UNIT_SCALE = 1 / CoreResources.PPM;
 
     // Grid info for A* nav‑graph
-    private final int   layerWidth;
-    private final int   layerHeight;
+    private final int layerWidth;
+    private final int layerHeight;
     private final float cellSizeMeters;
+    public ArrayList<Vector2> nodePositions = new ArrayList<>();
 
     public GameMapSystem(World world,
                          String mapPath,
@@ -50,16 +48,19 @@ public class GameMapSystem extends EntitySystem {
         if (collisionLayer == null) {
             throw new IllegalArgumentException("Tiled map is missing a layer named 'Ground'");
         }
+        CoreResources.setCollisionLayer(collisionLayer);
 
-        // Capture layer dimensions and tile size in meters
         this.layerWidth = collisionLayer.getWidth();
         this.layerHeight = collisionLayer.getHeight();
         this.cellSizeMeters = collisionLayer.getTileWidth() * UNIT_SCALE;
 
         // Build collision rectangles and Box2D bodies
         gatherCollisionTiles();
+        generateNodeEdges();
         mergeRectangles();
         createCollisionBodies();
+
+        CoreResources.setNodePositions(nodePositions);
     }
 
     @Override
@@ -72,8 +73,8 @@ public class GameMapSystem extends EntitySystem {
     private void gatherCollisionTiles() {
         int layerW = collisionLayer.getWidth();
         int layerH = collisionLayer.getHeight();
-        int tileW  = (int) collisionLayer.getTileWidth();
-        int tileH  = (int) collisionLayer.getTileHeight();
+        int tileW  = collisionLayer.getTileWidth();
+        int tileH  = collisionLayer.getTileHeight();
 
         for (int y = 0; y < layerH; y++) {
             for (int x = 0; x < layerW; x++) {
@@ -159,14 +160,33 @@ public class GameMapSystem extends EntitySystem {
         }
     }
 
-    public void dispose() {
-        if (tiledMap   != null) tiledMap.dispose();
-        if (mapRenderer!= null) mapRenderer.dispose();
-    }
+    public void generateNodeEdges() {
+        int layerW = collisionLayer.getWidth();
+        int layerH = collisionLayer.getHeight();
+        int tileW  = collisionLayer.getTileWidth();
+        int tileH  = collisionLayer.getTileHeight();
 
-    /**
-     * @return merged collision rectangles in world units (meters)
-     */
+        Set<Vector2> nodeSet = new HashSet<>();
+
+        for (int y = 1; y < layerH; y++) {
+            for (int x = 0; x < layerW; x++) {
+                TiledMapTileLayer.Cell current = collisionLayer.getCell(x, y);
+                TiledMapTileLayer.Cell below   = collisionLayer.getCell(x, y - 1);
+
+                // if this cell is empty but there is ground directly beneath
+                if (current == null && below != null && below.getTile() != null) {
+                    float posY = y * tileH;
+                    float leftX = x * tileW;
+                    float rightX = (x + 1) * tileW;
+
+                    nodeSet.add(new Vector2(leftX, posY));
+                    nodeSet.add(new Vector2(rightX, posY));
+                }
+            }
+        }
+
+        nodePositions = new ArrayList<>(nodeSet);
+    }
     public List<Rectangle> getMergedWorldRectangles() {
         List<Rectangle> out = new ArrayList<>();
         for (Rectangle r : mergedRectangles) {
@@ -180,6 +200,11 @@ public class GameMapSystem extends EntitySystem {
         return out;
     }
 
+    public void dispose() {
+        if (tiledMap   != null) tiledMap.dispose();
+        if (mapRenderer!= null) mapRenderer.dispose();
+    }
+
     public int getLayerWidth() {
         return layerWidth;
     }
@@ -191,4 +216,6 @@ public class GameMapSystem extends EntitySystem {
     public float getCellSizeMeters() {
         return cellSizeMeters;
     }
+
+
 }
