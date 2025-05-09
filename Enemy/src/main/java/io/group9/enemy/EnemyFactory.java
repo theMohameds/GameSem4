@@ -8,6 +8,8 @@ import data.WorldProvider;
 import io.group9.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import components.CollisionCategories;
+import locators.EnemyServiceLocator;
+import services.enemy.IEnemyService;
 
 public final class EnemyFactory {
     private EnemyFactory() { }
@@ -23,7 +25,6 @@ public final class EnemyFactory {
         Body body = world.createBody(bd);
         body.setLinearDamping(0f);
         body.setSleepingAllowed(false);
-        CoreResources.setEnemyBody(body);
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(8f / CoreResources.PPM, 15f / CoreResources.PPM);
@@ -63,14 +64,16 @@ public final class EnemyFactory {
         ec.body          = body;
         ec.footSensor    = footFx;
         ec.hurtboxSensor = hurtFx;
-        ec.facingLeft = true;
-
-        CoreResources.setEnemyHealth(ec.health);
+        ec.facingLeft = true;;
 
         body.setUserData(ec);
         Entity e = new Entity();
         e.add(ec);
         engine.addEntity(e);
-        CoreResources.setEnemyEntity(e);
+
+        IEnemyService enemySvc = EnemyServiceLocator.get();
+        enemySvc.setEnemyBody(body);
+        enemySvc.setEnemyEntity(e);
+        enemySvc.setHealth(ec.health);
     }
 }

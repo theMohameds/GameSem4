@@ -26,7 +26,9 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.group9.CoreResources;
+import locators.EnemyServiceLocator;
 import locators.InventoryServiceLocator;
+import services.enemy.IEnemyService;
 import services.player.IPlayerService;
 import locators.PlayerServiceLocator;
 import services.weapon.IInventoryService;
@@ -48,6 +50,7 @@ public final class UIPlugin implements ECSPlugin {
 
     IInventoryService inv = InventoryServiceLocator.getInventoryService();
     private final IPlayerService playerSvc = PlayerServiceLocator.get();
+    private final IEnemyService enemySvc = EnemyServiceLocator.get();
 
     @Override
     public void registerSystems(Engine eng) {
@@ -174,7 +177,7 @@ public final class UIPlugin implements ECSPlugin {
 
         @Override public void update(float dt) {
             playerHP.setValue(playerSvc.getHealth());
-            enemyHP.setValue(CoreResources.getEnemyHealth());
+            enemyHP.setValue(enemySvc.getHealth());
             timerLbl.setText(String.format("%02d", (int)Math.ceil(rm.getRoundTimer())));
             roundLbl.setText("ROUND " + rm.getRoundNumber());
             String cue = rm.getIntroCue();

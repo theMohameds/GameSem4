@@ -7,7 +7,6 @@ public class NoopCameraService implements ICameraService {
         return null;
     }
     @Override public void setCamera(OrthographicCamera cam) {
-        // no-op
     }
 }
 

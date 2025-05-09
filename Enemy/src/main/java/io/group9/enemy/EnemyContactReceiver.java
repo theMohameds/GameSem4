@@ -6,8 +6,10 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import io.group9.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.ai.EnemyState;
+import locators.EnemyServiceLocator;
 import locators.InventoryServiceLocator;
 import locators.PlayerServiceLocator;
+import services.enemy.IEnemyService;
 import services.weapon.IInventoryService;
 import services.weapon.IWeapon;
 import services.player.IPlayerService;
@@ -78,11 +80,12 @@ public class EnemyContactReceiver implements ContactReceiver {
 
         IInventoryService inv = InventoryServiceLocator.getInventoryService();
         IPlayerService playerSvc = PlayerServiceLocator.get();
+        IEnemyService enemySvc = EnemyServiceLocator.get();
         Optional<IWeapon> w = inv.getCurrentWeapon(playerSvc.getPlayerEntity());
         int damage = w.map(ws -> "Sword".equals(ws.getName()) ? 20 : 50).orElse(50);
 
         ec.health -= damage;
-        CoreResources.setEnemyHealth(ec.health);
+        enemySvc.setHealth(ec.health);
 
         if (ec.health <= 0) {
             ec.state      = EnemyState.DEAD;

@@ -6,7 +6,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import io.group9.CoreResources;
+import locators.EnemyServiceLocator;
 import locators.PlayerServiceLocator;
+import services.enemy.IEnemyService;
 import services.player.IPlayerService;
 
 import java.lang.reflect.Field;
@@ -31,6 +33,7 @@ public final class RoundManager extends EntitySystem {
     private boolean fightStarted = false;
 
     private final IPlayerService playerSvc = PlayerServiceLocator.get();
+    private final IEnemyService enemySvc = EnemyServiceLocator.get();
 
     public RoundManager(int priority) {
         super(priority);
@@ -85,8 +88,8 @@ public final class RoundManager extends EntitySystem {
             enemyWins++;
             return true;
         }
-        if (CoreResources.getEnemyHealth() <= 0 || CoreResources.getEnemyBody().getPosition().y < -1) {
-            CoreResources.setEnemyHealth(0);
+        if (enemySvc.getHealth() <= 0 || enemySvc.getEnemyBody().getPosition().y < -1) {
+            enemySvc.setHealth(0);
             playerWins++;
             return true;
         }
@@ -96,7 +99,7 @@ public final class RoundManager extends EntitySystem {
     public void freezeAllBodies() {
         for (Body b : new Body[]{
             playerSvc.getPlayerBody(),
-            CoreResources.getEnemyBody()
+            enemySvc.getEnemyBody()
         }) {
             if (b == null) continue;
             b.setLinearVelocity(0f, 0f);
@@ -115,10 +118,10 @@ public final class RoundManager extends EntitySystem {
     void startNextRound() {
         // figure out who actually died
         boolean playerDied = playerSvc.getHealth() <= 0;
-        boolean enemyDied  = CoreResources.getEnemyHealth()  <= 0;
+        boolean enemyDied  = enemySvc.getHealth()  <= 0;
 
         Body pBody = playerSvc.getPlayerBody();
-        Body eBody = CoreResources.getEnemyBody();
+        Body eBody = enemySvc.getEnemyBody();
 
         respawnPlayer(pBody, PLAYER_SPAWN);
         respawnEnemy(eBody, ENEMY_SPAWN, enemyDied);
@@ -168,8 +171,7 @@ public final class RoundManager extends EntitySystem {
     private void respawnEnemy(Body body, Vector2 spawnPoint, boolean died) {
         if (body == null) return;
 
-        // CoreResources health
-        CoreResources.setEnemyHealth(100);
+        enemySvc.setHealth(100);
 
         Object comp = body.getUserData();
         int maxJ = 0;
