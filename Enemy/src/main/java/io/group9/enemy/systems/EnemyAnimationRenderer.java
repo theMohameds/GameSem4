@@ -53,8 +53,7 @@ public class EnemyAnimationRenderer extends EntitySystem {
 
         OrthographicCamera cam = CameraServiceLocator.get().getCamera();
         if (cam == null) {
-            Gdx.app.error("EnemyAnimationRenderer", "Camera is null, using fallback.");
-            cam.update();
+            return;
         } else {
             cam.update();
         }

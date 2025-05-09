@@ -1,17 +1,20 @@
 package locators;
 
-
 import services.player.IPlayerService;
+import services.player.NoopPlayerService;
 
 import java.util.ServiceLoader;
 
 public final class PlayerServiceLocator {
-    private static final IPlayerService INSTANCE =
-        ServiceLoader.load(IPlayerService.class).findFirst().orElseThrow(() -> new IllegalStateException("No IPlayerService implementation found"));
+    private static IPlayerService instance;
 
-    private PlayerServiceLocator() { /* no-op */ }
+    private PlayerServiceLocator() {}
 
     public static IPlayerService get() {
-        return INSTANCE;
+        if (instance == null) {
+            instance = ServiceLoader.load(IPlayerService.class).findFirst().orElse(new NoopPlayerService());
+        }
+        return instance;
     }
 }
+

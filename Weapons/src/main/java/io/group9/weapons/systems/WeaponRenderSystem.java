@@ -22,7 +22,11 @@ public class WeaponRenderSystem extends EntitySystem {
     @Override
     public void update(float dt) {
         OrthographicCamera cam = CameraServiceLocator.get().getCamera();
-        cam.update();
+        if (cam == null) {
+            return;
+        } else {
+            cam.update();
+        }
         batch.setProjectionMatrix(cam.combined);
 
         World world = WorldProvider.getWorld();

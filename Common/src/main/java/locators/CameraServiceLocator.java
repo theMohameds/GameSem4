@@ -1,6 +1,8 @@
 package locators;
 
 import services.gameCamera.ICameraService;
+import services.gameCamera.NoopCameraService;
+
 import java.util.ServiceLoader;
 
 public final class CameraServiceLocator {
@@ -10,14 +12,8 @@ public final class CameraServiceLocator {
 
     public static ICameraService get() {
         if (instance == null) {
-            ServiceLoader<ICameraService> loader =
-                ServiceLoader.load(ICameraService.class);
-            for (ICameraService svc : loader) {
-                System.out.println("SPI FOUND: " + svc.getClass().getName());
-            }
-            instance = loader.findFirst().orElseThrow(() -> new IllegalStateException("No ICameraService found"));
+            instance = ServiceLoader.load(ICameraService.class).findFirst().orElse(new NoopCameraService());
         }
         return instance;
     }
-
 }

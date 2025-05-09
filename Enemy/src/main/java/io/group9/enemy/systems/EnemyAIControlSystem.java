@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import io.group9.CoreResources;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.components.EnemyComponent;
@@ -59,7 +60,18 @@ public class EnemyAIControlSystem extends EntitySystem {
     @Override
     public void update(float dt) {
         if (CoreResources.isRoundFrozen()) return;
-        playerPos.set(playerSvc.getPlayerBody().getPosition());
+
+        Body playerBody = playerSvc.getPlayerBody();
+        if (playerBody == null) {
+            return;
+        }
+
+        playerPos.set(playerBody.getPosition());
+
+        if (cam == null) {
+            return;
+        }
+
 
         for (Entity ent : enemies) {
             EnemyComponent ec = ent.getComponent(EnemyComponent.class);

@@ -188,7 +188,9 @@ public class FirstScreen implements Screen {
             stage.getBatch().draw(pauseSnapshot, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             stage.getBatch().end();
         } else {
-            debugRenderer.render(world, cam.combined);
+            if (cam != null) {
+                debugRenderer.render(world, cam.combined);
+            }
         }
 
         fpsLabel.setText("FPS: " + Gdx.graphics.getFramesPerSecond());

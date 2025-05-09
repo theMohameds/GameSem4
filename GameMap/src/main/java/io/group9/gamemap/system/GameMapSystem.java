@@ -66,6 +66,7 @@ public class GameMapSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
+        if (camera == null) return;
         camera.update();
         mapRenderer.setView(camera);
         mapRenderer.render();

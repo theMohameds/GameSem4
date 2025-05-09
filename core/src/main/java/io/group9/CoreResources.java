@@ -14,18 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CoreResources {
-    private static World world;
-    private static OrthographicCamera camera;
-    private static Body playerBody;
-    private static Entity playerEntity;
     private static CoreContactDispatcher contactDispatcher;
     private static Entity enemyEntity;
 
     // Pixels per meter conversion.
     public static final float PPM = 16f;
 
-    public static void setCamera(OrthographicCamera cam) { camera = cam; }
-    public static OrthographicCamera getCamera() { return camera; }
     public static void setContactDispatcher(CoreContactDispatcher dispatcher) { contactDispatcher = dispatcher; }
     public static CoreContactDispatcher getContactDispatcher() { return contactDispatcher; }
 
