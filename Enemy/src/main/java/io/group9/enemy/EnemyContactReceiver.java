@@ -6,10 +6,12 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import io.group9.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.ai.EnemyState;
+import locators.InventoryServiceLocator;
 import services.IInventoryService;
 import services.IWeapon;
 
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 public class EnemyContactReceiver implements ContactReceiver {
 
@@ -73,7 +75,7 @@ public class EnemyContactReceiver implements ContactReceiver {
             return;
         }
 
-        IInventoryService inv = CoreResources.getInventoryService();
+        IInventoryService inv = InventoryServiceLocator.getInventoryService();
         Optional<IWeapon> w = inv.getCurrentWeapon(CoreResources.getPlayerEntity());
         int damage = w.map(ws -> "Sword".equals(ws.getName()) ? 20 : 50).orElse(50);
 

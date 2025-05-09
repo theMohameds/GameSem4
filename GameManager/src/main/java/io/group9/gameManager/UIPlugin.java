@@ -26,12 +26,14 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.group9.CoreResources;
+import locators.InventoryServiceLocator;
 import services.IInventoryService;
 import services.IWeapon;
 import plugins.ECSPlugin;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 public final class UIPlugin implements ECSPlugin {
     private Stage stage;
@@ -42,6 +44,7 @@ public final class UIPlugin implements ECSPlugin {
     private Label slot1Lbl, slot2Lbl;
     private Image slot1Img, slot2Img;
     private Drawable borderDefault, borderSelected;
+    IInventoryService inv = InventoryServiceLocator.getInventoryService();
 
     @Override
     public void registerSystems(Engine eng) {
@@ -55,7 +58,6 @@ public final class UIPlugin implements ECSPlugin {
     @Override
     public void createEntities(Engine e) {
         rm.reset();
-        //rm.startNextRound();
         rm.freezeAllBodies();
     }
     @Override public int getPriority() { return 6; }
@@ -190,7 +192,6 @@ public final class UIPlugin implements ECSPlugin {
                 splash.setVisible(false);
             }
 
-            IInventoryService inv = CoreResources.getInventoryService();
             Entity player = CoreResources.getPlayerEntity();
             if (inv != null && player != null) {
                 List<IWeapon> invList = inv.getInventory(player);

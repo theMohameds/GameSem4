@@ -13,11 +13,13 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
+import locators.InventoryServiceLocator;
 import services.IInventoryService;
 import services.IWeapon;
 
 import java.util.EnumMap;
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 public class PlayerAnimationRenderer extends EntitySystem {
     private ImmutableArray<Entity> entities;
@@ -70,7 +72,7 @@ public class PlayerAnimationRenderer extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        IInventoryService inv = CoreResources.getInventoryService();
+        IInventoryService inv = InventoryServiceLocator.getInventoryService();
 
         OrthographicCamera cam = CoreResources.getCamera();
         if (cam == null) {

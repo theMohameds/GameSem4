@@ -44,6 +44,7 @@ public final class RoundManager extends EntitySystem {
         switch (phase) {
             case INTRO:
                 if (phaseTimer <= 0f) {
+                    CoreResources.setRoundFrozen(false);
                     phase = Phase.FIGHT;
                     phaseTimer = ROUND_TIME;
                 }
@@ -118,6 +119,7 @@ public final class RoundManager extends EntitySystem {
 
         phase = Phase.INTRO;
         phaseTimer = INTRO_TIME;
+        fightStarted = false;
         CoreResources.setRoundFrozen(true);
     }
 
@@ -185,11 +187,9 @@ public final class RoundManager extends EntitySystem {
 
             // Ground logic differs if it actually died vs. if it won
             if (died) {
-                // died → start “airborne” so landing refills jumps properly
                 safelySetInt(comp, cls, "groundContacts", 0);
                 safelySetBoolean(comp, cls, "wasGrounded",   false);
             } else {
-                // won → start “on ground” so we go straight to IDLE/RUN
                 safelySetInt(comp, cls, "groundContacts", 1);
                 safelySetBoolean(comp, cls, "wasGrounded",   true);
             }

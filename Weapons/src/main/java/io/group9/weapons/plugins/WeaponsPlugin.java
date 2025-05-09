@@ -21,13 +21,9 @@ public class WeaponsPlugin implements ECSPlugin {
 
     @Override
     public void createEntities(Engine engine) {
-        IInventoryService inv = ServiceLoader.load(IInventoryService.class).findFirst().orElseThrow(() -> new IllegalStateException("No IInventoryService found"));
-        CoreResources.setInventoryService(inv);
-
         CoreResources.getContactDispatcher().addReceiver(new WeaponPickupReceiver());
 
         WeaponFactory.spawnSword(160, 200);
-
     }
 
     @Override
