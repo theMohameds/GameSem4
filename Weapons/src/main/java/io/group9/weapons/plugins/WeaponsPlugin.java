@@ -3,8 +3,8 @@ package io.group9.weapons.plugins;
 import com.badlogic.ashley.core.Engine;
 import io.group9.CoreResources;
 import io.group9.weapons.ContactReceivers.WeaponPickupReceiver;
-import io.group9.weapons.BodyDestroySystem;
-import io.group9.weapons.WeaponSwitchSystem;
+import io.group9.weapons.systems.BodyDestroySystem;
+import io.group9.weapons.systems.WeaponSwitchSystem;
 import io.group9.weapons.systems.WeaponRenderSystem;
 import plugins.ECSPlugin;
 

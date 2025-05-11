@@ -1,4 +1,4 @@
-package io.group9.weapons;
+package io.group9.weapons.systems;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
