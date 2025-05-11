@@ -4,7 +4,6 @@ import java.util.*;
 
 public class AStar {
 
-    // The heuristic function interface, so you can pass your own heuristic logic
     public interface Heuristic {
         double estimate(PathNode node, PathNode goal);
     }
@@ -16,7 +15,6 @@ public class AStar {
     };
 
     public List<PathNode> aStarSearch(PathNode start, PathNode goal, Heuristic heuristic) {
-        // PriorityQueue orders nodes by their fCost (lowest first)
         PriorityQueue<PathNode> openSet = new PriorityQueue<>(Comparator.comparingDouble(PathNode::fCost));
 
         Map<PathNode, PathNode> cameFrom = new HashMap<>();
@@ -52,7 +50,6 @@ public class AStar {
                     if (!openSet.contains(neighbor)) {
                         openSet.add(neighbor);
                     } else {
-                        // Remove and re-add to update priority (Java PQ doesn't auto-update)
                         openSet.remove(neighbor);
                         openSet.add(neighbor);
                     }
@@ -60,7 +57,6 @@ public class AStar {
             }
         }
 
-        // No path found
         return Collections.emptyList();
     }
 
@@ -69,13 +65,12 @@ public class AStar {
         totalPath.add(current);
         while (cameFrom.containsKey(current)) {
             current = cameFrom.get(current);
-            totalPath.add(0, current);  // prepend to path
+            totalPath.add(0, current);
         }
         return totalPath;
     }
 
     private double distance(PathNode a, PathNode b) {
-        // Euclidean distance between nodes
         float dx = a.x - b.x;
         float dy = a.y - b.y;
         return Math.sqrt(dx * dx + dy * dy);

@@ -32,13 +32,10 @@ public class EnemyComponent implements Component {
 
     // Combat & Attack
     public int health = 100;
-    public int damagePerHit = 10;
     public float attackDuration = 0.3f;
     public float attackTimer = 0f;
     public boolean attackRequested = false;
     public boolean attacking = false;
-    public boolean pendingRemoveSensor = false;
-    public float attackCooldown = 1f;
     public float attackCooldownTimer = 0f;
 
     // Hurt
@@ -50,15 +47,13 @@ public class EnemyComponent implements Component {
     public final int maxJumps = 2;
     public int jumpsLeft = maxJumps;
     public static final float FIRST_JUMP_VELOCITY = 23f;
-    public Float jumpDirectionLocked = null; // null = not locked
+    public Float jumpDirectionLocked = null;
     public static final float DOUBLE_JUMP_VELOCITY = 23f;
 
     // Path-finding
     public GraphPath<PathNode> path;
     public int currentNode = 0;
     public int lastJumpNode = -1;
-    public float recalcInterval = 0.25f; // nice!
-    public float recalcTimer = 0f;
 
     // Reaction delay (AI)
     public float reactionDelay = 0f;
@@ -84,8 +79,5 @@ public class EnemyComponent implements Component {
     public float sensorH = 30f;
 
     public List<PathNode> currentPath = null;
-    public int currentTargetIndex = 1; // index in path of the node enemy is moving to
-    public float stepDuration = 1f; // seconds per step
-    public float stepTimer = 0f; // timer counting time spent moving toward current target
 
 }

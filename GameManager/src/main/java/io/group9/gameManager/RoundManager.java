@@ -1,7 +1,6 @@
 package io.group9.gameManager;
 
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,8 +9,8 @@ import locators.EnemyServiceLocator;
 import locators.PlayerServiceLocator;
 import services.enemy.IEnemyService;
 import services.player.IPlayerService;
+import java.util.Arrays;
 
-import java.lang.reflect.Field;
 
 
 public final class RoundManager extends EntitySystem {
@@ -97,34 +96,24 @@ public final class RoundManager extends EntitySystem {
     }
 
     public void freezeAllBodies() {
-        for (Body b : new Body[]{
-            playerSvc.getPlayerBody(),
-            enemySvc.getEnemyBody()
-        }) {
+        Body pBody = playerSvc.getPlayerBody();
+        Body eBody = enemySvc.getEnemyBody();
+        for (Body b : Arrays.asList(pBody, eBody)) {
             if (b == null) continue;
             b.setLinearVelocity(0f, 0f);
             b.setAngularVelocity(0f);
-            Object comp = b.getUserData();
-            if (comp != null) {
-                try {
-                    Field f = comp.getClass().getDeclaredField("needsFreeze");
-                    f.setAccessible(true);
-                    f.setBoolean(comp, true);
-                } catch (Exception ignored) {}
-            }
         }
+
+        playerSvc.freezeForRound();
+        enemySvc .freezeForRound();
     }
 
     void startNextRound() {
-        // figure out who actually died
         boolean playerDied = playerSvc.getHealth() <= 0;
-        boolean enemyDied  = enemySvc.getHealth()  <= 0;
+        boolean enemyDied  = enemySvc .getHealth() <= 0;
 
-        Body pBody = playerSvc.getPlayerBody();
-        Body eBody = enemySvc.getEnemyBody();
-
-        respawnPlayer(pBody, PLAYER_SPAWN);
-        respawnEnemy(eBody, ENEMY_SPAWN, enemyDied);
+        playerSvc.resetForRound(PLAYER_SPAWN);
+        enemySvc .resetForRound(ENEMY_SPAWN, enemyDied);
 
         phase = Phase.INTRO;
         phaseTimer = INTRO_TIME;
@@ -132,139 +121,6 @@ public final class RoundManager extends EntitySystem {
         CoreResources.setRoundFrozen(true);
     }
 
-    private void respawnPlayer(Body body, Vector2 spawnPoint) {
-        if (body == null) return;
-
-        // reset via service
-        playerSvc.setHealth(100);
-
-        Object comp = body.getUserData();
-        if (comp != null) {
-            Class<?> cls = comp.getClass();
-
-            safelySetInt(comp, cls, "health", 100);
-            int maxJ = safelyGetInt(comp, cls, "maxJumps", 0);
-            safelySetInt(comp, cls, "jumpsLeft", maxJ);
-
-            clearBooleanFlagsContaining(comp, cls, "jump");
-            safelySetEnum(comp, cls, "state", "IDLE");
-            for (String f : new String[]{"attacking","attackRequested","isHurt","needsFreeze"})
-                safelySetBoolean(comp, cls, f, false);
-            for (String t : new String[]{"reactionTimer","recalcTimer","hurtTimer","animTime"})
-                safelySetFloat(comp, cls, t, 0f);
-
-            safelySetInt(comp, cls, "groundContacts", 1);
-            safelySetBoolean(comp, cls, "wasGrounded", true);
-            safelySetBoolean(comp, cls, "facingLeft", false);
-        }
-
-        resetBodyPhysics(body);
-        body.setTransform(
-            spawnPoint.x / CoreResources.PPM,
-            spawnPoint.y / CoreResources.PPM,
-            0f
-        );
-
-        Gdx.app.log("RoundManager", "Player respawned");
-    }
-
-    private void respawnEnemy(Body body, Vector2 spawnPoint, boolean died) {
-        if (body == null) return;
-
-        enemySvc.setHealth(100);
-
-        Object comp = body.getUserData();
-        int maxJ = 0;
-        if (comp != null) {
-            Class<?> cls = comp.getClass();
-
-            // Reset reflected fields
-            safelySetInt(comp, cls, "health", 100);
-            maxJ = safelyGetInt(comp, cls, "maxJumps", 0);
-            safelySetInt(comp, cls, "jumpsLeft", maxJ);
-
-            clearBooleanFlagsContaining(comp, cls, "jump");
-            safelySetEnum(comp, cls, "state", "IDLE");
-            for (String f : new String[]{"attacking","attackRequested","isHurt","needsFreeze"})
-                safelySetBoolean(comp, cls, f, false);
-            for (String t : new String[]{"reactionTimer","recalcTimer","hurtTimer","animTime"})
-                safelySetFloat(comp, cls, t, 0f);
-
-            // Ground logic differs if it actually died vs. if it won
-            if (died) {
-                safelySetInt(comp, cls, "groundContacts", 0);
-                safelySetBoolean(comp, cls, "wasGrounded",   false);
-            } else {
-                safelySetInt(comp, cls, "groundContacts", 1);
-                safelySetBoolean(comp, cls, "wasGrounded",   true);
-            }
-
-            // Facing direction
-            safelySetBoolean(comp, cls, "facingLeft", true);
-        }
-
-        // Physics & position
-        resetBodyPhysics(body);
-        body.setTransform(
-            spawnPoint.x / CoreResources.PPM,
-            spawnPoint.y / CoreResources.PPM,
-            0f
-        );
-
-        Gdx.app.log("RoundManager",
-            "Enemy respawned (maxJumps=" + maxJ + ", died=" + died + ")");
-    }
-
-    private void safelySetInt(Object comp, Class<?> cls, String name, int val) {
-        try {
-            Field f = cls.getDeclaredField(name);
-            f.setAccessible(true);
-            f.setInt(comp, val);
-        } catch (Exception ignored) {}
-    }
-    private int safelyGetInt(Object comp, Class<?> cls, String name, int def) {
-        try {
-            Field f = cls.getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getInt(comp);
-        } catch (Exception e) {
-            return def;
-        }
-    }
-    private void safelySetFloat(Object comp, Class<?> cls, String name, float val) {
-        try {
-            Field f = cls.getDeclaredField(name);
-            f.setAccessible(true);
-            f.setFloat(comp, val);
-        } catch (Exception ignored) {}
-    }
-    private void safelySetBoolean(Object comp, Class<?> cls, String name, boolean val) {
-        try {
-            Field f = cls.getDeclaredField(name);
-            f.setAccessible(true);
-            f.setBoolean(comp, val);
-        } catch (Exception ignored) {}
-    }
-    private void safelySetEnum(Object comp, Class<?> cls, String name, String enumVal) {
-        try {
-            Field f = cls.getDeclaredField(name);
-            f.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            Class<? extends Enum> type = (Class<? extends Enum>)f.getType();
-            f.set(comp, Enum.valueOf(type, enumVal));
-        } catch (Exception ignored) {}
-    }
-    private void clearBooleanFlagsContaining(Object comp, Class<?> cls, String substring) {
-        for (Field f : cls.getDeclaredFields()) {
-            if (f.getType() == boolean.class
-                && f.getName().toLowerCase().contains(substring)) {
-                try {
-                    f.setAccessible(true);
-                    f.setBoolean(comp, false);
-                } catch (Exception ignored) {}
-            }
-        }
-    }
     private void resetBodyPhysics(Body body) {
         body.setType(BodyDef.BodyType.DynamicBody);
         body.setGravityScale(1f);

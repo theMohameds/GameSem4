@@ -24,7 +24,6 @@ public class EnemyStateSystem extends EntitySystem {
         for (Entity e : entities) {
             EnemyComponent ec = e.getComponent(EnemyComponent.class);
 
-            // Death freeze
             if (ec.state == EnemyState.DEAD && ec.needsFreeze) {
                 ec.body.setLinearVelocity(0f, 0f);
                 ec.body.setGravityScale(0f);
@@ -33,14 +32,12 @@ public class EnemyStateSystem extends EntitySystem {
             }
             if (ec.state == EnemyState.DEAD) continue;
 
-            // Landing detection & jump refill
             boolean nowGrounded = ec.isGrounded();
             if (nowGrounded && !ec.wasGrounded) {
                 ec.jumpsLeft = ec.maxJumps;
             }
             ec.wasGrounded = nowGrounded;
 
-            // Hurt state
             if (ec.state == EnemyState.HURT) {
                 ec.hurtTimer -= dt;
                 if (ec.hurtTimer <= 0f) {
@@ -53,7 +50,6 @@ public class EnemyStateSystem extends EntitySystem {
 
             if (ec.attacking) continue;
 
-            // State machine
             if (nowGrounded) {
                 ec.state = Math.abs(ec.body.getLinearVelocity().x) > 0.1f
                     ? EnemyState.RUN

@@ -43,7 +43,7 @@ public class PathGraphVisualizer {
 
     public void renderConnections() {
         begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(RUN_COLOR); // optional: show walkable graph
+        shapeRenderer.setColor(RUN_COLOR);
 
         for (PathNode n : pathGraph.getNodes()) {
             Vector2 p = new Vector2(n.x, n.y).scl(unitScale);

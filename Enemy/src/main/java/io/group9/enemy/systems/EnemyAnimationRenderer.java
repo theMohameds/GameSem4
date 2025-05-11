@@ -92,23 +92,22 @@ public class EnemyAnimationRenderer extends EntitySystem {
                     frame = currentAnim.getKeyFrame(stateTime, false);
                 }else {
                     float frameDuration = currentAnim.getFrameDuration();
-                    float startTime = frameDuration * 2; // frame 2 starts
-                    float endTime = frameDuration * 6;   // frame 5 starts
+                    float startTime = frameDuration * 2;
+                    float endTime = frameDuration * 6;
 
                     if (stateTime < startTime) {
                         stateTime = startTime;
                     }
                     if (stateTime > endTime) {
-                        stateTime = endTime - 0.0001f; // Stay just before frame 6 starts
+                        stateTime = endTime - 0.0001f;
                     }
 
-                    frame = currentAnim.getKeyFrame(stateTime, false); // Don't loop
+                    frame = currentAnim.getKeyFrame(stateTime, false);
                 }
             } else if (currentAnim == animations.get(EnemyState.AIRSPIN)) {
                 float airspinDuration = currentAnim.getAnimationDuration();
 
                 if (stateTime < airspinDuration) {
-                    // Still playing airspin normally
                     float playTime = Math.min(stateTime, airspinDuration - 0.0001f);
                     frame = currentAnim.getKeyFrame(playTime, false);
 
@@ -117,23 +116,18 @@ public class EnemyAnimationRenderer extends EntitySystem {
                     float playTime = 0;
                     float clipStartTime = 0;
                     if (ec.body.getLinearVelocity().y < 0){
-                        // AIRSPIN finished: play only the last 4 frames of JUMP
                         int totalJumpFrames = jumpAnim.getKeyFrames().length;
                         int clipFrameCount = 4;
 
-                        // Calculate start frame index (e.g., if totalJumpFrames=6, startFrame=2)
                         int startFrameIndex = Math.max(0, totalJumpFrames - clipFrameCount);
 
-                        // Convert frame index to time
                         float frameDuration = jumpAnim.getFrameDuration();
                         clipStartTime = startFrameIndex * frameDuration;
                         float clipDuration = clipFrameCount * frameDuration;
 
-                        // Calculate how long we've been into the jump clip
                         float elapsedSinceAirspin = stateTime - airspinDuration;
                         playTime = Math.min(elapsedSinceAirspin, clipDuration - 0.0001f);
 
-                        // Get the appropriate frame from the jump animation
 
                     }
 

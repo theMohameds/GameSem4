@@ -31,7 +31,6 @@ public class PlayerAttackSystem extends EntitySystem {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
 
-            // Start attack if requested
             if (pc.attackRequested && !pc.attacking) {
                 pc.attacking = true;
                 pc.attackTimer = pc.attackDuration;
@@ -45,13 +44,11 @@ public class PlayerAttackSystem extends EntitySystem {
                 createAttackSensor(pc);
             }
 
-            // If attack is active, count down the timer.
             if (pc.attacking) {
                 pc.attackTimer -= deltaTime;
                 if (pc.attackTimer <= 0f) {
                     removeAttackSensor(pc);
                     pc.attacking = false;
-                    // Restore to idle or in‐air state
                     if (pc.jumpsLeft == pc.maxJumps) {
                         pc.state = PlayerComponent.State.IDLE;
                     } else {

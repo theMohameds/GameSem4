@@ -175,7 +175,6 @@ public class GameMapSystem extends EntitySystem {
                 TiledMapTileLayer.Cell current = collisionLayer.getCell(x, y);
                 TiledMapTileLayer.Cell below   = collisionLayer.getCell(x, y - 1);
 
-                // if this cell is empty but there is ground directly beneath
                 if (current == null && below != null && below.getTile() != null) {
                     float posY = y * tileH;
                     float leftX = x * tileW;

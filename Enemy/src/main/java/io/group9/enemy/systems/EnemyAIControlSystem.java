@@ -24,10 +24,8 @@ public class EnemyAIControlSystem extends EntitySystem {
     private ImmutableArray<Entity> enemies;
     private final float cellSize;
     private final Vector2 playerPos = new Vector2();
-    private static final float SMOOTHING      = 800f;
     private static final float JUMP_HEIGHT_TH = 0.0f;
 
-    // Shared graph and nodes
     private static PathGraph sharedGraph;
     private static List<PathNode> sharedNodes;
 
@@ -65,13 +63,10 @@ public class EnemyAIControlSystem extends EntitySystem {
         if (playerBody == null) {
             return;
         }
-
         playerPos.set(playerBody.getPosition());
-
         if (cam == null) {
             return;
         }
-
 
         for (Entity ent : enemies) {
             EnemyComponent ec = ent.getComponent(EnemyComponent.class);
@@ -79,10 +74,25 @@ public class EnemyAIControlSystem extends EntitySystem {
 
             tickCooldown(ec, dt);
             Vector2 pos = ec.body.getPosition();
+            float dx = Math.abs(playerPos.x - pos.x);
+            float dy = Math.abs(playerPos.y - pos.y);
 
-            // Build frame-specific graph including start/goal
-            PathNode start = new PathNode(pos.x * CoreResources.PPM, pos.y * CoreResources.PPM);
-            PathNode goal = new PathNode(playerPos.x * CoreResources.PPM, playerPos.y * CoreResources.PPM);
+            if (dx <= ec.attackRange && dy <= ec.attackRange && ec.attackCooldownTimer <= 0f) {
+                ec.state = EnemyState.ATTACK;
+                ec.attackRequested = true;
+                ec.animTime = 0f;
+                ec.body.setLinearVelocity(0f, ec.body.getLinearVelocity().y);
+                continue;
+            }
+            if (dx <= ec.attackRange) {
+                ec.state = EnemyState.IDLE;
+                ec.body.setLinearVelocity(0f, ec.body.getLinearVelocity().y);
+                continue;
+            }
+
+            Vector2 pos2 = ec.body.getPosition();
+            PathNode start = new PathNode(pos2.x * CoreResources.PPM, pos2.y * CoreResources.PPM);
+            PathNode goal  = new PathNode(playerPos.x * CoreResources.PPM, playerPos.y * CoreResources.PPM);
 
             PathGraph graph = new PathGraph();
             graph.addNode(start);
@@ -96,49 +106,43 @@ public class EnemyAIControlSystem extends EntitySystem {
 
             AStar astar = new AStar();
             AStar.Heuristic heuristic = (n, g) -> {
-                double dx = n.x - g.x;
-                double dy = n.y - g.y;
-                return Math.sqrt(dx*dx + dy*dy);
+                double ddx = n.x - g.x;
+                double ddy = n.y - g.y;
+                return Math.sqrt(ddx*ddx + ddy*ddy);
             };
 
             List<PathNode> newPath = astar.aStarSearch(start, goal, heuristic);
-            // Remove the artificial start node so movement begins toward the first true waypoint
             if (!newPath.isEmpty() && newPath.get(0).equals(start)) {
                 newPath.remove(0);
             }
-
             if (!pathsEqual(newPath, ec.currentPath)) {
                 ec.currentPath  = newPath;
                 ec.currentNode  = 0;
                 ec.lastJumpNode = -1;
-
-                // Reset jumps only when grounded
                 if (ec.isGrounded()) {
                     ec.jumpsLeft = 2;
                 }
             }
 
-            List<PathNode> path = ec.currentPath;
-            if (path != null && !path.isEmpty()) visualizer.renderPath(path);
+            if (ec.currentPath != null && !ec.currentPath.isEmpty()) {
+                visualizer.renderPath(ec.currentPath);
+            }
 
-            handleJump(ec, path, dt);
-            moveAlongHorizontalPath(ec, path, dt);
+            handleJump(ec, ec.currentPath, dt);
+            moveAlongHorizontalPath(ec, ec.currentPath, dt);
         }
     }
 
-    private PathNode findClosestNode(float x, float y) {
-        PathNode closest = null;
-        float minDist = Float.MAX_VALUE;
-        for (PathNode node : sharedNodes) {
-            float dx = node.x - x;
-            float dy = node.y - y;
-            float dist = dx*dx + dy*dy;
-            if (dist < minDist) {
-                minDist = dist;
-                closest = node;
-            }
+    private boolean pathsEqual(List<PathNode> p1, List<PathNode> p2) {
+        if (p1 == p2) return true;
+        if (p1 == null || p2 == null || p1.size() != p2.size()) return false;
+        float eps = 0.1f;
+        for (int i = 0; i < p1.size(); i++) {
+            PathNode n1 = p1.get(i), n2 = p2.get(i);
+            if (Math.abs(n1.x - n2.x) > eps || Math.abs(n1.y - n2.y) > eps)
+                return false;
         }
-        return closest;
+        return true;
     }
 
     private void handleJump(EnemyComponent ec, List<PathNode> path, float dt) {
@@ -162,7 +166,7 @@ public class EnemyAIControlSystem extends EntitySystem {
     }
 
     private void moveAlongHorizontalPath(EnemyComponent ec, List<PathNode> path, float dt) {
-        if (ec == null || ec.body == null || path == null || path.isEmpty()) {
+        if (ec.body == null || path == null || path.isEmpty()) {
             ec.body.setLinearVelocity(0, ec.body.getLinearVelocity().y);
             return;
         }
@@ -182,7 +186,6 @@ public class EnemyAIControlSystem extends EntitySystem {
         float dist = toTarget.len();
         float maxStep = ec.maxLinearSpeed * dt;
 
-        // advance intermediate nodes
         while (ec.currentNode < lastIdx && (dist < NormalNodeDeadZone || maxStep >= dist)) {
             ec.currentNode++;
             ec.lastJumpNode = -1;
@@ -192,96 +195,26 @@ public class EnemyAIControlSystem extends EntitySystem {
             dist = toTarget.len();
         }
 
-        // final node stop
         if (ec.currentNode == lastIdx && (dist < endDeadZone || maxStep >= dist)) {
             ec.body.setLinearVelocity(0, ec.body.getLinearVelocity().y);
             return;
         }
 
-        // If jump direction is locked, respect it until grounded
         float vx;
         if (ec.jumpDirectionLocked != null && !ec.isGrounded()) {
             vx = ec.jumpDirectionLocked * ec.maxLinearSpeed;
         } else {
             float dirX = Math.signum(toTarget.x);
             vx = dirX * ec.maxLinearSpeed;
-            ec.jumpDirectionLocked = null; // unlock direction after moving
+            ec.jumpDirectionLocked = null;
         }
 
         ec.body.setLinearVelocity(vx, ec.body.getLinearVelocity().y);
         ec.facingLeft = vx < 0;
 
         if (ec.isGrounded() && ec.jumpDirectionLocked != null) {
-            ec.jumpDirectionLocked = null; // unlock when grounded
+            ec.jumpDirectionLocked = null;
         }
-    }
-    /*private void moveAlongHorizontalPath(EnemyComponent ec, List<PathNode> path, float dt) {
-    if (ec == null || ec.body == null || path == null || path.isEmpty()) {
-        ec.body.setLinearVelocity(0, ec.body.getLinearVelocity().y);
-        return;
-    }
-
-    int lastIdx = path.size() - 1;
-    if (ec.currentNode > lastIdx) {
-        ec.body.setLinearVelocity(0, ec.body.getLinearVelocity().y);
-        return;
-    }
-
-    Vector2 pos = ec.body.getPosition();
-    float NormalNodeDeadZone = 0.5f;
-    float endDeadZone = 1.5f;
-    PathNode node = path.get(ec.currentNode);
-    Vector2 target = new Vector2(node.x / CoreResources.PPM, node.y / CoreResources.PPM);
-    Vector2 toTarget = target.cpy().sub(pos);
-    float dist = toTarget.len();
-    float maxStep = ec.maxLinearSpeed * dt;
-
-    // Advance intermediate nodes
-    while (ec.currentNode < lastIdx && (dist < NormalNodeDeadZone || maxStep >= dist)) {
-        ec.currentNode++;
-        ec.lastJumpNode = -1;
-        node = path.get(ec.currentNode);
-        target.set(node.x / CoreResources.PPM, node.y / CoreResources.PPM);
-        toTarget = target.cpy().sub(pos);
-        dist = toTarget.len();
-    }
-
-    // Final node stop
-    if (ec.currentNode == lastIdx && (dist < endDeadZone || maxStep >= dist)) {
-        ec.body.setLinearVelocity(0, ec.body.getLinearVelocity().y);
-        return;
-    }
-
-    // Horizontal movement even when in the air
-    float vx;
-    if (ec.isGrounded()) {
-        float dirX = Math.signum(toTarget.x);
-        vx = dirX * ec.maxLinearSpeed;
-    } else {
-        // If airborne, move towards the player horizontally, even in the air
-        float dirX = Math.signum(toTarget.x);
-        vx = dirX * ec.maxLinearSpeed;
-    }
-
-    ec.body.setLinearVelocity(vx, ec.body.getLinearVelocity().y);
-    ec.facingLeft = vx < 0;
-
-    if (ec.isGrounded() && ec.jumpDirectionLocked != null) {
-        ec.jumpDirectionLocked = null; // Unlock when grounded
-        }
-    }
-     */
-
-    private boolean pathsEqual(List<PathNode> p1, List<PathNode> p2) {
-        if (p1 == p2) return true;
-        if (p1 == null || p2 == null || p1.size() != p2.size()) return false;
-        float eps = 0.1f;
-        for (int i = 0; i < p1.size(); i++) {
-            PathNode n1 = p1.get(i), n2 = p2.get(i);
-            if (Math.abs(n1.x - n2.x) > eps || Math.abs(n1.y - n2.y) > eps)
-                return false;
-        }
-        return true;
     }
 
     private void doJump(EnemyComponent ec, float vx, float vy, EnemyState st) {
@@ -289,7 +222,7 @@ public class EnemyAIControlSystem extends EntitySystem {
         ec.jumpsLeft--;
         ec.state = st;
         ec.animTime = 0f;
-        ec.jumpDirectionLocked = Math.signum(vx); // lock the direction during jump
+        ec.jumpDirectionLocked = Math.signum(vx);
     }
 
     private void tickCooldown(EnemyComponent ec, float dt) {

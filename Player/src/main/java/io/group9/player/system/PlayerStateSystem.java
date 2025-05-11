@@ -14,7 +14,6 @@ import io.group9.player.components.PlayerComponent;
 public class PlayerStateSystem extends EntitySystem {
     private ImmutableArray<Entity> entities;
 
-    // Gravity scale constants.
     private static final float UPWARD_GRAVITY_SCALE = 5.5f;
     private static final float FALL_MULTIPLIER      = 5.5f;
 
@@ -76,20 +75,19 @@ public class PlayerStateSystem extends EntitySystem {
         }
     }
 
-    // Update wall–hanging behavior.
+
     private void updateWallHanging(PlayerComponent pc, float deltaTime) {
-        // Cancel if on cooldown or key released
         if (pc.wallHangCooldownTimer > 0f || !isPressingWall(pc)) {
             disableWallHang(pc);
             return;
         }
-        // Jump off wall
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
             jumpOffWall(pc);
             return;
         }
 
-        // Continue hanging
+
         pc.wallHangingTimer += deltaTime;
         if (pc.wallHangingTimer < pc.wallHangingDuration) {
             freezePlayer(pc);
@@ -100,34 +98,31 @@ public class PlayerStateSystem extends EntitySystem {
         pc.state = PlayerComponent.State.LAND_WALL;
     }
 
-    // Check if player is holding into the wall
+
     private boolean isPressingWall(PlayerComponent pc) {
         return pc.wallOnLeft
             ? Gdx.input.isKeyPressed(Input.Keys.A)
             : Gdx.input.isKeyPressed(Input.Keys.D);
     }
 
-    // Exit wall hang and reset jumps
+
     private void disableWallHang(PlayerComponent pc) {
         pc.wallHanging = false;
         pc.wallHangingTimer = 0f;
-        //pc.jumpsLeft = pc.maxJumps;
     }
 
-    // Freeze in place
+
     private void freezePlayer(PlayerComponent pc) {
         pc.body.setLinearVelocity(0f, 0f);
         pc.body.setGravityScale(0f);
     }
 
-    // Slide down the wall slowly
     private void slideDown(PlayerComponent pc) {
         pc.body.setGravityScale(FALL_MULTIPLIER);
         Vector2 vel = pc.body.getLinearVelocity();
         pc.body.setLinearVelocity(0f, vel.y);
     }
 
-    // Jump off wall
     private void jumpOffWall(PlayerComponent pc) {
         disableWallHang(pc);
         pc.wallHangCooldownTimer = pc.wallHangCooldownDuration;
@@ -137,13 +132,11 @@ public class PlayerStateSystem extends EntitySystem {
         pc.state = PlayerComponent.State.JUMP;
     }
 
-    // Normal state update when not wall hanging.
     private void updateNormalState(PlayerComponent pc) {
         boolean onGround = Math.abs(pc.body.getLinearVelocity().y) < 0.01f;
 
         if (!pc.attacking) {
             if (onGround) {
-                // On-ground: decide between RUN and IDLE.
                 PlayerComponent.State newState;
                 float absVelX = Math.abs(pc.body.getLinearVelocity().x);
 
@@ -160,7 +153,6 @@ public class PlayerStateSystem extends EntitySystem {
                 }
 
             } else {
-                // In-air: choose between jump and air spin.
                 PlayerComponent.State newState;
                 if(pc.jumpsLeft == 0){
                     newState = PlayerComponent.State.AIRSPIN;
@@ -175,7 +167,6 @@ public class PlayerStateSystem extends EntitySystem {
         }
     }
 
-    // Adjust gravity based on player's vertical movement.
     private void applyGravityScaling(PlayerComponent pc) {
         if (pc.body.getLinearVelocity().y > 0) {
             pc.body.setGravityScale(UPWARD_GRAVITY_SCALE);
