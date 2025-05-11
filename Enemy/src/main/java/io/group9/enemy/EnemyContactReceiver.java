@@ -1,9 +1,8 @@
 package io.group9.enemy;
 
-import io.group9.ContactReceiver;
+import contact.ContactReceiver;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
-import io.group9.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.ai.EnemyState;
 import locators.EnemyServiceLocator;

@@ -11,7 +11,7 @@ import services.enemy.IEnemyService;
 import services.weapon.IPickable;
 import services.weapon.IWeapon;
 import services.weapon.IInventoryService;
-import io.group9.ContactReceiver;
+import contact.ContactReceiver;
 import services.player.IPlayerService;
 
 public class WeaponPickupReceiver implements ContactReceiver {

@@ -1,4 +1,4 @@
-package io.group9;
+package contact;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 

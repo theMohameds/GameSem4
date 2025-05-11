@@ -1,9 +1,8 @@
 package io.group9.player;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import io.group9.ContactReceiver;
+import contact.ContactReceiver;
 import io.group9.player.components.PlayerComponent;
 import locators.PlayerServiceLocator;
 import services.player.IPlayerService;

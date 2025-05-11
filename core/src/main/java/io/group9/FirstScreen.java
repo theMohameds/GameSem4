@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import contact.CoreContactDispatcher;
 import data.WorldProvider;
 import locators.CameraServiceLocator;
 import plugins.ECSPlugin;
