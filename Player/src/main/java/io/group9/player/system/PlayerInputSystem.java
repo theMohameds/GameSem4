@@ -1,5 +1,6 @@
 package io.group9.player.system;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
@@ -7,52 +8,72 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
+import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
 
 public class PlayerInputSystem extends EntitySystem {
     private ImmutableArray<Entity> entities;
 
     @Override
-    public void addedToEngine(com.badlogic.ashley.core.Engine engine) {
-        // Process all entities that have a PlayerComponent.
-        entities = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
+    public void addedToEngine(Engine engine) {
+        entities = engine.getEntitiesFor(
+            Family.all(PlayerComponent.class).get()
+        );
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(float dt) {
+        if (CoreResources.isRoundFrozen()) return;
+
         for (Entity e : entities) {
             PlayerComponent pc = e.getComponent(PlayerComponent.class);
             if (pc.body == null) continue;
+            if (pc.state == PlayerComponent.State.DEAD ||
+                pc.state == PlayerComponent.State.HURT) continue;
 
-            // --- Horizontal Movement ---
-            float horizontal = 0f;
+            // Movement
+            Vector2 vel = pc.body.getLinearVelocity();
+            float horiz = 0f;
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                horizontal = -pc.speed;
+                horiz         = -pc.speed;
                 pc.facingLeft = true;
             } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                horizontal = pc.speed;
+                horiz         =  pc.speed;
                 pc.facingLeft = false;
             }
-            // Preserve current vertical velocity.
-            Vector2 vel = pc.body.getLinearVelocity();
-            pc.body.setLinearVelocity(horizontal, vel.y);
+            pc.body.setLinearVelocity(horiz, vel.y);
 
-            // --- Jump Input ---
+            // Jump
             if (Gdx.input.isKeyJustPressed(Input.Keys.W) && pc.jumpsLeft > 0) {
-                if (pc.jumpsLeft == pc.maxJumps) { // First jump.
-                    pc.body.setLinearVelocity(vel.x, PlayerComponent.FIRST_JUMP_VELOCITY);
-                    pc.state = PlayerComponent.State.JUMP;
-                } else { // Double jump.
-                    pc.body.setLinearVelocity(vel.x, PlayerComponent.DOUBLE_JUMP_VELOCITY);
-                    pc.state = PlayerComponent.State.AIRSPIN;
-                }
+                float vy = pc.jumpsLeft == pc.maxJumps
+                    ? PlayerComponent.FIRST_JUMP_VELOCITY
+                    : PlayerComponent.DOUBLE_JUMP_VELOCITY;
+                pc.body.setLinearVelocity(vel.x, vy);
+                pc.state = pc.jumpsLeft == pc.maxJumps
+                    ? PlayerComponent.State.JUMP
+                    : PlayerComponent.State.AIRSPIN;
                 pc.jumpsLeft--;
             }
 
-            // --- Attack Input ---
-            // If attack key is pressed and not already attacking, set attackRequested flag.
+            // Attack
             if (Gdx.input.isKeyJustPressed(Input.Keys.J) && !pc.attacking) {
                 pc.attackRequested = true;
+                pc.attackType = PlayerComponent.AttackType.LIGHT;  // Set to Light attack
+            }
+
+            // --- Heavy Attack (K) ---
+            if (Gdx.input.isKeyJustPressed(Input.Keys.K) && !pc.attacking) {
+                pc.attackRequested = true;
+                pc.attackType = PlayerComponent.AttackType.HEAVY;  // Set to Heavy attack
+            }
+
+            // --- Block (L) ---
+            if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+                pc.isBlocking = true;
+                pc.body.setLinearVelocity(0, pc.body.getLinearVelocity().y);  // Stop horizontal movement while blocking
+                pc.state = PlayerComponent.State.BLOCK;
+            } else {
+                pc.isBlocking = false;
             }
         }
     }
