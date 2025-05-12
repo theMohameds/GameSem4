@@ -1,4 +1,4 @@
-package io.group9.enemy;
+package io.group9.enemy.plugins;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;

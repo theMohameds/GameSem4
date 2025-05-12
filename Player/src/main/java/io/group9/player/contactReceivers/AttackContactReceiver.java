@@ -1,4 +1,4 @@
-package io.group9.player;
+package io.group9.player.contactReceivers;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Contact;

@@ -1,8 +1,8 @@
-package io.group9.enemy;
+package io.group9.enemy.plugins;
 
 import com.badlogic.ashley.core.Engine;
 import io.group9.CoreResources;
-import io.group9.enemy.pathfinding.PathGraph;
+import io.group9.enemy.contactReceivers.EnemyContactReceiver;
 import io.group9.enemy.systems.EnemyAIControlSystem;
 import io.group9.enemy.systems.EnemyAttackSystem;
 import io.group9.enemy.systems.EnemyAnimationRenderer;

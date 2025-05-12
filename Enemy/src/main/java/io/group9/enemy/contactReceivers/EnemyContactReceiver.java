@@ -1,4 +1,4 @@
-package io.group9.enemy;
+package io.group9.enemy.contactReceivers;
 
 import contact.ContactReceiver;
 import com.badlogic.gdx.Gdx;

@@ -1,37 +1,18 @@
-package io.group9.player;
+package io.group9.player.plugins;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import data.WorldProvider;
 import io.group9.CoreResources;
 import io.group9.player.components.PlayerComponent;
-import io.group9.player.system.*;
-import plugins.ECSPlugin;
-import services.player.IPlayerService;
 import locators.PlayerServiceLocator;
+import services.player.IPlayerService;
 
-public class PlayerPlugin implements ECSPlugin {
+public class PlayerFactory {
 
-    @Override public void registerSystems(Engine eng) {
-        eng.addSystem(new PlayerAnimationRenderer());
-        eng.addSystem(new PlayerAttackSystem());
-        eng.addSystem(new PlayerInputSystem());
-        eng.addSystem(new PlayerStateSystem());
-
-        CoreResources.getContactDispatcher().addReceiver(new PlayerContactReceiver());
-        CoreResources.getContactDispatcher().addReceiver(new AttackContactReceiver());
-    }
-
-    @Override
-    public void createEntities(Engine eng) {
-        Gdx.app.log("PlayerPlugin", "Creating Player Entity");
+    public PlayerFactory() {}
+    public static void spawn(Engine eng) {
 
         World world = WorldProvider.getWorld();
 
@@ -72,6 +53,4 @@ public class PlayerPlugin implements ECSPlugin {
         svc.setHealth(pc.health);
         svc.setMaxHealth(pc.maxHealth);
     }
-
-    @Override public int getPriority() { return 2; }
 }
