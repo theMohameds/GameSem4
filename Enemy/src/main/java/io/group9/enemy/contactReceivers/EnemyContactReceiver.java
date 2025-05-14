@@ -81,7 +81,7 @@ public class EnemyContactReceiver implements ContactReceiver {
         IPlayerService playerSvc = PlayerServiceLocator.get();
         IEnemyService enemySvc = EnemyServiceLocator.get();
         Optional<IWeapon> w = inv.getCurrentWeapon(playerSvc.getPlayerEntity());
-        int damage = w.map(ws -> "Sword".equals(ws.getName()) ? 20 : 50).orElse(50);
+        int damage = w.map(ws -> "Sword".equals(ws.getName()) ? 25 : 10).orElse(50);
 
         ec.health -= damage;
         enemySvc.setHealth(ec.health);

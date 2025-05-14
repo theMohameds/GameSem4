@@ -108,7 +108,7 @@ public class FirstScreen implements Screen {
         fpsLabel.setPosition(10,10);
         stage.addActor(fpsLabel);
 
-        TextButton pasueButton = new TextButton("Pasue", skin);
+        TextButton pasueButton = new TextButton("Pause", skin);
         pasueButton.setPosition(10, Gdx.graphics.getHeight() - 50);
         pasueButton.addListener(new ClickListener(){
             @Override

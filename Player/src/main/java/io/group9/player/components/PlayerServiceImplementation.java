@@ -14,14 +14,14 @@ public class PlayerServiceImplementation implements IPlayerService {
     private int health, maxHealth;
     private final ComponentMapper<PlayerComponent> mapper = ComponentMapper.getFor(PlayerComponent.class);
 
-    @Override public int getHealth()           { return health; }
-    @Override public void setHealth(int h)     { health = h;       }
-    @Override public int getMaxHealth()        { return maxHealth; }
-    @Override public void setMaxHealth(int mh) { maxHealth = mh;   }
-    @Override public Entity getPlayerEntity()  { return playerEntity;   }
+    @Override public int getHealth() { return health; }
+    @Override public void setHealth(int h) { health = h;}
+    @Override public int getMaxHealth() { return maxHealth; }
+    @Override public void setMaxHealth(int mh) { maxHealth = mh; }
+    @Override public Entity getPlayerEntity() { return playerEntity; }
     @Override public void setPlayerEntity(Entity e) { playerEntity = e; }
-    @Override public Body getPlayerBody()      { return playerBody;     }
-    @Override public void setPlayerBody(Body b){ playerBody = b;   }
+    @Override public Body getPlayerBody() { return playerBody; }
+    @Override public void setPlayerBody(Body b) { playerBody = b; }
     @Override
     public void resetForRound(Vector2 spawnPoint) {
         setHealth(100);
