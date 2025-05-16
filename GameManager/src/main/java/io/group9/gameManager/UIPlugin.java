@@ -25,7 +25,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import io.group9.CoreResources;
 import locators.EnemyServiceLocator;
 import locators.InventoryServiceLocator;
 import services.enemy.IEnemyService;

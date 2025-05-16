@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import io.group9.CoreResources;
+import util.CoreResources;
 import locators.EnemyServiceLocator;
 import locators.PlayerServiceLocator;
 import services.enemy.IEnemyService;

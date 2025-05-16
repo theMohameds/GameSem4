@@ -5,7 +5,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import io.group9.CoreResources;
+import util.CoreResources;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.components.EnemyComponent;
 import io.group9.enemy.pathfinding.AStar;

@@ -1,16 +1,19 @@
 package io.group9.enemy.plugins;
 
 import com.badlogic.ashley.core.Engine;
-import io.group9.CoreResources;
+import contact.IContactDispatcherService;
+import util.CoreResources;
 import io.group9.enemy.contactReceivers.EnemyContactReceiver;
 import io.group9.enemy.systems.EnemyAIControlSystem;
 import io.group9.enemy.systems.EnemyAttackSystem;
 import io.group9.enemy.systems.EnemyAnimationRenderer;
 import io.group9.enemy.systems.EnemyStateSystem;
+import locators.ContactDispatcherLocator;
 import plugins.ECSPlugin;
 
 public class EnemyPlugin implements ECSPlugin {
     private boolean spawned = false;
+    IContactDispatcherService dispatcher = ContactDispatcherLocator.get();
 
     @Override
     public void registerSystems(Engine engine) {
@@ -20,8 +23,7 @@ public class EnemyPlugin implements ECSPlugin {
         engine.addSystem(new EnemyAttackSystem());
         engine.addSystem(new EnemyAnimationRenderer());
 
-        CoreResources.getContactDispatcher()
-            .addReceiver(new EnemyContactReceiver());
+        dispatcher.addReceiver(new EnemyContactReceiver());
     }
 
     @Override

@@ -19,9 +19,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import contact.CoreContactDispatcher;
+import contact.IContactDispatcherService;
 import data.WorldProvider;
 import locators.CameraServiceLocator;
+import locators.ContactDispatcherLocator;
 import plugins.ECSPlugin;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -64,11 +65,6 @@ public class FirstScreen implements Screen {
     public void show() {
         Gdx.app.log("FirstScreen", "Initializing world, engine, and plugins...");
 
-        // Create and set contact dispatcher.
-        CoreContactDispatcher dispatcher = new CoreContactDispatcher();
-        world.setContactListener(dispatcher);
-        CoreResources.setContactDispatcher(dispatcher);
-
         engine = new Engine();
         loadPluginsFromMods();
         debugRenderer = new Box2DDebugRenderer();
@@ -86,6 +82,15 @@ public class FirstScreen implements Screen {
             plugin.createEntities(engine);
             Gdx.app.log("FirstScreen", "Initialized plugin: " + plugin.getClass().getName());
         }
+
+        IContactDispatcherService dispatcher = ContactDispatcherLocator.get();
+        if(dispatcher == null) {
+            Gdx.app.error("FirstScreen", "ContactDispatcherLocator returned null dispatcher!");
+        } else {
+            Gdx.app.log("FirstScreen", "ContactDispatcherLocator returned dispatcher: " + dispatcher.getClass().getName());
+        }
+
+        world.setContactListener(dispatcher);
 
 
         cam = CameraServiceLocator.get().getCamera();

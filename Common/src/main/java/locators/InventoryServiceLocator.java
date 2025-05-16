@@ -1,4 +1,3 @@
-
 package locators;
 
 import services.weapon.IInventoryService;

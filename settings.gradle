@@ -13,4 +13,5 @@ include 'Player'
 include 'Enemy'
 include 'GameManager'
 include 'Weapons'
+include 'Collision'
 

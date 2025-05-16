@@ -2,7 +2,7 @@ package io.group9.weapons.plugins;
 
 import com.badlogic.gdx.physics.box2d.*;
 import data.WorldProvider;
-import io.group9.CoreResources;
+import util.CoreResources;
 import io.group9.weapons.components.SwordComponent;
 import services.weapon.IWeapon;
 

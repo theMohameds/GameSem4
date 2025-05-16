@@ -11,7 +11,7 @@ import plugins.GameMapProvider;
 import services.gameCamera.ICameraService;
 import io.group9.gamemap.system.GameMapSystem;
 import plugins.ECSPlugin;
-import io.group9.CoreResources;
+import util.CoreResources;
 
 import java.util.List;
 

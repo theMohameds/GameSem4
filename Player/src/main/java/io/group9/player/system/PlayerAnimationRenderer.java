@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
-import io.group9.CoreResources;
+import util.CoreResources;
 import io.group9.player.components.PlayerComponent;
 import locators.CameraServiceLocator;
 import locators.InventoryServiceLocator;

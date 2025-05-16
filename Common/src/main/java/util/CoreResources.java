@@ -1,21 +1,17 @@
-package io.group9;
+package util;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
-import contact.CoreContactDispatcher;
 import plugins.GameMapProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CoreResources {
-    private static CoreContactDispatcher contactDispatcher;
 
     // Pixels per meter conversion.
     public static final float PPM = 16f;
-    public static void setContactDispatcher(CoreContactDispatcher dispatcher) { contactDispatcher = dispatcher; }
-    public static CoreContactDispatcher getContactDispatcher() { return contactDispatcher; }
 
     private static GameMapProvider gameMapProvider;
     public static void setGameMapProvider(GameMapProvider prov) {
@@ -26,7 +22,7 @@ public class CoreResources {
     }
 
     private static volatile boolean roundFrozen = true;
-    public static void   setRoundFrozen(boolean f) { roundFrozen = f; }
+    public static void setRoundFrozen(boolean f) { roundFrozen = f; }
     public static boolean isRoundFrozen() { return roundFrozen; }
     public static List<Vector2> getNodePositions() {
         return nodePositions;

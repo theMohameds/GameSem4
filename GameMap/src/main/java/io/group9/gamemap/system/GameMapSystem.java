@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import io.group9.CoreResources;
+import util.CoreResources;
 
 
 import java.util.*;

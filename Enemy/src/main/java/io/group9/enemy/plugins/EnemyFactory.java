@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import data.WorldProvider;
-import io.group9.CoreResources;
+import util.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import components.CollisionCategories;
 import locators.EnemyServiceLocator;

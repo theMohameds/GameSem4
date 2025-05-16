@@ -1,21 +1,17 @@
 package io.group9.player.plugins;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.physics.box2d.*;
-import data.WorldProvider;
-import io.group9.CoreResources;
+import contact.IContactDispatcherService;
 import io.group9.player.contactReceivers.AttackContactReceiver;
 import io.group9.player.contactReceivers.PlayerContactReceiver;
-import io.group9.player.components.PlayerComponent;
 import io.group9.player.system.*;
+import locators.ContactDispatcherLocator;
 import plugins.ECSPlugin;
-import services.player.IPlayerService;
-import locators.PlayerServiceLocator;
 
 public class PlayerPlugin implements ECSPlugin {
     private boolean spawned = false;
+    IContactDispatcherService dispatcher = ContactDispatcherLocator.get();
 
     @Override public void registerSystems(Engine eng) {
         eng.addSystem(new PlayerAnimationRenderer());
@@ -23,8 +19,8 @@ public class PlayerPlugin implements ECSPlugin {
         eng.addSystem(new PlayerInputSystem());
         eng.addSystem(new PlayerStateSystem());
 
-        CoreResources.getContactDispatcher().addReceiver(new PlayerContactReceiver());
-        CoreResources.getContactDispatcher().addReceiver(new AttackContactReceiver());
+        dispatcher.addReceiver(new PlayerContactReceiver());
+        dispatcher.addReceiver(new AttackContactReceiver());
     }
 
     @Override
