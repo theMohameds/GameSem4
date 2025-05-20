@@ -2,7 +2,7 @@ package io.group9.enemy.plugins;
 
 import com.badlogic.ashley.core.Engine;
 import contact.IContactDispatcherService;
-import util.CoreResources;
+import data.util.CoreResources;
 import io.group9.enemy.contactReceivers.EnemyContactReceiver;
 import io.group9.enemy.systems.EnemyAIControlSystem;
 import io.group9.enemy.systems.EnemyAttackSystem;

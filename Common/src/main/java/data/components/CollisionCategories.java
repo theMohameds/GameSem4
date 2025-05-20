@@ -1,4 +1,4 @@
-package components;
+package data.components;
 
 public class CollisionCategories {
     public static final short PLAYER = 0x0001;  // 0001

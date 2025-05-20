@@ -1,4 +1,4 @@
-package plugins;
+package data;
 
 import com.badlogic.gdx.math.Rectangle;
 import java.util.List;

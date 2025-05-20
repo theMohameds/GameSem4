@@ -7,11 +7,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.World;
 import data.WorldProvider;
 import locators.CameraServiceLocator;
-import plugins.GameMapProvider;
+import data.GameMapProvider;
 import services.gameCamera.ICameraService;
 import io.group9.gamemap.system.GameMapSystem;
 import plugins.ECSPlugin;
-import util.CoreResources;
+import data.util.CoreResources;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
-package util;
+package data.util;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
-import plugins.GameMapProvider;
+import data.GameMapProvider;
 
 import java.util.ArrayList;
 import java.util.List;

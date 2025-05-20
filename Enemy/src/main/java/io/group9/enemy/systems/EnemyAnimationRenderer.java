@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
-import util.CoreResources;
+import data.util.CoreResources;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.components.EnemyComponent;
 import locators.CameraServiceLocator;

@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.physics.box2d.*;
 import data.WorldProvider;
-import util.CoreResources;
+import data.util.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
-import components.CollisionCategories;
+import data.components.CollisionCategories;
 
 public class EnemyAttackSystem extends EntitySystem {
     private ImmutableArray<Entity> enemies;

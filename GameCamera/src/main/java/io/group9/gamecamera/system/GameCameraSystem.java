@@ -4,10 +4,10 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import util.CoreResources;
+import data.util.CoreResources;
 import locators.CameraServiceLocator;
 import locators.PlayerServiceLocator;
-import plugins.GameMapProvider;
+import data.GameMapProvider;
 import services.gameCamera.ICameraService;
 import services.player.IPlayerService;
 
