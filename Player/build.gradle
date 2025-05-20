@@ -12,13 +12,26 @@ dependencies {
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
 
-  if(enableGraalNative == 'true') {
+  if (enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+
+  // ↓ these bring in the platform‐specific JNI libs at test time:
+      testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+      testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+
+  // JUnit5 & Mockito
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+  testImplementation 'org.mockito:mockito-core:4.11.0'
+  testImplementation 'org.mockito:mockito-junit-jupiter:4.11.0'
+  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
 }
 
-// Ensure JARs are built into mods/ directory
 jar {
-  archiveFileName.set("${project.name}.jar")  // Ensures correct naming
+  archiveFileName.set("${project.name}.jar")
   destinationDirectory.set(file("$rootDir/mods"))
+}
+
+test {
+  useJUnitPlatform()
 }
