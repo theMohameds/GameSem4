@@ -69,7 +69,7 @@ public class FirstScreen implements Screen {
         loadPluginsFromMods();
         debugRenderer = new Box2DDebugRenderer();
 
-        // Discover plugins via ServiceLoader.
+        // load plugins via ServiceLoader.
         ServiceLoader<ECSPlugin> loader = ServiceLoader.load(ECSPlugin.class, Thread.currentThread().getContextClassLoader());
         List<ECSPlugin> plugins = new ArrayList<>();
         for (ECSPlugin plugin : loader) {
@@ -98,7 +98,7 @@ public class FirstScreen implements Screen {
             Gdx.app.error("FirstScreen", "CameraService returned null camera!");
         }
 
-        //pause knappen
+        //pause button
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         isPaused = false;
@@ -155,7 +155,7 @@ public class FirstScreen implements Screen {
             }
         });
 
-        //Exit knp
+        //Exit button
         exitButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){

@@ -8,12 +8,6 @@ public class AStar {
         double estimate(PathNode node, PathNode goal);
     }
 
-    public Heuristic euclideanHeuristic = (node, goal) -> {
-        double dx = node.x - goal.x;
-        double dy = node.y - goal.y;
-        return Math.sqrt(dx*dx + dy*dy);
-    };
-
     public List<PathNode> aStarSearch(PathNode start, PathNode goal, Heuristic heuristic) {
         PriorityQueue<PathNode> openSet = new PriorityQueue<>(Comparator.comparingDouble(PathNode::fCost));
 

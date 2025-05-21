@@ -3,7 +3,6 @@ package io.group9.enemy.systems;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.physics.box2d.*;
-import data.WorldProvider;
 import data.util.CoreResources;
 import io.group9.enemy.components.EnemyComponent;
 import data.components.CollisionCategories;
@@ -18,7 +17,6 @@ public class EnemyAttackSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        World world = WorldProvider.getWorld();
 
 
         for (Entity e : enemies) {

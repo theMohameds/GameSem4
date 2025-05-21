@@ -132,7 +132,7 @@ public class StartScreen implements Screen {
                SettingsManager.setResolutionIndex(index);
            }
         });
-// --- RGB Sliders ---
+
         contentTable.add(new Label("Player Color:", skin)).left().pad(5).colspan(2).row();
 
         CheckBox redCheckBox = new CheckBox("Red", skin);
@@ -214,7 +214,7 @@ public class StartScreen implements Screen {
                 isOptionsVisible = false;
             }
         });
-// --- Close Button ---
+
         TextButton closeButton = new TextButton("Close", skin);
         closeButton.addListener(new ClickListener() {
             @Override

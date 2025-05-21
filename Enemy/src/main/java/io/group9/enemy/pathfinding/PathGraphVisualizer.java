@@ -16,17 +16,12 @@ public class PathGraphVisualizer {
     // === Color Definitions ===
     // For path lines
     private static final Color RUN_COLOR = new Color(70 / 255f, 130 / 255f, 180 / 255f, 1f);       // Steel Blue
-    private static final Color JUMP_COLOR = new Color(255 / 255f, 191 / 255f, 0 / 255f, 1f);        // Amber Yellow
-    private static final Color DOUBLE_JUMP_COLOR = new Color(220 / 255f, 20 / 255f, 60 / 255f, 1f); // Crimson Red
 
     // For node circle fills
     private static final Color NODE_PATH_COLOR = new Color(72 / 255f, 61 / 255f, 139 / 255f, 1f);   // Dark Slate Blue
 
     // For node types
     private static final Color NORMAL_NODE_COLOR = new Color(65 / 255f, 105 / 255f, 225 / 255f, 1f);      // Royal Blue
-    private static final Color JUMP_NODE_COLOR = new Color(255 / 255f, 165 / 255f, 0 / 255f, 1f);         // Orange
-    private static final Color DOUBLE_JUMP_NODE_COLOR = new Color(186 / 255f, 85 / 255f, 211 / 255f, 1f); // Medium Orchid
-    private static final Color ALL_JUMP_NODE_COLOR = new Color(0 / 255f, 255 / 255f, 127 / 255f, 1f);     // Spring Green
 
     public PathGraphVisualizer(PathGraph pathGraph, OrthographicCamera camera, float unitScale) {
         this.pathGraph = pathGraph;
@@ -91,7 +86,6 @@ public class PathGraphVisualizer {
             shapeRenderer.rectLine(from, to, thickness);
         }
 
-        // Draw path nodes
         float radius = 6 * unitScale;
         for (PathNode node : path) {
             float x = node.x * unitScale;

@@ -23,7 +23,7 @@ public class GameMapSystem extends EntitySystem {
     private final List<Rectangle> mergedRectangles = new ArrayList<>();
     private World world;
     private OrthographicCamera camera;
-    private final List<Body> collisionBodies = new ArrayList<>(); // Don't think we need it
+    private final List<Body> collisionBodies = new ArrayList<>();
 
     // Conversion factor from pixels to meters.
     private static final float UNIT_SCALE = 1 / CoreResources.PPM;

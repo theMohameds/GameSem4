@@ -55,22 +55,21 @@ public class PlayerInputSystem extends EntitySystem {
                 pc.jumpsLeft--;
             }
 
-            // Attack
             if (Gdx.input.isKeyJustPressed(Input.Keys.J) && !pc.attacking) {
                 pc.attackRequested = true;
-                pc.attackType = PlayerComponent.AttackType.LIGHT;  // Set to Light attack
+                pc.attackType = PlayerComponent.AttackType.LIGHT;
             }
 
-            // --- Heavy Attack (K) ---
+
             if (Gdx.input.isKeyJustPressed(Input.Keys.K) && !pc.attacking) {
                 pc.attackRequested = true;
-                pc.attackType = PlayerComponent.AttackType.HEAVY;  // Set to Heavy attack
+                pc.attackType = PlayerComponent.AttackType.HEAVY;
             }
 
-            // --- Block (L) ---
+
             if (Gdx.input.isKeyPressed(Input.Keys.L)) {
                 pc.isBlocking = true;
-                pc.body.setLinearVelocity(0, pc.body.getLinearVelocity().y);  // Stop horizontal movement while blocking
+                pc.body.setLinearVelocity(0, pc.body.getLinearVelocity().y);
                 pc.state = PlayerComponent.State.BLOCK;
             } else {
                 pc.isBlocking = false;

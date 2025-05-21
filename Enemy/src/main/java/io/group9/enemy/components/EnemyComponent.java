@@ -1,11 +1,9 @@
 package io.group9.enemy.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import io.group9.enemy.ai.EnemyLocation;
 import io.group9.enemy.ai.EnemyState;
 import io.group9.enemy.pathfinding.PathNode;
 
@@ -20,14 +18,10 @@ public class EnemyComponent implements Component {
     public Fixture attackSensor;
 
     // AI wrappers
-    public final EnemyLocation location = new EnemyLocation(this);
     public EnemyState state = EnemyState.IDLE;
 
     // Steering caps
     public float maxLinearSpeed = 14f;
-    public float maxLinearAcceleration = 80f;
-    public float maxAngularSpeed = 2f;
-    public float maxAngularAcceleration = 5f;
     public float boundingRadius = 0.4f;
 
     // Combat & Attack
