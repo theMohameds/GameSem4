@@ -21,7 +21,7 @@ public class CoreResources {
         return gameMapProvider;
     }
 
-    private static volatile boolean roundFrozen = true;
+    private static volatile boolean roundFrozen = false;
     public static void setRoundFrozen(boolean f) { roundFrozen = f; }
     public static boolean isRoundFrozen() { return roundFrozen; }
     public static List<Vector2> getNodePositions() {
